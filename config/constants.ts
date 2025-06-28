@@ -5,7 +5,7 @@ export const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 // Pica API Configuration
 export const PICA_CONFIG = {
   SECRET_KEY: 'your-pica-secret-key',
-  GEMINI_CONNECTION_KEY: 'your-pica-gemini-connection-key',
+  GEMINI_CONNECTION_KEY: 'test::github::default::d8ba768627184e909eec3cbeafa97380',
   ACTION_ID: 'conn_mod_def::GCmd5BQE388::PISTzTbvRSqXx0N0rMa-Lw',
   BASE_URL: 'https://api.picaos.com/v1/passthrough/models/gemini-1.5-flash:generateContent'
 };
