@@ -1,0 +1,647 @@
+📛 App Name: MediSim
+A React Native mobile app (built using Expo) that helps users visualize and understand their medical reports by generating personalized AI visuals, doctor explanations, and interactive education content.
+
+🧠 App Purpose
+MediSim is a mobile app designed to help users make sense of their medical reports using AI-powered personalized 3D images, a talking AI doctor, and interactive educational tools. It acts as a "mirror of your health", helping users see and understand the internal condition of their body.
+
+The app is not for diagnosis. It is meant for education, explanation, and visualization.
+
+The app is submitted for the Bolt.New Hackathon and will serve as the first launch of a SaaS product.
+
+💰 Monetization
+Subscription-based SaaS model
+
+$15/month paywall using RevenueCat
+
+Paywall will be triggered after free tier usage limits (e.g., 1 AI image, 1 AI doctor video)
+
+🧱 Tech Stack & Services Used
+Purpose	Service / Tool
+App Framework	React Native (with Expo)
+AI Image Generation	OpenAI DALL·E 3 or Runway ML
+AI Voice Generation	ElevenLabs
+AI Video Generation	Tavus (Doctor video)
+AI Chat for Education (QnA)	DeepSeek Chat (free)
+Backend (Auth + Storage + DB)	Supabase
+Payments / Subscription Paywall	RevenueCat
+UI Components	21st.dev
+Localization / Language Support	Lingo
+Crash/Error Tracking	Sentry
+Deployment (Landing Page)	Netlify + Entri
+
+🎯 Core Features (Detailed Specs)
+📄 1. Medical Report Upload & AI-Powered Visualization
+Purpose: User uploads a PDF or image of a medical report. The app extracts useful data and generates a 3D-style personalized visual of the affected body part.
+
+Steps:
+
+User taps "Upload Report" button.
+
+Selects a file (PDF/Image).
+
+Supabase stores the file securely.
+
+Basic text extraction is done (assume structured format for now).
+
+Based on keywords (e.g., “herniated disc L4-L5”), we use OpenAI DALL·E or Runway to:
+
+Generate a 2D/3D anatomical-style image with the issue marked
+
+Image is customized to match the condition (e.g., "lower spine disc bulge")
+
+Image is shown in a section called “Your Mirror”
+
+User can view image in zoom, annotate, or download
+
+Goal: Replace unreadable text reports with AI-generated visuals that simplify medical conditions.
+
+👨‍⚕️ 2. AI Talking Doctor (Video + Audio Explanation)
+Purpose: After uploading the report, the user gets a customized AI-generated video of a doctor explaining their report in simple words.
+
+Steps:
+
+Text extracted from report is turned into a script summary (we define basic logic: key issue + impact + recommendation)
+
+That script is used in:
+
+ElevenLabs to generate the doctor’s voice (human tone, friendly)
+
+Tavus to generate a talking video avatar of a doctor saying that script
+
+Output is a short video (30–60 seconds)
+
+User watches the video in a clean player with replay/download
+
+Goal: Make the report feel like a conversation with a doctor, not a scary document.
+
+🧠 3. Report Visualizer (Simple UI for Data)
+Purpose: Visually break down report data (text only) into readable UI elements.
+
+Steps:
+
+Highlight key terms (e.g., “bulge,” “mild,” “compression,” “disc height”)
+
+Render as:
+
+Color-coded tags (severity)
+
+Summary blocks
+
+Side-by-side comparisons (if multiple segments)
+
+UI layout:
+
+Accordion or tab for each body region (e.g., “Lumbar Spine,” “Cervical Spine”)
+
+Icons or visual clues for type of issue (nerve, disc, bone)
+
+Goal: Give users a clean UI that decodes their medical terms visually.
+
+📚 4. Educational Explorer (3D Models + Videos + QnA)
+Purpose: Generic, condition-based educational content for users to learn about diseases, anatomy, treatments, and common conditions.
+
+Sections:
+
+3D Body Models:
+
+Embedded WebGL viewers (like hiodigital.com)
+
+Users rotate and zoom in/out
+
+Labeled diagrams
+
+Disease Encyclopedia:
+
+Select disease → show:
+
+3D visual (generic)
+
+Short description
+
+Related YouTube video
+
+Key symptoms/treatments
+
+QnA / ChatBot:
+
+Uses DeepSeek Chat
+
+Users ask medical questions and get AI answers (educational only)
+
+Goal: Help users understand their condition and the human body interactively.
+
+🌐 5. Multi-Language Support
+Purpose: Serve global audience with native language support
+
+Steps:
+
+Use Lingo to localize entire app (dynamic strings)
+
+Add language selector in settings or onboarding
+
+Default to device locale if supported
+
+💵 6. Paywall (RevenueCat Integration)
+Purpose: Monetize AI features responsibly
+
+Steps:
+
+Integrate RevenueCat with user auth
+
+Set free tier (1 AI image, 1 doctor video, 1 QnA/day)
+
+Trigger paywall modal when limit hit
+
+Show pricing plan ($15/month) and subscribe
+
+If paid, unlock unlimited features
+
+🛠️ 7. Infra & Dev Tools
+Use Supabase for:
+
+Auth (email/password or OTP)
+
+File uploads (reports, videos)
+
+User data storage
+
+Use Sentry for:
+
+Logging crashes and issues
+
+Use 21st.dev for:
+
+Modern pre-built components
+
+Use Expo for:
+
+Easy deployment & testing
+
+Use Netlify + Entri for:
+
+Hosting and domain of landing page (later)
+
+📆 Development Plan (Split Over 2 Days)
+📅 June 27 – Day 1
+ Set up base app in Bolt (structure, navigation, Supabase)
+
+ Module 1: Upload report + preview
+
+ Module 2: Text extraction + image generation (OpenAI/Runway)
+
+ Module 3: Render visual + mirror UI
+
+ Module 4: RevenueCat paywall setup
+
+📅 June 28 – Day 2
+ Module 5: AI Doctor Video (Tavus + ElevenLabs)
+
+ Module 6: Report Visualizer UI (tags, summaries)
+
+ Module 7: Education Explorer (3D viewer, videos)
+
+ Module 8: DeepSeek QnA chatbot
+
+ Module 9: Multi-language setup with Lingo
+
+ Module 10: Sentry error tracking
+
+ Final testing + export for submission
+
+
+Context Prompt for UI Generation (Medisim)
+📱 App Name: Medisim
+🪞 Tagline: "Medisim – A Mirror to Your Health."
+🧠 App Concept Overview
+Medisim is a React Native mobile application designed to visualize and interpret medical reports through AI-generated personalized illustrations, AI-powered doctor explanations, and educational 3D content.
+
+The app acts as a "mirror of your body"—turning complex health data into interactive, visual, and understandable experiences for patients.
+
+🧩 Core Features
+Personalized Medical Report Illustration
+
+Upload your report (image or PDF)
+
+AI generates a visual 3D-style image or model
+
+View an interactive rendering of the affected body part
+
+AI Doctor (Talking Assistant)
+
+Virtual doctor explains your condition using text + voice
+
+Uses Eleven Labs + Tavus for video and speech
+
+Option to "Ask more questions"
+
+Report Visualization
+
+Modal-based interactive graphs, data analysis
+
+Explains medical metrics from the uploaded report
+
+Educational Section
+
+Learn about diseases, treatments, and anatomy
+
+Includes static illustrations, YouTube videos, and short texts
+
+3D generic models for common conditions (full-screen render)
+
+Paywall Integration
+
+$15/month subscription
+
+Powered by RevenueCat
+
+📲 UI Flow & Screens (Detailed)
+1. Welcome Screen
+Simple screen with logo and tagline:
+"Medisim – A Mirror to Your Health"
+
+A “Get Started” button
+
+2. Feature Highlights (5-Page Intro Scroll)
+Just like Telegram or Duolingo, this screen introduces app features across 5 horizontally scrollable pages:
+
+Page 1: Upload your report and see it visually
+
+Page 2: Talk to our AI doctor
+
+Page 3: Learn about diseases through 3D models
+
+Page 4: Your health metrics visualized clearly
+
+Page 5: Secure, Private, AI-powered medical assistant
+
+Each page includes:
+
+Icon/image
+
+Title
+
+1–2 line description
+
+3. Login / Signup Screen
+Options: Email, Google login
+
+Simple clean layout
+
+Option to skip login and explore (if freemium logic applied)
+
+4. Paywall Screen
+Title: “Unlock Your Health Mirror”
+
+Monthly subscription: $15/month
+
+Benefits:
+
+Personalized illustrations
+
+AI Doctor explanations
+
+Advanced visualizations
+
+Full educational content
+
+Subscribe or Restore purchase buttons (RevenueCat-ready layout)
+
+5. Home Page
+Split into two major sections:
+
+Top 75%: Report Upload Section
+
+Upload button (PDF/image)
+
+Quick actions:
+
+“Take a photo of your report”
+
+“Upload from files”
+
+Description text: “We’ll convert your medical report into a visual experience”
+
+Bottom 25%: Education Section
+
+3 cards:
+
+“Explore Treatments”
+
+“Understand Diseases”
+
+“3D Body Models”
+
+6. Report Results Page (Post Upload)
+Top: AI-Generated Image of Affected Area
+
+Below: AI Doctor
+
+Button: “Explain this to me”
+
+Plays video + voice using Tavus & Eleven Labs
+
+Option for Q&A follow-up
+
+Below that:
+
+Visualization Section
+
+"See Report Metrics"
+
+Button opens modal with:
+
+Graphs (e.g., spine curve, BP, HR)
+
+Lab values & normal ranges
+
+Interpretation summaries
+
+7. Education Section (Expanded View)
+Accessed from bottom cards on Home Page
+
+Each card leads to a screen with:
+
+Treatments
+
+List of conditions → tap → videos, explanation
+
+Diseases
+
+List of diseases → tap → symptoms, prevention, illustrations
+
+3D Models
+
+List of body parts → tap → full screen 3D model render
+
+Note:
+3D model screens are full-screen with no UI wrapper—models will be rendered directly using 3D libraries and cover the entire viewport.
+
+🎨 Design Language and Style
+Clean, minimal, modern healthcare UI
+
+Rounded cards, soft colors, large clear fonts
+
+Status indicators (e.g., “Analyzing your report…”) using animations or loaders
+
+Iconography that’s medical and friendly, not sterile
+
+Use of modal views for visualizations to avoid deep navigation
+
+📦 Services Being Used (For UI Clarity)
+Runway/OpenAI – Image Generation (for AI-Generated Reports)
+
+Tavus + Eleven Labs – AI Doctor video & speech
+
+RevenueCat – Subscription Paywall
+
+Supabase – Auth + Backend
+
+Google Stitch (this tool) – UI generation
+
+21st.dev – UI component inspiration
+
+Sentry – Error monitoring
+
+Lingui – Localization
+
+Expo – App build and deployment
+
+DeepSeek Chat – For Q&A chatbot (if needed)
+
+✅ Summary
+This app has 7 primary UI screens:
+
+Welcome
+
+Feature Scroll (5-page intro)
+
+Login/Signup
+
+Paywall
+
+Home (Upload + Education)
+
+Post-Upload Report Page (AI + Visualizations)
+
+Education Subsections
+
+Other views:
+
+Modal for graphs/visualizations
+
+Full-screen 3D model view
+
+**Detailed Feature Breakdown and Implementation Instructions for Medisim (for Bolt.new)**
+
+---
+
+**Project Name:** Medisim
+**Platform:** React Native (using Bolt.new)
+**Monetization:** \$15/month via RevenueCat
+**AI-Assisted Development:** All instructions are written to avoid assumptions, ensure precision, and ease of generation via Bolt.new
+
+---
+
+### 🔹 1. Welcome Screen
+
+**Purpose:** First screen users see, sets brand tone.
+
+**Components:**
+
+* Full screen view with logo centered vertically
+* App tagline: "Medisim – A Mirror to Your Health"
+* "Get Started" button at bottom
+
+**Functionality:**
+
+* On tapping "Get Started," navigate to Feature Intro screen
+
+**Styling:**
+
+* Background: Soft white or light blue
+* Font: Sans-serif, bold title
+
+---
+
+### 🔹 2. Feature Scroll (Intro)
+
+**Purpose:** Explain the app’s capabilities across 5 horizontally scrollable pages.
+
+**Layout:**
+
+* Each page includes:
+
+  * Header (Feature title)
+  * Icon/Illustration (top 50%)
+  * Description text (1-2 lines)
+
+**Pages:**
+
+1. Upload Report to Visualize
+2. Talk to AI Doctor
+3. Explore Diseases with 3D
+4. Understand Metrics via Graphs
+5. Secure and Private
+
+**Navigation:**
+
+* Swipe enabled
+* Dot indicators for page position
+* Final page has a "Continue" button to go to Login/Signup
+
+**Styling:**
+
+* Clean, flat icons
+* Soft color transitions
+
+---
+
+### 🔹 3. Login/Signup Screen
+
+**Functionality:**
+
+* Email & Password login
+* Signup option
+* Google Login (use Expo AuthSession + Supabase for handling tokens)
+* Optional: Skip for now (guest mode with limited access)
+
+**Navigation:**
+
+* On successful login/signup: Check subscription status (via RevenueCat), then route to Home or Paywall accordingly
+
+---
+
+### 🔹 4. Paywall Screen
+
+**Library:** RevenueCat React Native SDK
+
+**Content:**
+
+* Title: "Unlock Your Health Mirror"
+* Features List:
+
+  * Personalized illustrations
+  * AI explanations
+  * Full educational content
+* Price: \$15/month
+* Buttons:
+
+  * "Subscribe Now"
+  * "Restore Purchase"
+
+**Flow:**
+
+* On subscribe: Trigger RevenueCat purchase flow
+* On success: Navigate to Home Page
+
+---
+
+### 🔹 5. Home Page
+
+**Structure:**
+
+* **Top 75%: Upload Section**
+
+  * Button: "Upload Report"
+
+    * Option 1: Take a photo (use Expo Camera)
+    * Option 2: Select from files (Expo DocumentPicker)
+  * On upload: Store report on Supabase Storage
+  * Trigger backend/API call to Runway/OpenAI (handled in next screen)
+
+* **Bottom 25%: Education Cards**
+
+  * Horizontal scrollable 3 cards:
+
+    1. Treatments
+    2. Diseases
+    3. 3D Body
+
+**Styling:**
+
+* Rounded cards
+* Clear CTA buttons
+
+---
+
+### 🔹 6. Post-Upload Report Page
+
+**Purpose:** View AI-generated content from report
+
+**Sections:**
+
+1. **AI-Generated Image**
+
+   * Render image from Runway/OpenAI via API
+   * Show loading state until response received
+
+2. **AI Doctor (Video + Voice)**
+
+   * Button: "Explain This To Me"
+   * Trigger Tavus API to generate video
+   * Use Eleven Labs API for voice synthesis (text from AI summary)
+   * Show response in a video player
+   * Optional: Follow-up questions (text-based using DeepSeekChat or local LLM)
+
+3. **Visualization Modal**
+
+   * Button: "See My Report Graphs"
+   * Opens modal:
+
+     * Charts (BP, HR, etc.) using react-native-svg-charts or VictoryNative
+     * Table of lab values (Normal vs Yours)
+     * Interpretations (static from AI or template-based)
+
+---
+
+### 🔹 7. Educational Section
+
+**Access:** From Home page bottom cards or Navigation tab
+
+**Structure:**
+
+* **3 Main Sections (Cards):**
+
+  1. Treatments
+
+     * List of procedures by category
+     * Static text + YouTube embedded videos
+  2. Diseases
+
+     * Browse by category (e.g. Cardiology, Neuro)
+     * Each item: text + image + video
+  3. 3D Models
+
+     * List of organs/systems
+     * Tap = full screen model viewer (custom 3D renderer)
+     * Use simple WebGL-based or Lottie-compatible render view
+
+---
+
+### 🔹 Additional Notes
+
+* **Backend:** Supabase
+* **Storage:** Supabase Storage
+* **Analytics & Errors:** Sentry
+* **Localization:** Lingui
+* **App Build:** Expo SDK
+* **Component Inspiration:** 21st.dev
+* **Search / Chat (Optional):** DeepSeek Chat or custom chatbot UI
+
+---
+
+### ✅ Final Screen Flow Order
+
+1. Welcome
+2. Feature Scroll (Intro)
+3. Login/Signup
+4. Paywall (if not subscribed)
+5. Home
+6. Post-Upload (Results + AI + Visuals)
+7. Education (3 Tabs)
+
+---
+
+This file contains exact implementation-level instructions for each app feature. Now it can be directly used to break down into Bolt.new segments one at a time.
+
+Would you like to export this as a `.txt` file?

@@ -1,0 +1,209 @@
+import React, { useEffect } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+  Image,
+} from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
+import { router } from 'expo-router';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withTiming,
+  interpolate,
+} from 'react-native-reanimated';
+
+const { width, height } = Dimensions.get('window');
+
+export default function WelcomeScreen() {
+  const rotateValue = useSharedValue(0);
+  const scaleValue = useSharedValue(1);
+
+  useEffect(() => {
+    rotateValue.value = withRepeat(
+      withTiming(360, { duration: 20000 }),
+      -1,
+      false
+    );
+    scaleValue.value = withRepeat(
+      withTiming(1.1, { duration: 3000 }),
+      -1,
+      true
+    );
+  }, []);
+
+  const animatedOrb = useAnimatedStyle(() => ({
+    transform: [
+      { rotate: `${rotateValue.value}deg` },
+      { scale: scaleValue.value },
+    ],
+  }));
+
+  const handleGetStarted = () => {
+    router.push('/features');
+  };
+
+  return (
+    <View style={styles.container}>
+      <LinearGradient
+        colors={['#0A0A0A', '#1A1A2E', '#16213E']}
+        style={styles.gradient}
+      />
+      
+      {/* Animated Background Orbs */}
+      <View style={styles.orbContainer}>
+        <Animated.View style={[styles.orb, animatedOrb]}>
+          <LinearGradient
+            colors={['#4FACFE', '#00F2FE', '#43E97B']}
+            style={styles.orbGradient}
+          />
+        </Animated.View>
+      </View>
+
+      {/* Main Content */}
+      <View style={styles.content}>
+        <View style={styles.logoContainer}>
+          <View style={styles.glassOrb}>
+            <BlurView intensity={20} tint="light" style={styles.blurOrb}>
+              <View style={styles.innerOrb}>
+                <LinearGradient
+                  colors={['#4FACFE', '#00F2FE']}
+                  style={styles.innerGradient}
+                />
+              </View>
+            </BlurView>
+          </View>
+        </View>
+
+        <View style={styles.textContainer}>
+          <Text style={styles.title}>Medisim</Text>
+          <Text style={styles.subtitle}>A Mirror to Your Health</Text>
+        </View>
+
+        <TouchableOpacity style={styles.getStartedButton} onPress={handleGetStarted}>
+          <BlurView intensity={30} tint="light" style={styles.buttonBlur}>
+            <LinearGradient
+              colors={['#4FACFE', '#00F2FE']}
+              style={styles.buttonGradient}
+            >
+              <Text style={styles.buttonText}>Get Started</Text>
+            </LinearGradient>
+          </BlurView>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#000',
+  },
+  gradient: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+  },
+  orbContainer: {
+    position: 'absolute',
+    top: -100,
+    left: -100,
+    right: -100,
+    bottom: -100,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  orb: {
+    width: width * 1.5,
+    height: width * 1.5,
+    borderRadius: width * 0.75,
+    opacity: 0.1,
+  },
+  orbGradient: {
+    flex: 1,
+    borderRadius: width * 0.75,
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 40,
+  },
+  logoContainer: {
+    marginBottom: 80,
+  },
+  glassOrb: {
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  blurOrb: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  innerOrb: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    overflow: 'hidden',
+  },
+  innerGradient: {
+    flex: 1,
+    opacity: 0.8,
+  },
+  textContainer: {
+    alignItems: 'center',
+    marginBottom: 120,
+  },
+  title: {
+    fontSize: 48,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 16,
+    textAlign: 'center',
+    letterSpacing: 1,
+  },
+  subtitle: {
+    fontSize: 18,
+    color: 'rgba(255, 255, 255, 0.8)',
+    textAlign: 'center',
+    fontWeight: '400',
+    letterSpacing: 0.5,
+  },
+  getStartedButton: {
+    borderRadius: 30,
+    overflow: 'hidden',
+    elevation: 10,
+    shadowColor: '#4FACFE',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+  },
+  buttonBlur: {
+    paddingHorizontal: 50,
+    paddingVertical: 18,
+  },
+  buttonGradient: {
+    paddingHorizontal: 50,
+    paddingVertical: 18,
+    borderRadius: 30,
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+});
