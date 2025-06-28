@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -15,6 +15,7 @@ import { router } from 'expo-router';
 import { ArrowLeft, Mail, Lock, Eye, EyeOff } from 'lucide-react-native';
 import { signInUser, signUpUser } from '../lib/auth';
 import { supabase } from '../lib/supabase';
+import { useAuth, UserProfile } from '../lib/auth-context';
 
 // Define error interface
 interface AuthError {
@@ -30,6 +31,19 @@ export default function AuthScreen() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [fullName, setFullName] = useState('');
+  const { isAuthenticated, profile, refreshUser } = useAuth();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      const userProfile = profile as UserProfile | null;
+      if (userProfile && userProfile.plan === 'pro' && userProfile.subscription_status === 'active') {
+        router.replace('/home');
+      } else {
+        router.replace('/paywall');
+      }
+    }
+  }, [isAuthenticated, profile]);
 
   const handleBack = () => {
     router.back();
@@ -54,18 +68,10 @@ export default function AuthScreen() {
         // Login
         const { user, session } = await signInUser(email, password);
         if (user) {
-          // Check if user should go to paywall or home
-          const { data: profile, error } = await supabase
-            .from('users')
-            .select('plan, subscription_status')
-            .eq('id', user.id)
-            .single();
+          // Refresh auth context
+          await refreshUser();
 
-          if (profile && profile.plan === 'pro' && profile.subscription_status === 'active') {
-            router.push('/home');
-          } else {
-            router.push('/paywall');
-          }
+          // Navigation will be handled by the useEffect above
         }
       } else {
         // Sign up

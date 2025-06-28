@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Dimensions,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
@@ -17,12 +18,14 @@ import Animated, {
   withTiming,
   interpolate,
 } from 'react-native-reanimated';
+import { useAuth, UserProfile } from '../lib/auth-context';
 
 const { width, height } = Dimensions.get('window');
 
 export default function WelcomeScreen() {
   const rotateValue = useSharedValue(0);
   const scaleValue = useSharedValue(1);
+  const { isAuthenticated, isLoading, profile } = useAuth();
 
   useEffect(() => {
     rotateValue.value = withRepeat(
@@ -37,6 +40,19 @@ export default function WelcomeScreen() {
     );
   }, []);
 
+  // Check if user is already authenticated and redirect accordingly
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      // If user is authenticated, check subscription status
+      const userProfile = profile as UserProfile | null;
+      if (userProfile && userProfile.plan === 'pro' && userProfile.subscription_status === 'active') {
+        router.replace('/home');
+      } else {
+        router.replace('/paywall');
+      }
+    }
+  }, [isLoading, isAuthenticated, profile]);
+
   const animatedOrb = useAnimatedStyle(() => ({
     transform: [
       { rotate: `${rotateValue.value}deg` },
@@ -48,13 +64,26 @@ export default function WelcomeScreen() {
     router.push('/features');
   };
 
+  // Show loading indicator while checking auth state
+  if (isLoading) {
+    return (
+      <View style={[styles.container, styles.loadingContainer]}>
+        <LinearGradient
+          colors={['#0A0A0A', '#1A1A2E', '#16213E']}
+          style={styles.gradient}
+        />
+        <ActivityIndicator size="large" color="#4FACFE" />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <LinearGradient
         colors={['#0A0A0A', '#1A1A2E', '#16213E']}
         style={styles.gradient}
       />
-      
+
       {/* Animated Background Orbs */}
       <View style={styles.orbContainer}>
         <Animated.View style={[styles.orb, animatedOrb]}>
@@ -104,6 +133,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#000',
+  },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   gradient: {
     position: 'absolute',

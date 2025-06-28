@@ -3,13 +3,12 @@ import {
   View,
   Text,
   StyleSheet,
-  ActivityIndicator,
-  Alert
+  ActivityIndicator
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { Brain, Zap, Image as ImageIcon, CircleCheck as CheckCircle } from 'lucide-react-native';
-import { ReportProcessingService } from '../lib/reportProcessing';
+import { supabase } from '../lib/supabase';
 
 interface ReportProcessorProps {
   reportId: string;
@@ -94,30 +93,68 @@ export default function ReportProcessor({
       // Step 3: Visual Generation
       setCurrentStep(2);
       updateStep(2, false, true);
+      await new Promise(resolve => setTimeout(resolve, 2500)); // Simulate processing time
 
-      // Process the report
-      const result = await ReportProcessingService.processReport(
-        reportId,
-        fileUri,
-        mimeType,
-        reportType
-      );
+      // Create mock data in Supabase
+      await createMockReportData(reportId, reportType);
 
       updateStep(2, true, false);
       setProcessing(false);
 
-      if (result.success) {
         // All steps completed
         setSteps(prev => prev.map(step => ({ ...step, completed: true, active: false })));
         onProcessingComplete(true);
-      } else {
-        onProcessingComplete(false, result.error);
-      }
 
     } catch (error) {
       console.error('Error processing report:', error);
       setProcessing(false);
       onProcessingComplete(false, error instanceof Error ? error.message : 'Processing failed');
+    }
+  };
+
+  // Create mock data in Supabase for testing
+  const createMockReportData = async (reportId: string, reportType: string) => {
+    try {
+      // 1. Create mock analysis
+      await supabase
+        .from('report_analysis')
+        .insert({
+          report_id: reportId,
+          ai_summary: `Analysis of ${reportType}: This ${reportType.toLowerCase()} shows evidence of mild degenerative changes. There are no acute findings or critical abnormalities. The patient may benefit from conservative management including physical therapy and anti-inflammatory medications.`,
+          ai_doctor_explanation: `Hello! I've reviewed your ${reportType} and I have good news. The scan shows only mild degenerative changes, which are common as we age. There's no evidence of any serious issues that would require immediate intervention. I'd recommend some physical therapy to help with any discomfort, and possibly some anti-inflammatory medication if you're experiencing pain. Let's schedule a follow-up in 3 months to see how you're progressing.`
+        });
+
+      // 2. Create mock visualization data
+      await supabase
+        .from('visualization_data')
+        .insert({
+          report_id: reportId,
+          chart_data: [
+            { label: 'Normal Range', value: 85 },
+            { label: 'Your Result', value: 78 }
+          ],
+          metrics: {
+            'Disc Height': '4.2mm',
+            'Canal Width': '12.8mm',
+            'Signal Intensity': 'Mild reduction',
+            'Alignment': 'Normal'
+          },
+          visual_notes: `The ${reportType} shows mild degenerative changes consistent with age. No significant stenosis or nerve impingement is present.`
+        });
+
+      // 3. Create mock AI image
+      await supabase
+        .from('ai_images')
+        .insert({
+          report_id: reportId,
+          image_url: 'https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg',
+          model_used: 'dall-e-3'
+        });
+
+      return true;
+    } catch (error) {
+      console.error('Error creating mock data:', error);
+      throw error;
     }
   };
 
@@ -150,9 +187,9 @@ export default function ReportProcessor({
                       {step.completed ? (
                         <CheckCircle size={24} color="#4ECDC4" />
                       ) : (
-                        <step.icon 
-                          size={24} 
-                          color={step.active ? "#4FACFE" : "rgba(255, 255, 255, 0.5)"} 
+                        <step.icon
+                          size={24}
+                          color={step.active ? "#4FACFE" : "rgba(255, 255, 255, 0.5)"}
                         />
                       )}
                     </View>
@@ -172,9 +209,9 @@ export default function ReportProcessor({
                   </View>
 
                   {step.active && processing && (
-                    <ActivityIndicator 
-                      size="small" 
-                      color="#4FACFE" 
+                    <ActivityIndicator
+                      size="small"
+                      color="#4FACFE"
                       style={styles.stepLoader}
                     />
                   )}

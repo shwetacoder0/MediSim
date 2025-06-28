@@ -16,9 +16,13 @@ export class GoogleVisionService {
    */
   private static async imageToBase64(imageUri: string): Promise<string> {
     try {
+      console.log('Converting image to base64:', imageUri);
+
+      // Read the file as base64
       const base64 = await FileSystem.readAsStringAsync(imageUri, {
         encoding: FileSystem.EncodingType.Base64,
       });
+
       return base64;
     } catch (error) {
       console.error('Error converting image to base64:', error);
@@ -35,6 +39,12 @@ export class GoogleVisionService {
 
       // Convert image to base64
       const base64Image = await this.imageToBase64(imageUri);
+
+      if (!base64Image) {
+        throw new Error('Failed to convert image to base64');
+      }
+
+      console.log('Image converted to base64, sending to Google Vision API');
 
       // Prepare the request payload
       const requestPayload = {
@@ -83,7 +93,7 @@ export class GoogleVisionService {
 
       // Extract text from response
       const annotations = data.responses[0];
-      
+
       if (!annotations || annotations.error) {
         throw new Error(`Vision API error: ${annotations?.error?.message || 'No text detected'}`);
       }
@@ -102,7 +112,7 @@ export class GoogleVisionService {
       if (fullTextAnnotation) {
         // Use full text annotation for better document structure
         extractedText = fullTextAnnotation.text;
-        
+
         // Calculate average confidence from pages
         if (fullTextAnnotation.pages && fullTextAnnotation.pages.length > 0) {
           const totalConfidence = fullTextAnnotation.pages.reduce((sum: number, page: any) => {
@@ -137,10 +147,9 @@ export class GoogleVisionService {
         confidence: confidence,
         boundingBoxes: boundingBoxes.length > 0 ? boundingBoxes : undefined
       };
-
     } catch (error) {
       console.error('Error in Google Vision OCR:', error);
-      
+
       // If API fails, provide a helpful error message
       if (error instanceof Error) {
         if (error.message.includes('API key')) {
@@ -151,8 +160,12 @@ export class GoogleVisionService {
           throw new Error('Network error. Please check your internet connection and try again.');
         }
       }
-      
-      throw new Error(`OCR failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+
+      // If all else fails, return a fallback result with the error message
+      return {
+        text: `Error extracting text: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        confidence: 0,
+      };
     }
   }
 
@@ -182,9 +195,9 @@ export class GoogleVisionService {
     ];
 
     const lowerText = text.toLowerCase();
-    
+
     // Count medical keywords
-    const foundKeywords = medicalKeywords.filter(keyword => 
+    const foundKeywords = medicalKeywords.filter(keyword =>
       lowerText.includes(keyword)
     );
 
@@ -201,7 +214,7 @@ export class GoogleVisionService {
     const keywordDensity = foundKeywords.length / medicalKeywords.length;
     const hasStructure = lowerText.includes('findings') || lowerText.includes('impression');
     const hasPatientInfo = lowerText.includes('patient') || lowerText.includes('name');
-    
+
     let confidence = keywordDensity * 0.6;
     if (hasStructure) confidence += 0.2;
     if (hasPatientInfo) confidence += 0.1;
@@ -220,7 +233,7 @@ export class GoogleVisionService {
   static preprocessMedicalText(text: string): string {
     // Remove excessive whitespace and normalize line breaks
     let cleaned = text.replace(/\s+/g, ' ').trim();
-    
+
     // Fix common OCR errors in medical terms
     const corrections = [
       { from: /\bpatient\b/gi, to: 'patient' },
@@ -240,7 +253,7 @@ export class GoogleVisionService {
 
     // Restore proper paragraph structure
     cleaned = cleaned.replace(/\. ([A-Z])/g, '.\n\n$1');
-    
+
     return cleaned;
   }
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ScrollView,
   Modal,
+  ActivityIndicator,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
@@ -20,17 +21,26 @@ import {
   Microscope
 } from 'lucide-react-native';
 import MediaPicker from '../components/MediaPicker';
+import { useAuth } from '../lib/auth-context';
 
 export default function HomeScreen() {
   const [showMediaPicker, setShowMediaPicker] = useState(false);
+  const { isAuthenticated, isLoading } = useAuth();
+
+  // Redirect to auth screen if not authenticated
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.replace('/auth');
+    }
+  }, [isLoading, isAuthenticated]);
 
   const handleTakePhoto = () => {
     setShowMediaPicker(true);
   };
 
-  const handleUploadFile = () => {
-    setShowMediaPicker(true);
-  };
+//   const handleUploadFile = () => {
+//     setShowMediaPicker(true);
+//   };
 
   const handleExploreSection = (section: string) => {
     router.push(`/${section}` as any);
@@ -43,6 +53,19 @@ export default function HomeScreen() {
   const handleSettings = () => {
     router.push('/settings');
   };
+
+  // Show loading indicator while checking auth state
+  if (isLoading) {
+    return (
+      <View style={[styles.container, styles.loadingContainer]}>
+        <LinearGradient
+          colors={['#0A0A0A', '#1A1A2E', '#16213E']}
+          style={styles.gradient}
+        />
+        <ActivityIndicator size="large" color="#4FACFE" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -77,16 +100,16 @@ export default function HomeScreen() {
                 style={styles.primaryGradient}
               >
                 <Camera size={24} color="#FFFFFF" />
-                <Text style={styles.primaryButtonText}>Take a Photo</Text>
+                <Text style={styles.primaryButtonText}>Upload Report</Text>
               </LinearGradient>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.secondaryButton} onPress={handleUploadFile}>
+            {/* <TouchableOpacity style={styles.secondaryButton} onPress={handleUploadFile}>
               <BlurView intensity={20} tint="dark" style={styles.secondaryBlur}>
                 <Upload size={24} color="rgba(255, 255, 255, 0.9)" />
                 <Text style={styles.secondaryButtonText}>Upload from Files</Text>
               </BlurView>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
         </View>
 
@@ -178,6 +201,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#000',
+  },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   gradient: {
     position: 'absolute',

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,16 +7,56 @@ import {
   ScrollView,
   TextInput,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { router } from 'expo-router';
 import { ArrowLeft, User, Mail, Calendar, Crown, CreditCard as Edit3, LogOut, Trash2, Check, X } from 'lucide-react-native';
+import { useAuth, UserProfile } from '../lib/auth-context';
+import { signOutUser, updateUserProfile } from '../lib/auth';
+import { supabase } from '../lib/supabase';
 
 export default function ProfileScreen() {
+  const { user, profile, isLoading, isAuthenticated, refreshUser } = useAuth();
   const [isEditingName, setIsEditingName] = useState(false);
-  const [fullName, setFullName] = useState('John Doe');
-  const [tempName, setTempName] = useState(fullName);
+  const [fullName, setFullName] = useState('');
+  const [tempName, setTempName] = useState('');
+  const [email, setEmail] = useState('');
+  const [joinDate, setJoinDate] = useState('');
+  const [isProUser, setIsProUser] = useState(false);
+  const [subscriptionStatus, setSubscriptionStatus] = useState('');
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.replace('/auth');
+    }
+  }, [isLoading, isAuthenticated]);
+
+  // Load user data
+  useEffect(() => {
+    if (user && profile) {
+      const userProfile = profile as UserProfile;
+      setFullName(userProfile.full_name || '');
+      setTempName(userProfile.full_name || '');
+      setEmail(user.email || '');
+
+      // Format created_at date if available
+      if (user.created_at) {
+        const createdAt = new Date(user.created_at);
+        setJoinDate(createdAt.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        }));
+      }
+
+      // Check subscription status
+      setIsProUser(userProfile.plan === 'pro' && userProfile.subscription_status === 'active');
+      setSubscriptionStatus(userProfile.subscription_status || 'inactive');
+    }
+  }, [user, profile]);
 
   const handleBack = () => {
     router.back();
@@ -28,10 +68,18 @@ export default function ProfileScreen() {
       'Are you sure you want to sign out?',
       [
         { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Sign Out', 
+        {
+          text: 'Sign Out',
           style: 'destructive',
-          onPress: () => router.push('/')
+          onPress: async () => {
+            try {
+              await signOutUser();
+              router.push('/');
+            } catch (error) {
+              console.error('Error signing out:', error);
+              Alert.alert('Error', 'Failed to sign out. Please try again.');
+            }
+          }
         }
       ]
     );
@@ -43,13 +91,25 @@ export default function ProfileScreen() {
       'This action cannot be undone. All your data will be permanently deleted.',
       [
         { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Delete', 
+        {
+          text: 'Delete',
           style: 'destructive',
-          onPress: () => {
-            // Handle account deletion
-            Alert.alert('Account Deleted', 'Your account has been deleted.');
-            router.push('/');
+          onPress: async () => {
+            try {
+              // Delete user data
+              if (user) {
+                await supabase.from('users').delete().eq('id', user.id);
+                // Delete auth account
+                const { error } = await supabase.auth.admin.deleteUser(user.id);
+                if (error) throw error;
+
+                Alert.alert('Account Deleted', 'Your account has been deleted.');
+                router.push('/');
+              }
+            } catch (error) {
+              console.error('Error deleting account:', error);
+              Alert.alert('Error', 'Failed to delete account. Please try again.');
+            }
           }
         }
       ]
@@ -58,7 +118,7 @@ export default function ProfileScreen() {
 
   const handleManageSubscription = () => {
     // This would open RevenueCat paywall/settings
-    Alert.alert('Manage Subscription', 'This will open RevenueCat subscription management.');
+    router.push('/paywall');
   };
 
   const handleEditName = () => {
@@ -66,15 +126,38 @@ export default function ProfileScreen() {
     setIsEditingName(true);
   };
 
-  const handleSaveName = () => {
-    setFullName(tempName);
-    setIsEditingName(false);
+  const handleSaveName = async () => {
+    try {
+      if (user) {
+        await updateUserProfile({ full_name: tempName });
+        setFullName(tempName);
+        setIsEditingName(false);
+        // Refresh user data
+        await refreshUser();
+      }
+    } catch (error) {
+      console.error('Error updating name:', error);
+      Alert.alert('Error', 'Failed to update name. Please try again.');
+    }
   };
 
   const handleCancelEdit = () => {
     setTempName(fullName);
     setIsEditingName(false);
   };
+
+  // Show loading indicator while checking auth state
+  if (isLoading) {
+    return (
+      <View style={[styles.container, styles.loadingContainer]}>
+        <LinearGradient
+          colors={['#0A0A0A', '#1A1A2E', '#16213E']}
+          style={styles.gradient}
+        />
+        <ActivityIndicator size="large" color="#4FACFE" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -94,7 +177,7 @@ export default function ProfileScreen() {
               <User size={60} color="#4FACFE" />
             </BlurView>
           </View>
-          
+
           <View style={styles.nameContainer}>
             {isEditingName ? (
               <View style={styles.editNameContainer}>
@@ -123,43 +206,52 @@ export default function ProfileScreen() {
               </View>
             )}
           </View>
-          
-          <Text style={styles.email}>john.doe@example.com</Text>
+
+          <Text style={styles.email}>{email}</Text>
         </View>
 
         <View style={styles.content}>
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Account Information</Text>
-            
+
             <View style={styles.infoCard}>
               <BlurView intensity={15} tint="dark" style={styles.cardBlur}>
                 <View style={styles.infoItem}>
                   <Mail size={20} color="rgba(255, 255, 255, 0.6)" />
                   <View style={styles.infoText}>
                     <Text style={styles.infoLabel}>Email</Text>
-                    <Text style={styles.infoValue}>john.doe@example.com</Text>
+                    <Text style={styles.infoValue}>{email}</Text>
                     <Text style={styles.infoNote}>(Cannot be changed)</Text>
                   </View>
                 </View>
-                
+
                 <View style={styles.divider} />
-                
+
                 <View style={styles.infoItem}>
-                  <Crown size={20} color="#FFD700" />
+                  <Crown size={20} color={isProUser ? "#FFD700" : "rgba(255, 255, 255, 0.6)"} />
                   <View style={styles.infoText}>
                     <Text style={styles.infoLabel}>Subscription Status</Text>
-                    <Text style={[styles.infoValue, { color: '#4ECDC4' }]}>Active</Text>
-                    <Text style={styles.infoNote}>Premium member since Jan 2024</Text>
+                    <Text style={[
+                      styles.infoValue,
+                      { color: isProUser ? '#4ECDC4' : '#FF9A9E' }
+                    ]}>
+                      {isProUser ? 'Active' : 'Inactive'}
+                    </Text>
+                    <Text style={styles.infoNote}>
+                      {isProUser
+                        ? 'Premium member'
+                        : 'Free account - Upgrade for more features'}
+                    </Text>
                   </View>
                 </View>
-                
+
                 <View style={styles.divider} />
-                
+
                 <View style={styles.infoItem}>
                   <Calendar size={20} color="rgba(255, 255, 255, 0.6)" />
                   <View style={styles.infoText}>
                     <Text style={styles.infoLabel}>Join Date</Text>
-                    <Text style={styles.infoValue}>January 15, 2024</Text>
+                    <Text style={styles.infoValue}>{joinDate || 'Unknown'}</Text>
                   </View>
                 </View>
               </BlurView>
@@ -168,15 +260,15 @@ export default function ProfileScreen() {
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Account Actions</Text>
-            
+
             <TouchableOpacity style={styles.actionCard} onPress={handleManageSubscription}>
               <BlurView intensity={15} tint="dark" style={styles.cardBlur}>
                 <View style={styles.actionItem}>
-                  <Crown size={24} color="#FFD700" />
+                  <Crown size={24} color={isProUser ? "#FFD700" : "rgba(255, 255, 255, 0.6)"} />
                   <View style={styles.actionTextContainer}>
                     <Text style={styles.actionText}>Manage Subscription</Text>
                     <Text style={styles.actionDescription}>
-                      Update billing, cancel, or change plan
+                      {isProUser ? 'Update billing, cancel, or change plan' : 'Upgrade to Premium'}
                     </Text>
                   </View>
                 </View>
@@ -379,5 +471,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: 'rgba(255, 255, 255, 0.6)',
     lineHeight: 18,
+  },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
