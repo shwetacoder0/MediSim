@@ -13,7 +13,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { router, useLocalSearchParams } from 'expo-router';
-import { ArrowLeft, Share2, Play, BarChart3, Eye } from 'lucide-react-native';
+import { ArrowLeft, Share2, Play, ChartBar as BarChart3, Eye } from 'lucide-react-native';
 import { ReportProcessingService } from '../lib/reportProcessing';
 
 interface ReportData {

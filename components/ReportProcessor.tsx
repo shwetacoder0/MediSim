@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
-import { Brain, Zap, Image as ImageIcon, CheckCircle } from 'lucide-react-native';
+import { Brain, Zap, Image as ImageIcon, CircleCheck as CheckCircle } from 'lucide-react-native';
 import { ReportProcessingService } from '../lib/reportProcessing';
 
 interface ReportProcessorProps {
