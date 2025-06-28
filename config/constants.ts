@@ -10,6 +10,12 @@ export const PICA_CONFIG = {
   BASE_URL: 'https://api.picaos.com/v1/passthrough/models/gemini-1.5-flash:generateContent'
 };
 
+// Google Vision API Configuration
+export const GOOGLE_VISION_CONFIG = {
+  API_KEY: 'YOUR_GOOGLE_VISION_API_KEY', // Replace with your actual API key
+  BASE_URL: 'https://vision.googleapis.com/v1/images:annotate'
+};
+
 // OpenAI Configuration (for image generation)
 export const OPENAI_CONFIG = {
   API_KEY: 'your-openai-api-key',

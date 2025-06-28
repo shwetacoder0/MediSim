@@ -1,140 +1,184 @@
 // Text extraction utilities for medical reports
+import { GoogleVisionService, OCRResult } from './googleVision';
+import { PDFExtractionService, PDFExtractionResult } from './pdfExtraction';
 
 export interface ExtractedText {
   text: string;
   confidence: number;
+  extractionMethod: 'ocr' | 'pdf-direct' | 'pdf-ocr';
   metadata?: {
     pageCount?: number;
     language?: string;
     format?: string;
+    detectedType?: string;
+    isValidMedical?: boolean;
   };
 }
 
 export class TextExtractionService {
   /**
-   * Extract text from an image using OCR
-   * For now, this is a placeholder that simulates text extraction
-   * In production, you would integrate with services like:
-   * - Google Cloud Vision API
-   * - AWS Textract
-   * - Azure Computer Vision
+   * Extract text from an image using Google Vision OCR
    */
   static async extractFromImage(imageUri: string): Promise<ExtractedText> {
     try {
-      // Simulate OCR processing delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      console.log('Starting image text extraction with Google Vision...');
 
-      // For demo purposes, return sample medical report text
-      // In production, this would call an actual OCR service
-      const sampleText = `
-MAGNETIC RESONANCE IMAGING REPORT
+      // Use Google Vision API for OCR
+      const ocrResult: OCRResult = await GoogleVisionService.extractTextFromImage(imageUri);
 
-Patient: John Doe
-DOB: 01/15/1980
-Study Date: ${new Date().toLocaleDateString()}
-Study Type: MRI Lumbar Spine
+      // Validate if it's a medical report
+      const validation = GoogleVisionService.validateMedicalReport(ocrResult.text);
 
-CLINICAL HISTORY:
-Lower back pain with radiation to left leg. Rule out disc herniation.
+      // Preprocess the text for better analysis
+      const cleanedText = GoogleVisionService.preprocessMedicalText(ocrResult.text);
 
-TECHNIQUE:
-Sagittal T1, T2, and STIR sequences. Axial T2 sequences through the lumbar spine.
-
-FINDINGS:
-L4-L5: Mild disc height loss with posterior disc bulge. No significant central canal stenosis.
-L5-S1: Normal disc height and signal. No herniation or stenosis.
-Vertebral bodies: Normal alignment and signal intensity.
-Facet joints: Mild degenerative changes at L4-L5.
-
-IMPRESSION:
-1. Mild degenerative disc disease at L4-L5 with posterior disc bulge
-2. No significant spinal stenosis
-3. Mild facet arthropathy at L4-L5
-
-RECOMMENDATION:
-Clinical correlation recommended. Consider physical therapy and conservative management.
-      `;
+      console.log(`Image OCR completed. Confidence: ${ocrResult.confidence}, Medical validation: ${validation.confidence}`);
 
       return {
-        text: sampleText.trim(),
-        confidence: 0.95,
+        text: cleanedText,
+        confidence: ocrResult.confidence,
+        extractionMethod: 'ocr',
         metadata: {
           format: 'image',
-          language: 'en'
+          language: 'en',
+          detectedType: validation.detectedType,
+          isValidMedical: validation.isValid
         }
       };
     } catch (error) {
       console.error('Error extracting text from image:', error);
-      throw new Error('Failed to extract text from image');
+      
+      // Provide more specific error messages
+      if (error instanceof Error) {
+        if (error.message.includes('API key')) {
+          throw new Error('Google Vision API configuration error. Please check your API key.');
+        } else if (error.message.includes('quota')) {
+          throw new Error('OCR service quota exceeded. Please try again later.');
+        } else if (error.message.includes('No text')) {
+          throw new Error('No readable text found in the image. Please ensure the image is clear and contains text.');
+        }
+      }
+      
+      throw new Error(`Failed to extract text from image: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
   /**
    * Extract text from a PDF document
-   * For now, this is a placeholder
-   * In production, you would use libraries like:
-   * - pdf-parse
-   * - PDF.js
-   * - Or cloud services like AWS Textract
    */
   static async extractFromPDF(pdfUri: string): Promise<ExtractedText> {
     try {
-      // Simulate PDF processing delay
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      console.log('Starting PDF text extraction...');
 
-      // For demo purposes, return sample medical report text
-      const sampleText = `
-LABORATORY REPORT
+      // Use PDF extraction service
+      const pdfResult: PDFExtractionResult = await PDFExtractionService.extractTextFromPDF(pdfUri);
 
-Patient: Jane Smith
-DOB: 03/22/1985
-Collection Date: ${new Date().toLocaleDateString()}
-Report Date: ${new Date().toLocaleDateString()}
+      // Validate if it's a medical document
+      const validation = PDFExtractionService.validateMedicalPDF(pdfResult.text);
 
-COMPLETE BLOOD COUNT (CBC)
-White Blood Cell Count: 7.2 K/uL (Normal: 4.0-11.0)
-Red Blood Cell Count: 4.5 M/uL (Normal: 4.2-5.4)
-Hemoglobin: 13.8 g/dL (Normal: 12.0-16.0)
-Hematocrit: 41.2% (Normal: 36.0-46.0)
-Platelet Count: 285 K/uL (Normal: 150-450)
+      // Preprocess the text
+      const cleanedText = GoogleVisionService.preprocessMedicalText(pdfResult.text);
 
-BASIC METABOLIC PANEL
-Glucose: 92 mg/dL (Normal: 70-100)
-BUN: 15 mg/dL (Normal: 7-20)
-Creatinine: 0.9 mg/dL (Normal: 0.6-1.2)
-Sodium: 140 mEq/L (Normal: 136-145)
-Potassium: 4.1 mEq/L (Normal: 3.5-5.1)
-Chloride: 102 mEq/L (Normal: 98-107)
-
-INTERPRETATION:
-All values within normal limits. No significant abnormalities detected.
-      `;
+      console.log(`PDF extraction completed. Method: ${pdfResult.extractionMethod}, Confidence: ${pdfResult.confidence}`);
 
       return {
-        text: sampleText.trim(),
-        confidence: 0.98,
+        text: cleanedText,
+        confidence: pdfResult.confidence,
+        extractionMethod: pdfResult.extractionMethod === 'direct' ? 'pdf-direct' : 'pdf-ocr',
         metadata: {
-          pageCount: 1,
+          pageCount: pdfResult.pageCount,
           format: 'pdf',
-          language: 'en'
+          language: 'en',
+          isValidMedical: validation.isValid
         }
       };
     } catch (error) {
       console.error('Error extracting text from PDF:', error);
-      throw new Error('Failed to extract text from PDF');
+      throw new Error(`Failed to extract text from PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
   /**
-   * Determine the best extraction method based on file type
+   * Determine the best extraction method based on file type and extract text
    */
   static async extractText(fileUri: string, mimeType: string): Promise<ExtractedText> {
-    if (mimeType.startsWith('image/')) {
-      return this.extractFromImage(fileUri);
-    } else if (mimeType === 'application/pdf') {
-      return this.extractFromPDF(fileUri);
-    } else {
-      throw new Error(`Unsupported file type: ${mimeType}`);
+    try {
+      console.log(`Starting text extraction for file type: ${mimeType}`);
+
+      if (mimeType.startsWith('image/')) {
+        return await this.extractFromImage(fileUri);
+      } else if (mimeType === 'application/pdf') {
+        return await this.extractFromPDF(fileUri);
+      } else {
+        throw new Error(`Unsupported file type: ${mimeType}. Please upload an image (JPG, PNG) or PDF file.`);
+      }
+    } catch (error) {
+      console.error('Text extraction failed:', error);
+      throw error;
     }
+  }
+
+  /**
+   * Validate extracted text quality and provide feedback
+   */
+  static validateExtractedText(extractedText: ExtractedText): {
+    isValid: boolean;
+    issues: string[];
+    suggestions: string[];
+  } {
+    const issues: string[] = [];
+    const suggestions: string[] = [];
+
+    // Check text length
+    if (extractedText.text.length < 50) {
+      issues.push('Very little text was extracted');
+      suggestions.push('Ensure the image is clear and well-lit');
+    }
+
+    // Check confidence
+    if (extractedText.confidence < 0.7) {
+      issues.push('Low extraction confidence');
+      suggestions.push('Try taking a clearer photo or scanning at higher resolution');
+    }
+
+    // Check if it looks like a medical report
+    if (extractedText.metadata?.isValidMedical === false) {
+      issues.push('Document may not be a medical report');
+      suggestions.push('Please upload a medical report, lab result, or diagnostic image');
+    }
+
+    // Check for common OCR issues
+    const hasLotsOfNumbers = (extractedText.text.match(/\d/g) || []).length > extractedText.text.length * 0.3;
+    if (hasLotsOfNumbers && extractedText.confidence < 0.8) {
+      issues.push('Document contains many numbers which may have OCR errors');
+      suggestions.push('Double-check that numerical values are correctly interpreted');
+    }
+
+    return {
+      isValid: issues.length === 0,
+      issues,
+      suggestions
+    };
+  }
+
+  /**
+   * Get extraction statistics for debugging
+   */
+  static getExtractionStats(extractedText: ExtractedText): {
+    characterCount: number;
+    wordCount: number;
+    lineCount: number;
+    confidence: number;
+    method: string;
+  } {
+    const text = extractedText.text;
+    
+    return {
+      characterCount: text.length,
+      wordCount: text.split(/\s+/).filter(word => word.length > 0).length,
+      lineCount: text.split('\n').length,
+      confidence: extractedText.confidence,
+      method: extractedText.extractionMethod
+    };
   }
 }
