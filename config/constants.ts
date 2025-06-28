@@ -12,7 +12,7 @@ export const PICA_CONFIG = {
 
 // Google Vision API Configuration
 export const GOOGLE_VISION_CONFIG = {
-  API_KEY: 'YOUR_GOOGLE_VISION_API_KEY', // Replace with your actual API key
+  API_KEY: 'AIzaSyBrPY01GPy02fMug_OmRP9UIVmqWzvFsQ0', // Replace with your actual API key
   BASE_URL: 'https://vision.googleapis.com/v1/images:annotate'
 };
 
