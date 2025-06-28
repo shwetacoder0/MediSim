@@ -21,14 +21,6 @@ import {
 } from 'lucide-react-native';
 import MediaPicker from '../components/MediaPicker';
 
-// Define types for file and report
-interface FileData {
-  uri: string;
-  name: string;
-  type: string;
-  mimeType: string;
-}
-
 export default function HomeScreen() {
   const [showMediaPicker, setShowMediaPicker] = useState(false);
 
@@ -38,15 +30,6 @@ export default function HomeScreen() {
 
   const handleUploadFile = () => {
     setShowMediaPicker(true);
-  };
-
-  const handleFileSelected = (file: FileData, reportType: string) => {
-    // Navigate to the report screen with the file data
-    router.push({
-      pathname: '/report-screen' as any,
-      params: { fileUri: file.uri, fileName: file.name, fileType: file.type, reportType }
-    });
-    setShowMediaPicker(false);
   };
 
   const handleExploreSection = (section: string) => {
@@ -176,20 +159,16 @@ export default function HomeScreen() {
       <Modal
         visible={showMediaPicker}
         animationType="slide"
-        transparent={true}
+        presentationStyle="fullScreen"
         onRequestClose={() => setShowMediaPicker(false)}
       >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setShowMediaPicker(false)}
-            >
-              <Text style={styles.closeButtonText}>✕</Text>
-            </TouchableOpacity>
-            <MediaPicker onFileSelected={handleFileSelected} />
-          </View>
-        </View>
+        <MediaPicker />
+        <TouchableOpacity
+          style={styles.closeModalButton}
+          onPress={() => setShowMediaPicker(false)}
+        >
+          <Text style={styles.closeModalText}>✕</Text>
+        </TouchableOpacity>
       </Modal>
     </View>
   );
@@ -339,25 +318,20 @@ const styles = StyleSheet.create({
   cardIcon: {
     marginLeft: 20,
   },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  closeModalButton: {
+    position: 'absolute',
+    top: 60,
+    right: 20,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  modalContent: {
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingBottom: 30,
-    maxHeight: '80%',
-  },
-  closeButton: {
-    alignSelf: 'flex-end',
-    padding: 15,
-  },
-  closeButtonText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
+  closeModalText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '600',
   },
 });
