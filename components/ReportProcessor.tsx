@@ -18,6 +18,7 @@ import { ReportProcessingService } from '../lib/reportProcessing';
 import { STORAGE_BUCKETS } from '../config/constants';
 import * as FileSystem from 'expo-file-system';
 import { decode } from 'base64-arraybuffer';
+import { Asset } from 'expo-asset';
 
 interface ReportProcessorProps {
   reportId: string;
@@ -197,20 +198,23 @@ export default function ReportProcessor({
   // Upload the kidney visualization image to Supabase storage
   const uploadKidneyVisualizationToStorage = async () => {
     try {
-      // In a real app, this would be the path to the generated image
-      // For this demo, we'll use the asset from our project
-      const imagePath = Platform.OS === 'ios'
-        ? `${FileSystem.documentDirectory}kidney-visualization.png`
-        : `${FileSystem.cacheDirectory}kidney-visualization.png`;
+      // For this demo, we'll use a static asset
+      const asset = Asset.fromModule(require('../assets/images/kidney-visualization.png'));
 
-      // Copy the asset to a temporary file
-      await FileSystem.copyAsync({
-        from: require('../assets/images/kidney-visualization.png'),
-        to: imagePath
-      });
+      // Download the asset if it's not downloaded yet
+      if (!asset.localUri) {
+        await asset.downloadAsync();
+      }
+
+      const imageUri = asset.localUri || asset.uri;
+
+      if (!imageUri) {
+        console.error('Could not resolve image URI');
+        return null;
+      }
 
       // Read the file as base64
-      const base64Image = await FileSystem.readAsStringAsync(imagePath, {
+      const base64Image = await FileSystem.readAsStringAsync(imageUri, {
         encoding: FileSystem.EncodingType.Base64
       });
 
