@@ -17,7 +17,6 @@ import * as FileSystem from 'expo-file-system';
 import { router } from 'expo-router';
 import { supabase } from '../lib/supabase';
 import { REPORT_TYPES, STORAGE_BUCKETS } from '../config/constants';
-import { TextExtractionService } from '../lib/textExtraction';
 
 interface FileData {
   uri: string;
@@ -33,7 +32,7 @@ interface MediaPickerProps {
 export default function MediaPicker({ onFileSelected }: MediaPickerProps) {
   const [reportType, setReportType] = useState(REPORT_TYPES[0]);
   const [uploading, setUploading] = useState(false);
-  const [processingStep, setProcessingStep] = useState<'idle' | 'uploading' | 'extracting' | 'complete'>('idle');
+  const [processingStep, setProcessingStep] = useState<'idle' | 'uploading' | 'complete'>('idle');
   const [processingMessage, setProcessingMessage] = useState('');
 
   const requestPermissions = async () => {
@@ -92,22 +91,7 @@ export default function MediaPicker({ onFileSelected }: MediaPickerProps) {
     }
   };
 
-  const extractTextFromFile = async (file: FileData) => {
-    try {
-      setProcessingStep('extracting');
-      setProcessingMessage('Extracting text from your report...');
-
-      // Extract text based on file type
-      const extractedText = await TextExtractionService.extractText(file.uri, file.mimeType);
-
-      return extractedText;
-    } catch (error) {
-      console.error('Error extracting text:', error);
-      throw error;
-    }
-  };
-
-  const createReportRecord = async (fileUrl: string, fileName: string, extractedText: any): Promise<string> => {
+  const createReportRecord = async (fileUrl: string, fileName: string): Promise<string> => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
@@ -138,23 +122,19 @@ export default function MediaPicker({ onFileSelected }: MediaPickerProps) {
       // Step 1: Upload file to Supabase
       const fileUrl = await uploadFileToSupabase(file);
 
-      // Step 2: Extract text from the file
-      const extractedText = await extractTextFromFile(file);
-
-      // Step 3: Create report record
-      const reportId = await createReportRecord(fileUrl, file.name, extractedText);
+      // Step 2: Create report record
+      const reportId = await createReportRecord(fileUrl, file.name);
 
       setProcessingStep('complete');
 
-      // Step 4: Navigate to processing screen
+      // Step 3: Navigate to processing screen
       router.push({
         pathname: '/report-processing',
         params: {
           reportId,
           fileUri: file.uri,
           mimeType: file.mimeType,
-          reportType,
-          extractedText: JSON.stringify(extractedText)
+          reportType
         }
       });
 
@@ -227,10 +207,8 @@ export default function MediaPicker({ onFileSelected }: MediaPickerProps) {
     switch (processingStep) {
       case 'uploading':
         return 'Uploading your report...';
-      case 'extracting':
-        return 'Extracting text from your report...';
       case 'complete':
-        return 'Processing complete!';
+        return 'Upload complete!';
       default:
         return 'Processing your report...';
     }

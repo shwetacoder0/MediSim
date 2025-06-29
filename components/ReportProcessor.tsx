@@ -3,12 +3,21 @@ import {
   View,
   Text,
   StyleSheet,
-  ActivityIndicator
+  ActivityIndicator,
+  Image,
+  Platform
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { Brain, Zap, Image as ImageIcon, CircleCheck as CheckCircle } from 'lucide-react-native';
 import { supabase } from '../lib/supabase';
+import { TextExtractionService } from '../lib/textExtraction';
+import { GeminiService } from '../lib/geminiService';
+import { ImageGenerationService } from '../lib/imageGeneration';
+import { ReportProcessingService } from '../lib/reportProcessing';
+import { STORAGE_BUCKETS } from '../config/constants';
+import * as FileSystem from 'expo-file-system';
+import { decode } from 'base64-arraybuffer';
 
 interface ReportProcessorProps {
   reportId: string;
@@ -26,6 +35,111 @@ interface ProcessingStep {
   completed: boolean;
   active: boolean;
 }
+
+// Mock data for the report analysis
+const MOCK_ANALYSIS = {
+  detailedAnalysis: `Patient Findings - Kidney and Urinary Tract Overview
+
+Right Kidney:
+
+Size: 11.3 x 4.5 x 5.2 cm
+
+No signs of hydronephrosis (swelling due to urine buildup).
+
+No kidney stones or opaque densities.
+
+Identified anatomical variation: extra renal type of renal pelvis.
+
+Left Kidney:
+
+Size: 10.6 x 4.5 x 5.4 cm
+
+No hydronephrosis.
+
+A tiny 0.2 cm opaque density (HU +150) is noted in the interpolar region, indicating non-obstructive nephrolithiasis (a small kidney stone).
+
+Ureters:
+
+Both are not dilated and show no stones or blockage.
+
+Urinary Bladder:
+
+Adequate filling.
+
+No filling defects or abnormal masses.
+
+Other Observations:
+
+Liver, gallbladder, pancreas, spleen, and adrenal glands appear normal.
+
+Segmental wall calcification of abdominal aorta and right iliofemoral arteries (likely vascular aging).
+
+Pelvic phleboliths present — benign small calcifications.
+
+Marginal osteophytes (bony spurs) in the dorsal spine.
+
+Visualized iliac bones are unremarkable.
+
+Clinical Impression:
+
+Likely diagnosis: Tiny non-obstructing left nephrolithiasis
+
+Noted variation: Extrarenal pelvis (right kidney)`,
+  visualizationData: {
+    chartData: {
+      "kidney_sizes_cm": {
+        "right_kidney": [11.3, 4.5, 5.2],
+        "left_kidney": [10.6, 4.5, 5.4],
+        "normal_range": [10.0, 4.0, 5.0]
+      },
+      "stone_presence": {
+        "right_kidney": false,
+        "left_kidney": {
+          "present": true,
+          "size_cm": 0.2,
+          "location": "interpolar",
+          "type": "non-obstructing"
+        }
+      },
+      "hydronephrosis": {
+        "right_kidney": false,
+        "left_kidney": false
+      },
+      "ureter_status": {
+        "right": "normal",
+        "left": "normal"
+      },
+      "vascular_findings": {
+        "aorta_calcification": true,
+        "right_iliofemoral_calcification": true
+      },
+      "skeletal_findings": {
+        "dorsal_spine_osteophytes": true
+      },
+      "bladder": {
+        "filling": "adequate",
+        "defects": false
+      }
+    },
+    metrics: {
+      "renal_stone_size_mm": 2,
+      "stone_density_HU": 150,
+      "hydronephrosis": false,
+      "ureter_dilation": false,
+      "vascular_calcification_detected": 2,
+      "skeletal_anomalies": 1,
+      "organs_visualized": 6,
+      "abnormal_findings_count": 4
+    },
+    visualNotes: `- Mark left kidney interpolar zone with a 2mm calcification (stone).
+- Highlight extrarenal renal pelvis on right kidney.
+- Overlay a label on aorta and right iliofemoral artery showing calcified segments.
+- Tag dorsal spine with "marginal osteophytes".
+- Label urinary bladder as "adequately filled, no defect".
+- Optionally annotate surrounding organs as "grossly unremarkable".`
+  },
+  doctorScript: "Hello! I've reviewed your CT Stonogram results. The good news is that your kidneys are functioning well overall. I did notice a tiny 2mm stone in your left kidney, but it's not causing any blockage, which is good. Your right kidney has a normal variation called an 'extrarenal pelvis,' which is just an anatomical difference and nothing to worry about. Your ureters and bladder look completely normal. I also noticed some minor calcifications in your blood vessels and some small bone spurs in your spine, which are common findings as we age. These findings explain your symptoms of right lower quadrant pain and blood in your urine. I'd recommend increasing your water intake to help pass the small stone naturally, and we can discuss pain management options if needed. Any questions about your results?"
+};
 
 export default function ReportProcessor({
   reportId,
@@ -63,6 +177,7 @@ export default function ReportProcessor({
 
   const [currentStep, setCurrentStep] = useState(0);
   const [processing, setProcessing] = useState(true);
+  const [extractedText, setExtractedText] = useState('');
 
   useEffect(() => {
     processReport();
@@ -76,85 +191,150 @@ export default function ReportProcessor({
     })));
   };
 
+  // Add a simulated delay for better UX
+  const simulateDelay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+  // Upload the kidney visualization image to Supabase storage
+  const uploadKidneyVisualizationToStorage = async () => {
+    try {
+      // In a real app, this would be the path to the generated image
+      // For this demo, we'll use the asset from our project
+      const imagePath = Platform.OS === 'ios'
+        ? `${FileSystem.documentDirectory}kidney-visualization.png`
+        : `${FileSystem.cacheDirectory}kidney-visualization.png`;
+
+      // Copy the asset to a temporary file
+      await FileSystem.copyAsync({
+        from: require('../assets/images/kidney-visualization.png'),
+        to: imagePath
+      });
+
+      // Read the file as base64
+      const base64Image = await FileSystem.readAsStringAsync(imagePath, {
+        encoding: FileSystem.EncodingType.Base64
+      });
+
+      // Generate a unique filename
+      const filename = `kidney_${reportId}_${Date.now()}.png`;
+
+      // Upload to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from(STORAGE_BUCKETS.AI_IMAGES)
+        .upload(filename, decode(base64Image), {
+          contentType: 'image/png'
+        });
+
+      if (error) {
+        console.error('Error uploading image to storage:', error);
+        return null;
+      }
+
+      // Get the public URL
+      const { data: publicUrlData } = supabase.storage
+        .from(STORAGE_BUCKETS.AI_IMAGES)
+        .getPublicUrl(filename);
+
+      return publicUrlData.publicUrl;
+    } catch (error) {
+      console.error('Error in uploadKidneyVisualizationToStorage:', error);
+      return null;
+    }
+  };
+
   const processReport = async () => {
     try {
       // Step 1: Text Extraction
       setCurrentStep(0);
       updateStep(0, false, true);
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate processing time
+
+      // Simulate text extraction
+      await simulateDelay(2000);
+
       updateStep(0, true, false);
 
       // Step 2: AI Analysis
       setCurrentStep(1);
       updateStep(1, false, true);
-      await new Promise(resolve => setTimeout(resolve, 3000)); // Simulate processing time
+
+      // Simulate AI analysis
+      await simulateDelay(3000);
+
       updateStep(1, true, false);
 
       // Step 3: Visual Generation
       setCurrentStep(2);
       updateStep(2, false, true);
-      await new Promise(resolve => setTimeout(resolve, 2500)); // Simulate processing time
 
-      // Create mock data in Supabase
-      await createMockReportData(reportId, reportType);
+      // Simulate visual generation
+      await simulateDelay(2500);
+
+      // Upload the kidney visualization to Supabase storage
+      const imageUrl = await uploadKidneyVisualizationToStorage() || 'kidney_visualization.png';
+
+      // Save the mock analysis to the database
+      try {
+        const { data, error } = await supabase
+          .from('report_analysis')
+          .upsert({
+            report_id: reportId,
+            ai_summary: MOCK_ANALYSIS.detailedAnalysis,
+            ai_doctor_explanation: MOCK_ANALYSIS.doctorScript,
+            analysis_date: new Date().toISOString()
+          })
+          .select();
+
+        if (error) {
+          console.error('Error saving analysis to database:', error);
+        }
+
+        // Also save visualization data
+        const { data: vizData, error: vizError } = await supabase
+          .from('visualization_data')
+          .upsert({
+            report_id: reportId,
+            chart_data: MOCK_ANALYSIS.visualizationData.chartData,
+            metrics: MOCK_ANALYSIS.visualizationData.metrics,
+            visual_notes: MOCK_ANALYSIS.visualizationData.visualNotes
+          })
+          .select();
+
+        if (vizError) {
+          console.error('Error saving visualization data to database:', vizError);
+        }
+
+        // Create an AI image record with the storage URL
+        const { data: imageData, error: imageError } = await supabase
+          .from('ai_images')
+          .upsert({
+            report_id: reportId,
+            image_url: imageUrl,
+            model_used: 'demo_model',
+            generated_at: new Date().toISOString()
+          })
+          .select();
+
+        if (imageError) {
+          console.error('Error creating AI image record:', imageError);
+        }
+      } catch (error) {
+        console.error('Error in database operation:', error);
+      }
 
       updateStep(2, true, false);
       setProcessing(false);
 
-        // All steps completed
-        setSteps(prev => prev.map(step => ({ ...step, completed: true, active: false })));
-        onProcessingComplete(true);
+      // All steps completed
+      setSteps(prev => prev.map(step => ({ ...step, completed: true, active: false })));
+
+      // Add a small delay before completing
+      await simulateDelay(1000);
+
+      onProcessingComplete(true);
 
     } catch (error) {
       console.error('Error processing report:', error);
       setProcessing(false);
       onProcessingComplete(false, error instanceof Error ? error.message : 'Processing failed');
-    }
-  };
-
-  // Create mock data in Supabase for testing
-  const createMockReportData = async (reportId: string, reportType: string) => {
-    try {
-      // 1. Create mock analysis
-      await supabase
-        .from('report_analysis')
-        .insert({
-          report_id: reportId,
-          ai_summary: `Analysis of ${reportType}: This ${reportType.toLowerCase()} shows evidence of mild degenerative changes. There are no acute findings or critical abnormalities. The patient may benefit from conservative management including physical therapy and anti-inflammatory medications.`,
-          ai_doctor_explanation: `Hello! I've reviewed your ${reportType} and I have good news. The scan shows only mild degenerative changes, which are common as we age. There's no evidence of any serious issues that would require immediate intervention. I'd recommend some physical therapy to help with any discomfort, and possibly some anti-inflammatory medication if you're experiencing pain. Let's schedule a follow-up in 3 months to see how you're progressing.`
-        });
-
-      // 2. Create mock visualization data
-      await supabase
-        .from('visualization_data')
-        .insert({
-          report_id: reportId,
-          chart_data: [
-            { label: 'Normal Range', value: 85 },
-            { label: 'Your Result', value: 78 }
-          ],
-          metrics: {
-            'Disc Height': '4.2mm',
-            'Canal Width': '12.8mm',
-            'Signal Intensity': 'Mild reduction',
-            'Alignment': 'Normal'
-          },
-          visual_notes: `The ${reportType} shows mild degenerative changes consistent with age. No significant stenosis or nerve impingement is present.`
-        });
-
-      // 3. Create mock AI image
-      await supabase
-        .from('ai_images')
-        .insert({
-          report_id: reportId,
-          image_url: 'https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg',
-          model_used: 'dall-e-3'
-        });
-
-      return true;
-    } catch (error) {
-      console.error('Error creating mock data:', error);
-      throw error;
     }
   };
 

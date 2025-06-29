@@ -9,12 +9,17 @@ import {
   ActivityIndicator,
   Share,
   Modal,
+  useWindowDimensions,
+  Platform
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { router, useLocalSearchParams } from 'expo-router';
-import { ArrowLeft, Share2, Play, ChartBar as BarChart3, Eye } from 'lucide-react-native';
+import { ArrowLeft, Share2, Play, ChartBar as BarChart3, Eye, ChevronLeft, Download, Zap, MessageSquare, FileText, User } from 'lucide-react-native';
 import { ReportProcessingService } from '../lib/reportProcessing';
+import { supabase } from '../lib/supabase';
+import ReportDetail from '../components/ReportDetail';
+import { STORAGE_BUCKETS } from '../config/constants';
 
 interface ReportData {
   report: any;
@@ -26,28 +31,129 @@ interface ReportData {
 export default function ReportResultsScreen() {
   const params = useLocalSearchParams();
   const { reportId } = params;
-  
+  const { width } = useWindowDimensions();
+
   const [reportData, setReportData] = useState<ReportData | null>(null);
   const [loading, setLoading] = useState(true);
   const [showMetrics, setShowMetrics] = useState(false);
   const [generatingVideo, setGeneratingVideo] = useState(false);
+  const [activeTab, setActiveTab] = useState('summary');
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    if (reportId) {
-      loadReportData();
+    if (!reportId) {
+      router.back();
+      return;
     }
+
+    fetchReportData();
   }, [reportId]);
 
-  const loadReportData = async () => {
+  const fetchReportData = async () => {
     try {
       setLoading(true);
-      const data = await ReportProcessingService.getProcessedReport(reportId as string);
-      setReportData(data);
+
+      // Fetch report data from Supabase
+      const { data: reportData, error: reportError } = await supabase
+        .from('reports')
+        .select('*')
+        .eq('id', reportId)
+        .single();
+
+      if (reportError) {
+        console.error('Error fetching report:', reportError);
+        throw new Error('Failed to fetch report data');
+      }
+
+      // Fetch analysis data
+      const { data: analysisData, error: analysisError } = await supabase
+        .from('report_analysis')
+        .select('*')
+        .eq('report_id', reportId)
+        .single();
+
+      if (analysisError) {
+        console.error('Error fetching analysis:', analysisError);
+      }
+
+      // Fetch visualization data
+      const { data: vizData, error: vizError } = await supabase
+        .from('visualization_data')
+        .select('*')
+        .eq('report_id', reportId)
+        .single();
+
+      if (vizError) {
+        console.error('Error fetching visualization data:', vizError);
+      }
+
+      setReportData({
+        report: reportData,
+        analysis: analysisData,
+        visualization: vizData,
+        images: reportData.images
+      });
+
+      // Check if we have an AI image already
+      const { data: imageData, error: imageError } = await supabase
+        .from('ai_images')
+        .select('*')
+        .eq('report_id', reportId)
+        .single();
+
+      if (imageError) {
+        console.error('Error fetching image data:', imageError);
+        // Upload the kidney image to Supabase storage
+        await uploadKidneyImage();
+      } else if (imageData) {
+        setImageUrl(imageData.image_url);
+        setReportData(prevData => ({
+          ...prevData,
+          images: [imageData]
+        }));
+      } else {
+        // Upload the kidney image to Supabase storage
+        await uploadKidneyImage();
+      }
+
+      // Simulate loading delay
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
     } catch (error) {
-      console.error('Error loading report data:', error);
-      router.back();
-    } finally {
+      console.error('Error fetching report data:', error);
       setLoading(false);
+    }
+  };
+
+  const uploadKidneyImage = async () => {
+    try {
+      // For demo purposes, we'll just create a record in the ai_images table
+      // In a real app, you would upload the actual image file to Supabase storage
+
+      const { data, error } = await supabase
+        .from('ai_images')
+        .insert({
+          report_id: reportId,
+          image_url: 'kidney_visualization.png', // This would normally be a URL to the stored image
+          model_used: 'demo_model',
+          generated_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error uploading kidney image:', error);
+      } else {
+        console.log('Kidney image record created:', data);
+        setImageUrl(data.image_url);
+        setReportData(prevData => ({
+          ...prevData,
+          images: [data]
+        }));
+      }
+    } catch (error) {
+      console.error('Error in uploadKidneyImage:', error);
     }
   };
 
@@ -57,11 +163,11 @@ export default function ReportResultsScreen() {
 
   const handleShare = async () => {
     try {
-      if (!reportData?.images?.[0]?.image_url) return;
+      if (!imageUrl) return;
 
       await Share.share({
         message: 'Check out my medical report analysis from MediSim',
-        url: reportData.images[0].image_url
+        url: imageUrl
       });
     } catch (error) {
       console.error('Error sharing:', error);
@@ -70,7 +176,7 @@ export default function ReportResultsScreen() {
 
   const handleWatchExplanation = async () => {
     setGeneratingVideo(true);
-    
+
     // Simulate video generation
     setTimeout(() => {
       setGeneratingVideo(false);
@@ -83,9 +189,22 @@ export default function ReportResultsScreen() {
     setShowMetrics(true);
   };
 
+  const handleDownload = () => {
+    // Implement download functionality
+    console.log('Download report:', reportId);
+  };
+
+  const handleAskAI = () => {
+    // Navigate to AI chat
+    router.push({
+      pathname: '/home',
+      params: { reportId }
+    });
+  };
+
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
+      <View style={[styles.container, styles.loadingContainer]}>
         <LinearGradient
           colors={['#0A0A0A', '#1A1A2E', '#16213E']}
           style={styles.gradient}
@@ -103,8 +222,6 @@ export default function ReportResultsScreen() {
       </View>
     );
   }
-
-  const imageUrl = reportData.images?.[0]?.image_url || 'https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg';
 
   return (
     <View style={styles.container}>
@@ -127,15 +244,10 @@ export default function ReportResultsScreen() {
         {/* AI Generated Image */}
         <View style={styles.imageContainer}>
           <Image
-            source={{ uri: imageUrl }}
-            style={styles.reportImage}
-            resizeMode="cover"
+            source={require('../assets/images/kidney-visualization.png')}
+            style={[styles.visualImage, { width: width * 0.9, height: width * 0.9 }]}
+            resizeMode="contain"
           />
-          <View style={styles.imageOverlay}>
-            <TouchableOpacity style={styles.zoomButton}>
-              <Eye size={20} color="#FFFFFF" />
-            </TouchableOpacity>
-          </View>
         </View>
 
         {/* AI Doctor Section */}
@@ -220,7 +332,7 @@ export default function ReportResultsScreen() {
             colors={['#0A0A0A', '#1A1A2E', '#16213E']}
             style={styles.gradient}
           />
-          
+
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Report Analysis</Text>
             <TouchableOpacity
@@ -236,7 +348,7 @@ export default function ReportResultsScreen() {
               <>
                 <View style={styles.metricsModalSection}>
                   <Text style={styles.sectionTitle}>Key Measurements</Text>
-                  {reportData.visualization.metrics && 
+                  {reportData.visualization.metrics &&
                     Object.entries(reportData.visualization.metrics).map(([key, value]) => (
                       <View key={key} style={styles.metricRow}>
                         <Text style={styles.metricLabel}>{key}:</Text>
@@ -507,5 +619,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: 'rgba(255, 255, 255, 0.8)',
     lineHeight: 20,
+  },
+  visualImage: {
+    width: '100%',
+    height: '100%',
   },
 });

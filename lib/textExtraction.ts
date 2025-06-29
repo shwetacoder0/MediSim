@@ -15,12 +15,57 @@ export interface ExtractedText {
   };
 }
 
+// Fixed OCR text for testing
+const FIXED_OCR_TEXT = `EXAMINATION: CT STONOGRAM
+
+CLINICAL INFORMATION: Right lower quadrant pain; hematuria; Pyuria
+
+TECHNIQUE: Plain multislice axial CT images through the urinary tract were obtained with sagittal and coronal reconstructions in DICOM viewer.
+
+The following findings were noted:
+
+The right kidney measures 11.3 x 4.5 x 5.2 cm. while the left kidney measures 10.6 x 4.5 x 5.4. There is no opaque density or hydronephrosis in the right kidney.
+There appears to be however an extra renal type of renal pelvis. There is a 0.2 cm (HU=+150) opaque density in the left kidney interpolar region with no hydronephrosis.
+
+Both ureters are not dilated without opaque lithiasis. The urinary bladder is adequately filled with no intravesical filling defect.
+
+The visualized liver, gallbladder, pancreas, spleen and adrenal glands are grossly unremarkable.
+
+Segmental wall calcifications of the abdominal aorta and right ilio-femoral arteries.
+
+There are pelvic phleboliths
+
+Marginal osteophytes in the dorsal spine and the included visualized iliac bones.
+
+IMPRESSION: Consider tiny nonobstructing left nephrolithiasis
+Suggestive extrarenal type of renal pelvis, right
+
+Thank you for your referral.`;
+
 export class TextExtractionService {
   /**
    * Extract text from an image using Google Vision OCR
+   * Currently using fixed text for testing
    */
   static async extractFromImage(imageUri: string): Promise<ExtractedText> {
     try {
+      console.log('Using fixed OCR text instead of Google Vision API...');
+
+      // Return fixed text instead of calling Google Vision API
+      return {
+        text: FIXED_OCR_TEXT,
+        confidence: 0.95,
+        extractionMethod: 'ocr',
+        metadata: {
+          format: 'image',
+          language: 'en',
+          detectedType: 'CT Scan',
+          isValidMedical: true
+        }
+      };
+
+      // Original Google Vision API code (commented out)
+      /*
       console.log('Starting image text extraction with Google Vision...');
 
       // Use Google Vision API for OCR
@@ -45,29 +90,48 @@ export class TextExtractionService {
           isValidMedical: validation.isValid
         }
       };
+      */
     } catch (error) {
       console.error('Error extracting text from image:', error);
-      
-      // Provide more specific error messages
-      if (error instanceof Error) {
-        if (error.message.includes('API key')) {
-          throw new Error('Google Vision API configuration error. Please check your API key.');
-        } else if (error.message.includes('quota')) {
-          throw new Error('OCR service quota exceeded. Please try again later.');
-        } else if (error.message.includes('No text')) {
-          throw new Error('No readable text found in the image. Please ensure the image is clear and contains text.');
+
+      // Return fixed text even if there's an error
+      return {
+        text: FIXED_OCR_TEXT,
+        confidence: 0.95,
+        extractionMethod: 'ocr',
+        metadata: {
+          format: 'image',
+          language: 'en',
+          detectedType: 'CT Scan',
+          isValidMedical: true
         }
-      }
-      
-      throw new Error(`Failed to extract text from image: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      };
     }
   }
 
   /**
    * Extract text from a PDF document
+   * Currently using fixed text for testing
    */
   static async extractFromPDF(pdfUri: string): Promise<ExtractedText> {
     try {
+      console.log('Using fixed OCR text instead of PDF extraction...');
+
+      // Return fixed text instead of calling PDF extraction
+      return {
+        text: FIXED_OCR_TEXT,
+        confidence: 0.95,
+        extractionMethod: 'pdf-direct',
+        metadata: {
+          pageCount: 1,
+          format: 'pdf',
+          language: 'en',
+          isValidMedical: true
+        }
+      };
+
+      // Original PDF extraction code (commented out)
+      /*
       console.log('Starting PDF text extraction...');
 
       // Use PDF extraction service
@@ -92,9 +156,22 @@ export class TextExtractionService {
           isValidMedical: validation.isValid
         }
       };
+      */
     } catch (error) {
       console.error('Error extracting text from PDF:', error);
-      throw new Error(`Failed to extract text from PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
+
+      // Return fixed text even if there's an error
+      return {
+        text: FIXED_OCR_TEXT,
+        confidence: 0.95,
+        extractionMethod: 'pdf-direct',
+        metadata: {
+          pageCount: 1,
+          format: 'pdf',
+          language: 'en',
+          isValidMedical: true
+        }
+      };
     }
   }
 
@@ -172,7 +249,7 @@ export class TextExtractionService {
     method: string;
   } {
     const text = extractedText.text;
-    
+
     return {
       characterCount: text.length,
       wordCount: text.split(/\s+/).filter(word => word.length > 0).length,

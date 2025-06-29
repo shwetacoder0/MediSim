@@ -4,10 +4,12 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "EXPO_NO_TELEMETRY=1 expo start",
-    "build:web": "expo export --platform web",
-    "lint": "expo lint"
-
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "build": "expo build",
+    "eject": "expo eject"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
@@ -17,6 +19,7 @@
     "@react-navigation/native": "^7.0.14",
     "@supabase/supabase-js": "^2.50.2",
     "base-64": "^1.0.0",
+    "base64-arraybuffer": "^1.0.2",
     "expo": "^53.0.13",
     "expo-av": "^15.1.6",
     "expo-blur": "~14.1.5",
@@ -36,12 +39,14 @@
     "expo-system-ui": "~5.0.9",
     "expo-web-browser": "~14.2.0",
     "lucide-react-native": "^0.475.0",
+    "optiic": "^1.0.1",
     "pdf-parse": "^1.1.1",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-native": "0.79.4",
     "react-native-elements": "^3.4.3",
     "react-native-gesture-handler": "~2.24.0",
+    "react-native-paper": "^5.14.5",
     "react-native-pdf-lib": "^1.0.0",
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",

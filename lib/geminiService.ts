@@ -1,6 +1,6 @@
-import { PICA_CONFIG } from '../config/constants';
+import { GEMINI_CONFIG } from '../config/constants';
 
-export interface PicaAnalysisResponse {
+export interface GeminiAnalysisResponse {
   detailedAnalysis: string;
   visualizationData: {
     chartData: any;
@@ -10,16 +10,18 @@ export interface PicaAnalysisResponse {
   doctorScript: string;
 }
 
-export class PicaService {
+export class GeminiService {
+  /**
+   * Make a request to the Gemini API
+   */
   private static async makeRequest(prompt: string): Promise<any> {
     try {
-      const response = await fetch(PICA_CONFIG.BASE_URL, {
+      const url = `${GEMINI_CONFIG.BASE_URL}?key=${GEMINI_CONFIG.API_KEY}`;
+
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-pica-secret': PICA_CONFIG.SECRET_KEY,
-          'x-pica-connection-key': PICA_CONFIG.GEMINI_CONNECTION_KEY,
-          'x-pica-action-id': PICA_CONFIG.ACTION_ID
         },
         body: JSON.stringify({
           contents: [
@@ -31,25 +33,29 @@ export class PicaService {
           ],
           generationConfig: {
             temperature: 0.7,
-            maxOutputTokens: 4096,
-            responseMimeType: 'application/json'
+            maxOutputTokens: 4096
           }
         })
       });
 
       if (!response.ok) {
-        throw new Error(`Pica API error: ${response.status} ${response.statusText}`);
+        const errorText = await response.text();
+        console.error('Gemini API error response:', errorText);
+        throw new Error(`Gemini API error: ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error('Pica API request failed:', error);
+      console.error('Gemini API request failed:', error);
       throw error;
     }
   }
 
-  static async analyzeReport(extractedText: string, reportType: string): Promise<PicaAnalysisResponse> {
+  /**
+   * Analyze a medical report using Gemini API
+   */
+  static async analyzeReport(extractedText: string, reportType: string): Promise<GeminiAnalysisResponse> {
     const prompt = `
 You are a medical AI assistant analyzing a ${reportType} report. Please analyze the following medical report text and provide a comprehensive response in JSON format with exactly these three components:
 
@@ -83,25 +89,25 @@ Response format:
 
     try {
       const response = await this.makeRequest(prompt);
-      
+
       // Extract the JSON response from Gemini's response
       const content = response.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!content) {
-        throw new Error('No content received from Pica/Gemini');
+        throw new Error('No content received from Gemini');
       }
 
       // Parse the JSON response
       const analysisResult = JSON.parse(content);
-      
+
       // Validate the response structure
       if (!analysisResult.detailedAnalysis || !analysisResult.visualizationData || !analysisResult.doctorScript) {
-        throw new Error('Invalid response structure from Pica/Gemini');
+        throw new Error('Invalid response structure from Gemini');
       }
 
       return analysisResult;
     } catch (error) {
-      console.error('Error analyzing report with Pica:', error);
-      
+      console.error('Error analyzing report with Gemini:', error);
+
       // Return fallback response if API fails
       return {
         detailedAnalysis: `Analysis of ${reportType} report shows various findings that require medical interpretation. The report contains important information about the patient's condition.`,
@@ -121,6 +127,9 @@ Response format:
     }
   }
 
+  /**
+   * Generate an image prompt based on the medical analysis
+   */
   static async generateImagePrompt(detailedAnalysis: string, reportType: string): Promise<string> {
     const prompt = `
 Based on this medical analysis, create a detailed prompt for generating a medical illustration:
@@ -141,7 +150,7 @@ Keep the prompt under 200 words and focus on visual elements.
     try {
       const response = await this.makeRequest(prompt);
       const content = response.candidates?.[0]?.content?.parts?.[0]?.text;
-      
+
       if (!content) {
         // Fallback prompt
         return `Professional medical illustration of ${reportType.toLowerCase()} showing anatomical structures in cross-section, clean medical style, educational diagram, high contrast, labeled anatomy`;

@@ -1,6 +1,6 @@
 import { supabase } from './supabase';
 import { TextExtractionService } from './textExtraction';
-import { PicaService } from './pica';
+import { GeminiService } from './geminiService';
 import { ImageGenerationService } from './imageGeneration';
 import { STORAGE_BUCKETS } from '../config/constants';
 
@@ -29,14 +29,14 @@ export class ReportProcessingService {
       // Step 1: Extract text from the uploaded file
       console.log('Extracting text...');
       const extractedText = await TextExtractionService.extractText(fileUri, mimeType);
-      
+
       if (!extractedText.text || extractedText.text.trim().length === 0) {
         throw new Error('No text could be extracted from the file');
       }
 
-      // Step 2: Analyze the report with Pica/Gemini
-      console.log('Analyzing with Pica/Gemini...');
-      const analysis = await PicaService.analyzeReport(extractedText.text, reportType);
+      // Step 2: Analyze the report with Gemini
+      console.log('Analyzing with Gemini...');
+      const analysis = await GeminiService.analyzeReport(extractedText.text, reportType);
 
       // Step 3: Save the analysis to the database
       console.log('Saving analysis...');
@@ -73,7 +73,7 @@ export class ReportProcessingService {
 
       // Step 5: Generate image prompt and create AI illustration
       console.log('Generating AI illustration...');
-      const imagePrompt = await PicaService.generateImagePrompt(
+      const imagePrompt = await GeminiService.generateImagePrompt(
         analysis.detailedAnalysis,
         reportType
       );
@@ -108,7 +108,7 @@ export class ReportProcessingService {
 
     } catch (error) {
       console.error('Error processing report:', error);
-      
+
       return {
         reportId,
         analysisId: '',
