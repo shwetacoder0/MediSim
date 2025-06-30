@@ -18,13 +18,16 @@ import {
   User,
   Stethoscope,
   Activity,
-  Microscope
+  Microscope,
+  MessageCircle
 } from 'lucide-react-native';
 import MediaPicker from '../components/MediaPicker';
+import AIDoctorChat from '../components/AIDoctorChat';
 import { useAuth } from '../lib/auth-context';
 
 export default function HomeScreen() {
   const [showMediaPicker, setShowMediaPicker] = useState(false);
+  const [showAIDoctor, setShowAIDoctor] = useState(false);
   const { isAuthenticated, isLoading } = useAuth();
 
   // Redirect to auth screen if not authenticated
@@ -38,10 +41,6 @@ export default function HomeScreen() {
     setShowMediaPicker(true);
   };
 
-//   const handleUploadFile = () => {
-//     setShowMediaPicker(true);
-//   };
-
   const handleExploreSection = (section: string) => {
     router.push(`/${section}` as any);
   };
@@ -52,6 +51,10 @@ export default function HomeScreen() {
 
   const handleSettings = () => {
     router.push('/settings');
+  };
+
+  const handleAIDoctorChat = () => {
+    setShowAIDoctor(true);
   };
 
   // Show loading indicator while checking auth state
@@ -103,14 +106,31 @@ export default function HomeScreen() {
                 <Text style={styles.primaryButtonText}>Upload Report</Text>
               </LinearGradient>
             </TouchableOpacity>
-
-            {/* <TouchableOpacity style={styles.secondaryButton} onPress={handleUploadFile}>
-              <BlurView intensity={20} tint="dark" style={styles.secondaryBlur}>
-                <Upload size={24} color="rgba(255, 255, 255, 0.9)" />
-                <Text style={styles.secondaryButtonText}>Upload from Files</Text>
-              </BlurView>
-            </TouchableOpacity> */}
           </View>
+        </View>
+
+        {/* AI Doctor Section */}
+        <View style={styles.aiDoctorSection}>
+          <Text style={styles.aiDoctorTitle}>24/7 AI Medical Assistant</Text>
+          <Text style={styles.aiDoctorSubtitle}>
+            Get instant medical guidance and answers to your health questions
+          </Text>
+
+          <TouchableOpacity style={styles.aiDoctorButton} onPress={handleAIDoctorChat}>
+            <BlurView intensity={20} tint="dark" style={styles.aiDoctorBlur}>
+              <View style={styles.aiDoctorContent}>
+                <View style={styles.aiDoctorIcon}>
+                  <MessageCircle size={32} color="#4FACFE" />
+                </View>
+                <View style={styles.aiDoctorText}>
+                  <Text style={styles.aiDoctorButtonTitle}>Talk to AI Doctor</Text>
+                  <Text style={styles.aiDoctorButtonDescription}>
+                    Start a video consultation now
+                  </Text>
+                </View>
+              </View>
+            </BlurView>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.exploreSection}>
@@ -193,6 +213,16 @@ export default function HomeScreen() {
           <Text style={styles.closeModalText}>✕</Text>
         </TouchableOpacity>
       </Modal>
+
+      {/* AI Doctor Modal */}
+      <Modal
+        visible={showAIDoctor}
+        animationType="slide"
+        presentationStyle="fullScreen"
+        onRequestClose={() => setShowAIDoctor(false)}
+      >
+        <AIDoctorChat onClose={() => setShowAIDoctor(false)} />
+      </Modal>
     </View>
   );
 }
@@ -239,7 +269,7 @@ const styles = StyleSheet.create({
   },
   mainSection: {
     paddingHorizontal: 30,
-    marginBottom: 50,
+    marginBottom: 40,
   },
   sectionTitle: {
     fontSize: 32,
@@ -280,23 +310,59 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
   },
-  secondaryButton: {
-    borderRadius: 16,
+  aiDoctorSection: {
+    paddingHorizontal: 30,
+    marginBottom: 40,
+  },
+  aiDoctorTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  aiDoctorSubtitle: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.8)',
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 24,
+  },
+  aiDoctorButton: {
+    borderRadius: 20,
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
   },
-  secondaryBlur: {
+  aiDoctorBlur: {
+    padding: 20,
+  },
+  aiDoctorContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 18,
-    gap: 12,
   },
-  secondaryButtonText: {
-    color: 'rgba(255, 255, 255, 0.9)',
-    fontSize: 18,
-    fontWeight: '500',
+  aiDoctorIcon: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'rgba(79, 172, 254, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  aiDoctorText: {
+    flex: 1,
+  },
+  aiDoctorButtonTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 4,
+  },
+  aiDoctorButtonDescription: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.8)',
+    lineHeight: 18,
   },
   exploreSection: {
     paddingHorizontal: 30,

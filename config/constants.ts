@@ -8,6 +8,21 @@ export const GEMINI_CONFIG = {
   BASE_URL: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent'
 };
 
+// Pica API Configuration
+export const PICA_CONFIG = {
+  SECRET_KEY: 'your-pica-secret-key', // Replace with your actual Pica secret key
+  GEMINI_CONNECTION_KEY: 'your-pica-gemini-connection-key', // Replace with your actual connection key
+  ACTION_ID: 'conn_mod_def::GCmd5BQE388::PISTzTbvRSqXx0N0rMa-Lw',
+  BASE_URL: 'https://api.picaos.com/v1/passthrough/models/gemini-1.5-flash:generateContent'
+};
+
+// Tavus API Configuration
+export const TAVUS_CONFIG = {
+  apiKey: 'your-tavus-api-key', // Replace with your actual Tavus API key
+  replicaId: 'your-doctor-replica-id', // Replace with your doctor avatar replica ID
+  baseUrl: 'https://tavusapi.com', // Tavus API base URL
+};
+
 // Google Vision API Configuration
 export const GOOGLE_VISION_CONFIG = {
   API_KEY: '', // Replace with your actual API key
