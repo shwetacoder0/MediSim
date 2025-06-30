@@ -12,17 +12,20 @@ import {
   useWindowDimensions,
   Platform,
   FlatList,
-  Dimensions
+  Dimensions,
+  TextInput
 } from 'react-native';
 import { LineChart, BarChart, PieChart, ProgressChart } from 'react-native-chart-kit';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { router, useLocalSearchParams } from 'expo-router';
-import { ArrowLeft, Share2, Play, ChartBar as BarChart3, Eye, ChevronLeft, Download, Zap, MessageSquare, FileText, User, ChevronRight, Circle } from 'lucide-react-native';
+import { ArrowLeft, Share2, Play, ChartBar as BarChart3, Eye, ChevronLeft, Download, Zap, MessageSquare, FileText, User, ChevronRight, Circle, X, Mic, Send, Pause } from 'lucide-react-native';
 import { ReportProcessingService } from '../lib/reportProcessing';
 import { supabase } from '../lib/supabase';
 import ReportDetail from '../components/ReportDetail';
 import { STORAGE_BUCKETS } from '../config/constants';
+import { Video, ResizeMode } from 'expo-av';
+import ConversationalAI from '../components/ConversationalAI';
 
 interface ReportData {
   report: any;
@@ -36,6 +39,7 @@ export default function ReportResultsScreen() {
   const { reportId } = params;
   const { width } = useWindowDimensions();
   const scrollViewRef = useRef<ScrollView>(null);
+  const videoRef = useRef<Video>(null);
 
   const [reportData, setReportData] = useState<ReportData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -44,6 +48,12 @@ export default function ReportResultsScreen() {
   const [activeTab, setActiveTab] = useState('summary');
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+  // AI Doctor modal states
+  const [showDoctorModal, setShowDoctorModal] = useState(false);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [isCallActive, setIsCallActive] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // Hardcoded kidney images for now
   const kidneyImages = [
@@ -206,16 +216,38 @@ export default function ReportResultsScreen() {
     }
   };
 
-  const handleWatchExplanation = async () => {
+    const handleWatchExplanation = async () => {
     setGeneratingVideo(true);
 
-    // Simulate video generation
+    // Simulate video preparation
     setTimeout(() => {
       setGeneratingVideo(false);
-      // In production, this would play the actual AI doctor video
-      alert('AI Doctor video would play here with the explanation');
-    }, 3000);
+      setShowDoctorModal(true);
+    }, 1000);
   };
+
+  const handleCloseModal = () => {
+    if (videoRef.current) {
+      videoRef.current.pauseAsync();
+    }
+    setIsVideoPlaying(false);
+    setIsCallActive(false);
+    setShowDoctorModal(false);
+  };
+
+  const handlePlayPause = async () => {
+    if (videoRef.current) {
+      if (isVideoPlaying) {
+        await videoRef.current.pauseAsync();
+      } else {
+        await videoRef.current.playAsync();
+      }
+      setIsVideoPlaying(!isVideoPlaying);
+    }
+  };
+
+  // ElevenLabs conversation status is now managed by the ConversationalAI component
+  // via the onStatusChange callback
 
   const handleViewMetrics = () => {
     setShowMetrics(true);
@@ -401,21 +433,21 @@ export default function ReportResultsScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Image Dots Indicator */}
-          <View style={styles.imageDotContainer}>
-            {kidneyImages.map((_, index) => (
-              <TouchableOpacity
-                key={index}
-                onPress={() => handleImageChange(index)}
-                style={styles.dotButton}
-              >
-                <View style={[
-                  styles.dot,
-                  activeImageIndex === index ? styles.activeDot : {}
-                ]} />
-              </TouchableOpacity>
-            ))}
-          </View>
+                        {/* Image Dots Indicator */}
+        <View style={styles.imageDotContainer}>
+          {kidneyImages.map((_, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={() => handleImageChange(index)}
+              style={styles.dotButton}
+            >
+              <View style={[
+                styles.dot,
+                activeImageIndex === index ? styles.activeDot : {}
+              ]} />
+            </TouchableOpacity>
+          ))}
+        </View>
         </View>
 
                         {/* Image Description */}
@@ -726,6 +758,115 @@ export default function ReportResultsScreen() {
               </>
             )}
           </ScrollView>
+        </View>
+      </Modal>
+
+      {/* AI Doctor Modal */}
+      <Modal
+        visible={showDoctorModal}
+        animationType="slide"
+        presentationStyle="fullScreen"
+        onRequestClose={handleCloseModal}
+      >
+        <View style={styles.doctorModalContainer}>
+          <LinearGradient
+            colors={['#0A0A0A', '#1A1A2E', '#16213E']}
+            style={styles.gradient}
+          />
+
+          {/* Modal Header */}
+          <View style={styles.doctorModalHeader}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={handleCloseModal}
+            >
+              <X size={22} color="#FFFFFF" />
+            </TouchableOpacity>
+            <Text style={styles.doctorModalTitle}>AI Doctor Consultation</Text>
+            <View style={styles.headerSpacer} />
+          </View>
+
+          {/* Video Player */}
+          <View style={styles.videoContainer}>
+            <Video
+              ref={videoRef}
+              source={require('../assets/images/ea44bdb309.mp4')}
+              rate={1.0}
+              volume={1.0}
+              isMuted={false}
+              resizeMode={ResizeMode.CONTAIN}
+              shouldPlay={false}
+              isLooping={false}
+              style={styles.video}
+              onPlaybackStatusUpdate={(status) => {
+                if (status.isLoaded) {
+                  setIsVideoPlaying(status.isPlaying);
+                }
+              }}
+            />
+            <TouchableOpacity
+              style={styles.videoControlButton}
+              onPress={handlePlayPause}
+            >
+              {isVideoPlaying ? (
+                <Pause size={24} color="#FFFFFF" />
+              ) : (
+                <Play size={24} color="#FFFFFF" />
+              )}
+            </TouchableOpacity>
+          </View>
+
+          {/* ElevenLabs Voice Conversation Section */}
+          <View style={styles.conversationContainer}>
+            <View style={styles.conversationStatus}>
+              {isProcessing ? (
+                <View style={styles.processingContainer}>
+                  <ActivityIndicator size="large" color="#4FACFE" />
+                  <Text style={styles.processingText}>Connecting to AI Doctor...</Text>
+                </View>
+              ) : isCallActive ? (
+                <View style={styles.activeCallContainer}>
+                  <View style={styles.waveformContainer}>
+                    <View style={[styles.waveBar, styles.waveBar1]} />
+                    <View style={[styles.waveBar, styles.waveBar2]} />
+                    <View style={[styles.waveBar, styles.waveBar3]} />
+                    <View style={[styles.waveBar, styles.waveBar4]} />
+                    <View style={[styles.waveBar, styles.waveBar5]} />
+                  </View>
+                  <Text style={styles.callActiveText}>AI Doctor is listening...</Text>
+                  <Text style={styles.callInstructionText}>Speak clearly and ask questions about your report</Text>
+                </View>
+              ) : (
+                <View style={styles.startCallContainer}>
+                  <Text style={styles.startCallText}>Start a voice conversation with the AI doctor</Text>
+                  <Text style={styles.callDescriptionText}>
+                    The AI will listen to your questions and respond with information about your kidney scan
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            {/* ElevenLabs Conversational AI Component */}
+            <View style={styles.elevenlabsContainer}>
+              <ConversationalAI
+                dom={{ style: styles.conversationalAI }}
+                reportId={reportId as string}
+                onStatusChange={(status) => {
+                  if (status === 'connected') {
+                    setIsCallActive(true);
+                    setIsProcessing(false);
+                  } else if (status === 'disconnected') {
+                    setIsCallActive(false);
+                    setIsProcessing(false);
+                  } else if (status === 'error') {
+                    setIsCallActive(false);
+                    setIsProcessing(false);
+                    alert('Error connecting to AI Doctor. Please try again.');
+                  }
+                }}
+              />
+            </View>
+          </View>
         </View>
       </Modal>
     </View>
@@ -1220,5 +1361,166 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: 'rgba(255, 255, 255, 0.8)',
     lineHeight: 20,
+  },
+  // AI Doctor Modal styles
+  doctorModalContainer: {
+    flex: 1,
+    backgroundColor: '#000',
+  },
+  doctorModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 60,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  doctorModalTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    textAlign: 'center',
+  },
+  headerSpacer: {
+    width: 44,
+    height: 44,
+  },
+  videoContainer: {
+    width: '100%',
+    height: 250,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+    position: 'relative',
+  },
+  video: {
+    width: '100%',
+    height: '100%',
+  },
+  videoControlButton: {
+    position: 'absolute',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  conversationContainer: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+  conversationStatus: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  processingContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  processingText: {
+    fontSize: 16,
+    color: '#FFFFFF',
+    marginTop: 20,
+  },
+  activeCallContainer: {
+    alignItems: 'center',
+    padding: 20,
+  },
+  waveformContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 80,
+    marginBottom: 20,
+  },
+  waveBar: {
+    width: 4,
+    marginHorizontal: 3,
+    backgroundColor: '#4FACFE',
+    borderRadius: 2,
+  },
+  waveBar1: {
+    height: 15,
+  },
+  waveBar2: {
+    height: 30,
+  },
+  waveBar3: {
+    height: 45,
+  },
+  waveBar4: {
+    height: 30,
+  },
+  waveBar5: {
+    height: 15,
+  },
+  callActiveText: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 10,
+  },
+  callInstructionText: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.7)',
+    textAlign: 'center',
+  },
+  startCallContainer: {
+    alignItems: 'center',
+    padding: 20,
+  },
+  startCallText: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  callDescriptionText: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.7)',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  callControls: {
+    paddingVertical: 20,
+    alignItems: 'center',
+  },
+  startCallButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#4FACFE',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 30,
+  },
+  endCallButton: {
+    backgroundColor: '#FF6B6B',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 30,
+  },
+  callButtonIcon: {
+    marginRight: 8,
+  },
+  callButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  disabledButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  elevenlabsContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 20,
+  },
+  conversationalAI: {
+    width: 120,
+    height: 60,
   },
 });
