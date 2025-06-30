@@ -10,28 +10,29 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
-import { Video, ResizeMode } from 'expo-av';
-import { Mic, MicOff, Phone, PhoneOff, User } from 'lucide-react-native';
+import { WebView } from 'react-native-webview';
+import { Phone, PhoneOff, User, Video, VideoOff } from 'lucide-react-native';
 import { TavusService, ConversationSession } from '../lib/tavusService';
 import { TAVUS_CONFIG } from '../config/constants';
 
 interface AIDoctorChatProps {
   onClose?: () => void;
+  patientContext?: string;
 }
 
-export default function AIDoctorChat({ onClose }: AIDoctorChatProps) {
+export default function AIDoctorChat({ onClose, patientContext }: AIDoctorChatProps) {
   const [session, setSession] = useState<ConversationSession | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
   const [isCallActive, setIsCallActive] = useState(false);
-  const videoRef = useRef<Video>(null);
+  const [error, setError] = useState<string | null>(null);
+  const webViewRef = useRef<WebView>(null);
   const tavusService = useRef(new TavusService(TAVUS_CONFIG));
 
   useEffect(() => {
     return () => {
       // Cleanup: end conversation when component unmounts
-      if (session?.sessionId && isCallActive) {
-        tavusService.current.endConversation(session.sessionId);
+      if (session?.conversationId && isCallActive) {
+        tavusService.current.endConversation(session.conversationId);
       }
     };
   }, [session, isCallActive]);
@@ -39,21 +40,18 @@ export default function AIDoctorChat({ onClose }: AIDoctorChatProps) {
   const startConversation = async () => {
     try {
       setIsConnecting(true);
-      
-      // Request microphone permissions
-      if (Platform.OS !== 'web') {
-        // Handle native permissions here
-      }
+      setError(null);
 
-      const newSession = await tavusService.current.startConversation();
+      const newSession = await tavusService.current.startConversation(patientContext);
       setSession(newSession);
       setIsCallActive(true);
       
       // Poll for connection status
-      pollConnectionStatus(newSession.sessionId);
+      pollConnectionStatus(newSession.conversationId);
     } catch (error) {
       console.error('Failed to start conversation:', error);
-      Alert.alert('Error', 'Failed to connect to AI Doctor. Please try again.');
+      setError('Failed to connect to AI Doctor. Please try again.');
+      Alert.alert('Connection Error', 'Failed to connect to AI Doctor. Please try again.');
     } finally {
       setIsConnecting(false);
     }
@@ -63,7 +61,7 @@ export default function AIDoctorChat({ onClose }: AIDoctorChatProps) {
     if (!session) return;
 
     try {
-      await tavusService.current.endConversation(session.sessionId);
+      await tavusService.current.endConversation(session.conversationId);
       setSession(null);
       setIsCallActive(false);
       onClose?.();
@@ -72,29 +70,24 @@ export default function AIDoctorChat({ onClose }: AIDoctorChatProps) {
     }
   };
 
-  const pollConnectionStatus = async (sessionId: string) => {
+  const pollConnectionStatus = async (conversationId: string) => {
     try {
-      const status = await tavusService.current.getConversationStatus(sessionId);
+      const status = await tavusService.current.getConversationStatus(conversationId);
       setSession(status);
 
       if (status.status === 'connected') {
-        // Connection established
         console.log('AI Doctor connected');
       } else if (status.status === 'error') {
-        Alert.alert('Connection Error', 'Failed to connect to AI Doctor');
+        setError('Connection failed');
         setIsCallActive(false);
       } else if (status.status === 'connecting') {
         // Continue polling
-        setTimeout(() => pollConnectionStatus(sessionId), 2000);
+        setTimeout(() => pollConnectionStatus(conversationId), 2000);
       }
     } catch (error) {
       console.error('Error polling status:', error);
+      setError('Connection error');
     }
-  };
-
-  const toggleMute = () => {
-    setIsMuted(!isMuted);
-    // Implement actual mute functionality with Tavus API
   };
 
   if (!isCallActive && !isConnecting) {
@@ -105,10 +98,13 @@ export default function AIDoctorChat({ onClose }: AIDoctorChatProps) {
             <View style={styles.avatarContainer}>
               <User size={40} color="#4FACFE" />
             </View>
-            <Text style={styles.doctorTitle}>AI Medical Assistant</Text>
+            <Text style={styles.doctorTitle}>24/7 AI Medical Assistant</Text>
             <Text style={styles.doctorDescription}>
-              Available 24/7 to answer your health questions and provide medical guidance
+              Get instant medical guidance and answers to your health questions from our AI doctor
             </Text>
+            {error && (
+              <Text style={styles.errorText}>{error}</Text>
+            )}
           </View>
 
           <TouchableOpacity
@@ -124,8 +120,8 @@ export default function AIDoctorChat({ onClose }: AIDoctorChatProps) {
                 <ActivityIndicator color="#FFFFFF" size="small" />
               ) : (
                 <>
-                  <Phone size={20} color="#FFFFFF" />
-                  <Text style={styles.startButtonText}>Start Consultation</Text>
+                  <Video size={20} color="#FFFFFF" />
+                  <Text style={styles.startButtonText}>Start Video Consultation</Text>
                 </>
               )}
             </LinearGradient>
@@ -137,23 +133,37 @@ export default function AIDoctorChat({ onClose }: AIDoctorChatProps) {
 
   return (
     <View style={styles.chatContainer}>
-      {/* Video Container */}
+      {/* WebView Container for Tavus Conversation */}
       <View style={styles.videoContainer}>
-        {session?.videoUrl ? (
-          <Video
-            ref={videoRef}
-            source={{ uri: session.videoUrl }}
-            rate={1.0}
-            volume={1.0}
-            isMuted={isMuted}
-            resizeMode={ResizeMode.COVER}
-            shouldPlay={isCallActive}
-            style={styles.video}
+        {session?.conversationUrl ? (
+          <WebView
+            ref={webViewRef}
+            source={{ uri: session.conversationUrl }}
+            style={styles.webView}
+            mediaPlaybackRequiresUserAction={false}
+            allowsInlineMediaPlayback={true}
+            javaScriptEnabled={true}
+            domStorageEnabled={true}
+            startInLoadingState={true}
+            renderLoading={() => (
+              <View style={styles.loadingVideo}>
+                <ActivityIndicator size="large" color="#4FACFE" />
+                <Text style={styles.loadingText}>Connecting to AI Doctor...</Text>
+              </View>
+            )}
+            onError={(syntheticEvent) => {
+              const { nativeEvent } = syntheticEvent;
+              console.error('WebView error: ', nativeEvent);
+              setError('Failed to load video consultation');
+            }}
+            onLoadEnd={() => {
+              console.log('WebView loaded successfully');
+            }}
           />
         ) : (
           <View style={styles.loadingVideo}>
             <ActivityIndicator size="large" color="#4FACFE" />
-            <Text style={styles.loadingText}>Connecting to AI Doctor...</Text>
+            <Text style={styles.loadingText}>Preparing consultation...</Text>
           </View>
         )}
       </View>
@@ -163,17 +173,6 @@ export default function AIDoctorChat({ onClose }: AIDoctorChatProps) {
         <BlurView intensity={30} tint="dark" style={styles.controlsBlur}>
           <View style={styles.controls}>
             <TouchableOpacity
-              style={[styles.controlButton, isMuted && styles.mutedButton]}
-              onPress={toggleMute}
-            >
-              {isMuted ? (
-                <MicOff size={24} color="#FFFFFF" />
-              ) : (
-                <Mic size={24} color="#FFFFFF" />
-              )}
-            </TouchableOpacity>
-
-            <TouchableOpacity
               style={styles.endCallButton}
               onPress={endConversation}
             >
@@ -182,9 +181,9 @@ export default function AIDoctorChat({ onClose }: AIDoctorChatProps) {
           </View>
 
           <Text style={styles.statusText}>
-            {session?.status === 'connecting' ? 'Connecting...' : 
-             session?.status === 'connected' ? 'AI Doctor is listening' : 
-             'Disconnected'}
+            {session?.status === 'connecting' ? 'Connecting to AI Doctor...' : 
+             session?.status === 'connected' ? 'AI Doctor is ready to help' : 
+             'Consultation ended'}
           </Text>
         </BlurView>
       </View>
@@ -223,12 +222,19 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#FFFFFF',
     marginBottom: 8,
+    textAlign: 'center',
   },
   doctorDescription: {
     fontSize: 14,
     color: 'rgba(255, 255, 255, 0.8)',
     textAlign: 'center',
     lineHeight: 20,
+  },
+  errorText: {
+    fontSize: 14,
+    color: '#FF6B6B',
+    textAlign: 'center',
+    marginTop: 12,
   },
   startButton: {
     borderRadius: 16,
@@ -254,7 +260,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000',
   },
-  video: {
+  webView: {
     flex: 1,
   },
   loadingVideo: {
@@ -273,7 +279,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    paddingBottom: 40,
+    paddingBottom: Platform.OS === 'ios' ? 40 : 20,
   },
   controlsBlur: {
     margin: 20,
@@ -284,19 +290,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 20,
     marginBottom: 12,
-  },
-  controlButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  mutedButton: {
-    backgroundColor: 'rgba(255, 107, 107, 0.8)',
   },
   endCallButton: {
     width: 56,

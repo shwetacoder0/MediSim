@@ -18,8 +18,9 @@ export const PICA_CONFIG = {
 
 // Tavus API Configuration
 export const TAVUS_CONFIG = {
-  apiKey: '2cc763bf7c804f9abb14af8854bc9027', // Replace with your actual Tavus API key
-  replicaId: 'rc2146c13e81', // Replace with your doctor avatar replica ID
+  apiKey: 'your-tavus-api-key', // Replace with your actual Tavus API key
+  replicaId: 'your-replica-id', // Replace with your doctor avatar replica ID
+  personaId: 'your-persona-id', // Replace with your doctor persona ID (create once)
   baseUrl: 'https://tavusapi.com', // Tavus API base URL
 };
 
