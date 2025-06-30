@@ -4,9 +4,12 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "EXPO_NO_TELEMETRY=1 expo start",
-    "build:web": "expo export --platform web",
-    "lint": "expo lint"
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "build": "expo build",
+    "eject": "expo eject"
   },
   "dependencies": {
     "@elevenlabs/react": "^0.1.7",
@@ -16,6 +19,7 @@
     "@react-native-async-storage/async-storage": "^2.1.2",
     "@react-navigation/bottom-tabs": "^7.2.0",
     "@react-navigation/native": "^7.0.14",
+    "@react-three/fiber": "^9.1.4",
     "@supabase/supabase-js": "^2.50.2",
     "base-64": "^1.0.0",
     "base64-arraybuffer": "^1.0.2",
@@ -57,7 +61,7 @@
     "react-native-svg": "15.11.2",
     "react-native-url-polyfill": "^2.0.0",
     "react-native-web": "^0.20.0",
-    "react-native-webview": "^13.13.5",
+    "react-native-webview": "^13.15.0",
     "three": "^0.160.0"
   },
   "devDependencies": {

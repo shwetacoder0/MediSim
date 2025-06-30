@@ -103,8 +103,8 @@ export default function ProfileScreen() {
                 const { error } = await supabase.auth.admin.deleteUser(user.id);
                 if (error) throw error;
 
-                Alert.alert('Account Deleted', 'Your account has been deleted.');
-                router.push('/');
+            Alert.alert('Account Deleted', 'Your account has been deleted.');
+            router.push('/');
               }
             } catch (error) {
               console.error('Error deleting account:', error);
@@ -130,8 +130,8 @@ export default function ProfileScreen() {
     try {
       if (user) {
         await updateUserProfile({ full_name: tempName });
-        setFullName(tempName);
-        setIsEditingName(false);
+    setFullName(tempName);
+    setIsEditingName(false);
         // Refresh user data
         await refreshUser();
       }

@@ -45,7 +45,7 @@ export default function AIDoctorChat({ onClose, patientContext }: AIDoctorChatPr
       const newSession = await tavusService.current.startConversation(patientContext);
       setSession(newSession);
       setIsCallActive(true);
-      
+
       // Poll for connection status
       pollConnectionStatus(newSession.conversationId);
     } catch (error) {
@@ -140,7 +140,7 @@ export default function AIDoctorChat({ onClose, patientContext }: AIDoctorChatPr
             ref={webViewRef}
             source={{ uri: session.conversationUrl }}
             style={styles.webView}
-            mediaPlaybackRequiresUserAction={false}
+            mediaPlaybackRequiresUserAction={Platform.OS === 'ios' ? false : undefined}
             allowsInlineMediaPlayback={true}
             javaScriptEnabled={true}
             domStorageEnabled={true}
@@ -181,8 +181,8 @@ export default function AIDoctorChat({ onClose, patientContext }: AIDoctorChatPr
           </View>
 
           <Text style={styles.statusText}>
-            {session?.status === 'connecting' ? 'Connecting to AI Doctor...' : 
-             session?.status === 'connected' ? 'AI Doctor is ready to help' : 
+            {session?.status === 'connecting' ? 'Connecting to AI Doctor...' :
+             session?.status === 'connected' ? 'AI Doctor is ready to help' :
              'Consultation ended'}
           </Text>
         </BlurView>

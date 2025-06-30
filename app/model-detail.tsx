@@ -118,11 +118,11 @@ export default function ModelDetailScreen() {
                       </TouchableOpacity>
                     </View>
                   </View>
-                  
+
                   <View style={styles.modelInfo}>
                     <Text style={styles.modelTitle}>{model.title}</Text>
                     <Text style={styles.modelDescription}>{model.description}</Text>
-                    
+
                     <View style={styles.modelFeatures}>
                       <View style={styles.featureTag}>
                         <Text style={styles.featureText}>Interactive</Text>
@@ -217,7 +217,7 @@ export default function ModelDetailScreen() {
           >
             <X size={28} color="#FFFFFF" />
           </TouchableOpacity>
-          
+
           {selectedModel && (
             <GLBViewer
               modelUrl={EducationService.get3DModelUrl(selectedModel.glb_file_url || '')}

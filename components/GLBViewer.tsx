@@ -1,10 +1,21 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { View, StyleSheet, ActivityIndicator, Text, TouchableOpacity, Platform } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, Text, TouchableOpacity, Platform, Alert } from 'react-native';
 import { GLView } from 'expo-gl';
-import { Renderer, Scene, PerspectiveCamera, AmbientLight, DirectionalLight } from 'expo-three';
+import { Renderer } from 'expo-three';
 import * as THREE from 'three';
+import { Asset } from 'expo-asset';
+import * as FileSystem from 'expo-file-system';
 import { RotateCcw, ZoomIn, ZoomOut, Rotate3d as RotateLeft, Rotate3d as RotateRight } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
+import { fetchModelFromUrl, isGlbUrl, logGlbInfo } from '../lib/modelLoader';
+
+// Since we can't directly import the GLTFLoader type, we'll define a simplified interface
+interface GLTF {
+  scene: THREE.Group;
+  scenes: THREE.Group[];
+  animations: THREE.AnimationClip[];
+  cameras: THREE.Camera[];
+}
 
 interface GLBViewerProps {
   modelUrl: string;
@@ -14,8 +25,8 @@ interface GLBViewerProps {
 export default function GLBViewer({ modelUrl, style }: GLBViewerProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const sceneRef = useRef<Scene | null>(null);
-  const cameraRef = useRef<PerspectiveCamera | null>(null);
+  const sceneRef = useRef<THREE.Scene | null>(null);
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const rendererRef = useRef<Renderer | null>(null);
   const modelRef = useRef<THREE.Group | null>(null);
   const animationRef = useRef<number | null>(null);
@@ -45,11 +56,12 @@ export default function GLBViewer({ modelUrl, style }: GLBViewerProps) {
       rendererRef.current = renderer;
 
       // Create scene
-      const scene = new Scene();
+      const scene = new THREE.Scene();
+      scene.background = null; // Transparent background
       sceneRef.current = scene;
 
       // Create camera
-      const camera = new PerspectiveCamera(
+      const camera = new THREE.PerspectiveCamera(
         75,
         gl.drawingBufferWidth / gl.drawingBufferHeight,
         0.1,
@@ -59,18 +71,40 @@ export default function GLBViewer({ modelUrl, style }: GLBViewerProps) {
       cameraRef.current = camera;
 
       // Add lights
-      const ambientLight = new AmbientLight(0x404040, 0.6);
+      const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
       scene.add(ambientLight);
 
-      const directionalLight = new DirectionalLight(0xffffff, 0.8);
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
       directionalLight.position.set(1, 1, 1);
       scene.add(directionalLight);
 
-      const directionalLight2 = new DirectionalLight(0xffffff, 0.4);
+      const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.4);
       directionalLight2.position.set(-1, -1, -1);
       scene.add(directionalLight2);
 
-      // Create placeholder model based on URL
+      // Log the model URL we're trying to load
+      console.log('Loading model from URL:', modelUrl);
+
+      // Check if it's a GLB URL
+      if (isGlbUrl(modelUrl)) {
+        try {
+          // Download the model and get local URI
+          const localUri = await fetchModelFromUrl(modelUrl);
+
+          if (localUri) {
+            // Log info about the file (for debugging)
+            await logGlbInfo(localUri);
+
+            console.log('Successfully loaded GLB model, using placeholder for now');
+          } else {
+            console.error('Failed to fetch model from URL');
+          }
+        } catch (err) {
+          console.error('Error loading GLB model:', err);
+        }
+      }
+
+      // For now, use the placeholder models
       createPlaceholderModel(scene, modelUrl);
 
       setLoading(false);
@@ -104,9 +138,9 @@ export default function GLBViewer({ modelUrl, style }: GLBViewerProps) {
     }
   };
 
-  const createPlaceholderModel = (scene: Scene, url: string) => {
+  const createPlaceholderModel = (scene: THREE.Scene, url: string) => {
     const group = new THREE.Group();
-    
+
     // Determine model type from URL
     if (url.includes('brain')) {
       createBrainModel(group);
@@ -124,7 +158,7 @@ export default function GLBViewer({ modelUrl, style }: GLBViewerProps) {
   const createBrainModel = (group: THREE.Group) => {
     // Main brain hemisphere
     const brainGeometry = new THREE.SphereGeometry(1, 32, 32);
-    const brainMaterial = new THREE.MeshPhongMaterial({ 
+    const brainMaterial = new THREE.MeshPhongMaterial({
       color: 0xffc0cb,
       shininess: 20
     });
@@ -134,7 +168,7 @@ export default function GLBViewer({ modelUrl, style }: GLBViewerProps) {
 
     // Brain stem
     const stemGeometry = new THREE.CylinderGeometry(0.3, 0.4, 1, 8);
-    const stemMaterial = new THREE.MeshPhongMaterial({ 
+    const stemMaterial = new THREE.MeshPhongMaterial({
       color: 0xffb6c1,
       shininess: 20
     });
@@ -144,7 +178,7 @@ export default function GLBViewer({ modelUrl, style }: GLBViewerProps) {
 
     // Cerebellum
     const cerebellumGeometry = new THREE.SphereGeometry(0.4, 16, 16);
-    const cerebellumMaterial = new THREE.MeshPhongMaterial({ 
+    const cerebellumMaterial = new THREE.MeshPhongMaterial({
       color: 0xff69b4,
       shininess: 20
     });
@@ -154,7 +188,7 @@ export default function GLBViewer({ modelUrl, style }: GLBViewerProps) {
 
     // Left hemisphere detail
     const leftHemisphere = new THREE.SphereGeometry(0.5, 16, 16);
-    const leftMaterial = new THREE.MeshPhongMaterial({ 
+    const leftMaterial = new THREE.MeshPhongMaterial({
       color: 0xffa0b4,
       shininess: 25
     });
@@ -182,7 +216,7 @@ export default function GLBViewer({ modelUrl, style }: GLBViewerProps) {
     ]);
 
     const tubeGeometry = new THREE.TubeGeometry(curve, 64, 0.15, 8, false);
-    const intestineMaterial = new THREE.MeshPhongMaterial({ 
+    const intestineMaterial = new THREE.MeshPhongMaterial({
       color: 0xffb6c1,
       shininess: 10
     });
@@ -200,7 +234,7 @@ export default function GLBViewer({ modelUrl, style }: GLBViewerProps) {
     ]);
 
     const largeTubeGeometry = new THREE.TubeGeometry(largeCurve, 32, 0.25, 8, false);
-    const largeIntestineMaterial = new THREE.MeshPhongMaterial({ 
+    const largeIntestineMaterial = new THREE.MeshPhongMaterial({
       color: 0xff9999,
       shininess: 10
     });
@@ -209,7 +243,7 @@ export default function GLBViewer({ modelUrl, style }: GLBViewerProps) {
 
     // Stomach
     const stomachGeometry = new THREE.SphereGeometry(0.6, 16, 16);
-    const stomachMaterial = new THREE.MeshPhongMaterial({ 
+    const stomachMaterial = new THREE.MeshPhongMaterial({
       color: 0xffcccc,
       shininess: 15
     });
@@ -220,7 +254,7 @@ export default function GLBViewer({ modelUrl, style }: GLBViewerProps) {
 
     // Liver (simplified)
     const liverGeometry = new THREE.BoxGeometry(1.2, 0.8, 0.6);
-    const liverMaterial = new THREE.MeshPhongMaterial({ 
+    const liverMaterial = new THREE.MeshPhongMaterial({
       color: 0x8B4513,
       shininess: 20
     });
@@ -267,7 +301,7 @@ export default function GLBViewer({ modelUrl, style }: GLBViewerProps) {
         style={styles.glView}
         onContextCreate={onContextCreate}
       />
-      
+
       {loading && (
         <View style={styles.loadingOverlay}>
           <ActivityIndicator size="large" color="#4FACFE" />
@@ -282,19 +316,19 @@ export default function GLBViewer({ modelUrl, style }: GLBViewerProps) {
             <TouchableOpacity style={styles.controlButton} onPress={resetView}>
               <RotateCcw size={20} color="#FFFFFF" />
             </TouchableOpacity>
-            
+
             <TouchableOpacity style={styles.controlButton} onPress={zoomIn}>
               <ZoomIn size={20} color="#FFFFFF" />
             </TouchableOpacity>
-            
+
             <TouchableOpacity style={styles.controlButton} onPress={zoomOut}>
               <ZoomOut size={20} color="#FFFFFF" />
             </TouchableOpacity>
-            
+
             <TouchableOpacity style={styles.controlButton} onPress={rotateLeft}>
               <RotateLeft size={20} color="#FFFFFF" />
             </TouchableOpacity>
-            
+
             <TouchableOpacity style={styles.controlButton} onPress={rotateRight}>
               <RotateRight size={20} color="#FFFFFF" />
             </TouchableOpacity>
