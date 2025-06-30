@@ -88,7 +88,7 @@ export default function WelcomeScreen() {
       {/* Bolt Icon at the top - now clickable */}
       <TouchableOpacity style={styles.boltIconContainer} onPress={handleBoltClick}>
         <Image
-          source={require('../assets/images/white_circle_360x360.png')}
+          source={require('../assets/images/black_circle_360x360.png')}
           style={styles.boltIcon}
           resizeMode="contain"
         />
