@@ -4,7 +4,7 @@ import { GLView } from 'expo-gl';
 import { Renderer, Scene, PerspectiveCamera, AmbientLight, DirectionalLight } from 'expo-three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import * as THREE from 'three';
-import { RotateCcw, ZoomIn, ZoomOut, RotateLeft, RotateRight } from 'lucide-react-native';
+import { RotateCcw, ZoomIn, ZoomOut, Rotate3d as RotateLeft, Rotate3d as RotateRight } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
 
 interface GLBViewerProps {
