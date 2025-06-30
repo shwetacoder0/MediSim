@@ -8,8 +8,6 @@ import {
   Dimensions,
   ActivityIndicator,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft, Play, Users, TrendingUp } from 'lucide-react-native';
 import { WebView } from 'react-native-webview';
@@ -43,7 +41,7 @@ export default function DiseaseDetailScreen() {
   };
 
   const getSeverityColor = (index: number) => {
-    const colors = ['#FF6B6B', '#FFB347', '#4ECDC4'];
+    const colors = ['#FF8A65', '#FFB74D', '#6BCF7F'];
     return colors[index % colors.length];
   };
 
@@ -60,11 +58,7 @@ export default function DiseaseDetailScreen() {
   if (loading) {
     return (
       <View style={[styles.container, styles.loadingContainer]}>
-        <LinearGradient
-          colors={['#0A0A0A', '#1A1A2E', '#16213E']}
-          style={styles.gradient}
-        />
-        <ActivityIndicator size="large" color="#4FACFE" />
+        <ActivityIndicator size="large" color="#4A90E2" />
         <Text style={styles.loadingText}>Loading disease information...</Text>
       </View>
     );
@@ -72,13 +66,8 @@ export default function DiseaseDetailScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#0A0A0A', '#1A1A2E', '#16213E']}
-        style={styles.gradient}
-      />
-
       <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-        <ArrowLeft size={24} color="#FFFFFF" />
+        <ArrowLeft size={20} color="#6B7280" />
       </TouchableOpacity>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -94,61 +83,59 @@ export default function DiseaseDetailScreen() {
         <View style={styles.diseasesSection}>
           {diseases.map((disease, index) => (
             <View key={disease.id} style={styles.diseaseCard}>
-              <BlurView intensity={15} tint="dark" style={styles.cardBlur}>
-                <View style={styles.cardContent}>
-                  {/* YouTube Video Embed */}
-                  <View style={styles.videoContainer}>
-                    <WebView
-                      source={{ uri: EducationService.getYouTubeEmbedUrl(disease.content_url || '') }}
-                      style={styles.webView}
-                      allowsInlineMediaPlayback={true}
-                      mediaPlaybackRequiresUserAction={false}
-                      javaScriptEnabled={true}
-                      domStorageEnabled={true}
-                      startInLoadingState={true}
-                      renderLoading={() => (
-                        <View style={styles.videoPlaceholder}>
-                          <Play size={40} color="rgba(255, 255, 255, 0.8)" />
-                          <Text style={styles.loadingVideoText}>Loading video...</Text>
-                        </View>
-                      )}
-                    />
-                    <View style={styles.durationBadge}>
-                      <Text style={styles.durationText}>Educational</Text>
+              <View style={styles.cardContent}>
+                {/* YouTube Video Embed */}
+                <View style={styles.videoContainer}>
+                  <WebView
+                    source={{ uri: EducationService.getYouTubeEmbedUrl(disease.content_url || '') }}
+                    style={styles.webView}
+                    allowsInlineMediaPlayback={true}
+                    mediaPlaybackRequiresUserAction={false}
+                    javaScriptEnabled={true}
+                    domStorageEnabled={true}
+                    startInLoadingState={true}
+                    renderLoading={() => (
+                      <View style={styles.videoPlaceholder}>
+                        <Play size={32} color="#6B7280" />
+                        <Text style={styles.loadingVideoText}>Loading video...</Text>
+                      </View>
+                    )}
+                  />
+                  <View style={styles.durationBadge}>
+                    <Text style={styles.durationText}>Educational</Text>
+                  </View>
+                </View>
+                
+                <View style={styles.diseaseInfo}>
+                  <View style={styles.diseaseHeader}>
+                    <Text style={styles.diseaseTitle}>{disease.title}</Text>
+                    <View style={[
+                      styles.severityBadge,
+                      { backgroundColor: getSeverityColor(index) + '15' }
+                    ]}>
+                      <Text style={[
+                        styles.severityText,
+                        { color: getSeverityColor(index) }
+                      ]}>
+                        Important
+                      </Text>
                     </View>
                   </View>
                   
-                  <View style={styles.diseaseInfo}>
-                    <View style={styles.diseaseHeader}>
-                      <Text style={styles.diseaseTitle}>{disease.title}</Text>
-                      <View style={[
-                        styles.severityBadge,
-                        { backgroundColor: getSeverityColor(index) + '20' }
-                      ]}>
-                        <Text style={[
-                          styles.severityText,
-                          { color: getSeverityColor(index) }
-                        ]}>
-                          Important
-                        </Text>
-                      </View>
+                  <Text style={styles.diseaseDescription}>{disease.description}</Text>
+                  
+                  <View style={styles.statsContainer}>
+                    <View style={styles.statItem}>
+                      <Users size={14} color="#9CA3AF" />
+                      <Text style={styles.statText}>{getPrevalenceText(index)}</Text>
                     </View>
-                    
-                    <Text style={styles.diseaseDescription}>{disease.description}</Text>
-                    
-                    <View style={styles.statsContainer}>
-                      <View style={styles.statItem}>
-                        <Users size={16} color="rgba(255, 255, 255, 0.6)" />
-                        <Text style={styles.statText}>{getPrevalenceText(index)}</Text>
-                      </View>
-                      <View style={styles.statItem}>
-                        <TrendingUp size={16} color="rgba(255, 255, 255, 0.6)" />
-                        <Text style={styles.statText}>Learn More</Text>
-                      </View>
+                    <View style={styles.statItem}>
+                      <TrendingUp size={14} color="#9CA3AF" />
+                      <Text style={styles.statText}>Learn More</Text>
                     </View>
                   </View>
                 </View>
-              </BlurView>
+              </View>
             </View>
           ))}
 
@@ -167,18 +154,11 @@ export default function DiseaseDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#F8F9FA',
   },
   loadingContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  gradient: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
   },
   backButton: {
     position: 'absolute',
@@ -186,6 +166,13 @@ const styles = StyleSheet.create({
     left: 20,
     zIndex: 10,
     padding: 10,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   scrollView: {
     flex: 1,
@@ -193,48 +180,50 @@ const styles = StyleSheet.create({
   header: {
     paddingTop: 120,
     paddingHorizontal: 30,
-    marginBottom: 30,
+    marginBottom: 24,
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 8,
+    color: '#1F2937',
+    marginBottom: 6,
   },
   subtitle: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
-    lineHeight: 22,
+    fontSize: 15,
+    color: '#6B7280',
+    lineHeight: 20,
   },
   loadingText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    marginTop: 16,
+    color: '#6B7280',
+    fontSize: 15,
+    marginTop: 12,
   },
   diseasesSection: {
     paddingHorizontal: 30,
-    paddingBottom: 50,
+    paddingBottom: 40,
   },
   diseaseCard: {
-    borderRadius: 20,
+    borderRadius: 16,
     overflow: 'hidden',
-    marginBottom: 25,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  cardBlur: {
-    padding: 20,
+    marginBottom: 20,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   cardContent: {
     flexDirection: 'column',
+    padding: 16,
   },
   videoContainer: {
     position: 'relative',
-    height: 200,
+    height: 180,
     borderRadius: 12,
     overflow: 'hidden',
-    marginBottom: 16,
-    backgroundColor: '#000',
+    marginBottom: 12,
+    backgroundColor: '#F3F4F6',
   },
   webView: {
     flex: 1,
@@ -243,25 +232,25 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: '#F3F4F6',
   },
   loadingVideoText: {
-    color: 'rgba(255, 255, 255, 0.8)',
-    fontSize: 14,
-    marginTop: 8,
+    color: '#6B7280',
+    fontSize: 13,
+    marginTop: 6,
   },
   durationBadge: {
     position: 'absolute',
     bottom: 8,
     right: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    backgroundColor: 'rgba(31, 41, 55, 0.8)',
+    paddingHorizontal: 6,
+    paddingVertical: 3,
     borderRadius: 6,
   },
   durationText: {
     color: '#FFFFFF',
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
   },
   diseaseInfo: {
@@ -271,57 +260,57 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   diseaseTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1F2937',
     flex: 1,
-    marginRight: 12,
+    marginRight: 10,
   },
   severityBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 8,
   },
   severityText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
   },
   diseaseDescription: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
-    lineHeight: 20,
-    marginBottom: 16,
+    fontSize: 13,
+    color: '#6B7280',
+    lineHeight: 18,
+    marginBottom: 12,
   },
   statsContainer: {
     flexDirection: 'row',
-    gap: 20,
+    gap: 16,
   },
   statItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 4,
   },
   statText: {
-    fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.6)',
+    fontSize: 11,
+    color: '#9CA3AF',
     fontWeight: '500',
   },
   emptyState: {
     alignItems: 'center',
-    padding: 40,
+    padding: 32,
   },
   emptyText: {
-    fontSize: 18,
-    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 16,
+    color: '#6B7280',
     textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   emptySubtext: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.6)',
+    fontSize: 13,
+    color: '#9CA3AF',
     textAlign: 'center',
   },
 });

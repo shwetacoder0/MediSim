@@ -9,8 +9,6 @@ import {
   Modal,
   Dimensions,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft, Eye, X, Maximize } from 'lucide-react-native';
 import { EducationService, EducationSection } from '../lib/educationService';
@@ -64,11 +62,7 @@ export default function ModelDetailScreen() {
   if (loading) {
     return (
       <View style={[styles.container, styles.loadingContainer]}>
-        <LinearGradient
-          colors={['#0A0A0A', '#1A1A2E', '#16213E']}
-          style={styles.gradient}
-        />
-        <ActivityIndicator size="large" color="#4FACFE" />
+        <ActivityIndicator size="large" color="#4A90E2" />
         <Text style={styles.loadingText}>Loading 3D models...</Text>
       </View>
     );
@@ -76,13 +70,8 @@ export default function ModelDetailScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#0A0A0A', '#1A1A2E', '#16213E']}
-        style={styles.gradient}
-      />
-
       <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-        <ArrowLeft size={24} color="#FFFFFF" />
+        <ArrowLeft size={20} color="#6B7280" />
       </TouchableOpacity>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -100,43 +89,41 @@ export default function ModelDetailScreen() {
               style={styles.modelCard}
               onPress={() => handleModelPress(model)}
             >
-              <BlurView intensity={15} tint="dark" style={styles.cardBlur}>
-                <View style={styles.cardContent}>
-                  {/* 3D Model Preview */}
-                  <View style={styles.modelPreviewContainer}>
-                    <GLBViewer
-                      modelUrl={EducationService.get3DModelUrl(model.glb_file_url || '')}
-                      style={styles.modelPreview}
-                    />
-                    <View style={styles.previewOverlay}>
-                      <TouchableOpacity
-                        style={styles.viewButton}
-                        onPress={() => handleModelPress(model)}
-                      >
-                        <Eye size={20} color="#FFFFFF" />
-                        <Text style={styles.viewButtonText}>View 3D</Text>
-                      </TouchableOpacity>
-                    </View>
+              <View style={styles.cardContent}>
+                {/* 3D Model Preview */}
+                <View style={styles.modelPreviewContainer}>
+                  <GLBViewer
+                    modelUrl={EducationService.get3DModelUrl(model.glb_file_url || '')}
+                    style={styles.modelPreview}
+                  />
+                  <View style={styles.previewOverlay}>
+                    <TouchableOpacity
+                      style={styles.viewButton}
+                      onPress={() => handleModelPress(model)}
+                    >
+                      <Eye size={16} color="#FFFFFF" />
+                      <Text style={styles.viewButtonText}>View 3D</Text>
+                    </TouchableOpacity>
                   </View>
+                </View>
 
-                  <View style={styles.modelInfo}>
-                    <Text style={styles.modelTitle}>{model.title}</Text>
-                    <Text style={styles.modelDescription}>{model.description}</Text>
+                <View style={styles.modelInfo}>
+                  <Text style={styles.modelTitle}>{model.title}</Text>
+                  <Text style={styles.modelDescription}>{model.description}</Text>
 
-                    <View style={styles.modelFeatures}>
-                      <View style={styles.featureTag}>
-                        <Text style={styles.featureText}>Interactive</Text>
-                      </View>
-                      <View style={styles.featureTag}>
-                        <Text style={styles.featureText}>3D</Text>
-                      </View>
-                      <View style={styles.featureTag}>
-                        <Text style={styles.featureText}>Detailed</Text>
-                      </View>
+                  <View style={styles.modelFeatures}>
+                    <View style={styles.featureTag}>
+                      <Text style={styles.featureText}>Interactive</Text>
+                    </View>
+                    <View style={styles.featureTag}>
+                      <Text style={styles.featureText}>3D</Text>
+                    </View>
+                    <View style={styles.featureTag}>
+                      <Text style={styles.featureText}>Detailed</Text>
                     </View>
                   </View>
                 </View>
-              </BlurView>
+              </View>
             </TouchableOpacity>
           ))}
 
@@ -157,25 +144,20 @@ export default function ModelDetailScreen() {
         onRequestClose={() => setSelectedModel(null)}
       >
         <View style={styles.modalContainer}>
-          <LinearGradient
-            colors={['#0A0A0A', '#1A1A2E', '#16213E']}
-            style={styles.gradient}
-          />
-
           {/* Modal Header */}
           <View style={styles.modalHeader}>
             <TouchableOpacity
               style={styles.closeButton}
               onPress={() => setSelectedModel(null)}
             >
-              <X size={24} color="#FFFFFF" />
+              <X size={20} color="#6B7280" />
             </TouchableOpacity>
             <Text style={styles.modalTitle}>{selectedModel?.title}</Text>
             <TouchableOpacity
               style={styles.fullscreenButton}
               onPress={handleFullscreen}
             >
-              <Maximize size={24} color="#FFFFFF" />
+              <Maximize size={20} color="#6B7280" />
             </TouchableOpacity>
           </View>
 
@@ -191,14 +173,12 @@ export default function ModelDetailScreen() {
 
           {/* Model Info */}
           <View style={styles.modalInfo}>
-            <BlurView intensity={20} tint="dark" style={styles.infoBlur}>
-              <Text style={styles.modalDescription}>
-                {selectedModel?.description}
-              </Text>
-              <Text style={styles.instructionText}>
-                Use the controls below to rotate, zoom, and explore the 3D model
-              </Text>
-            </BlurView>
+            <Text style={styles.modalDescription}>
+              {selectedModel?.description}
+            </Text>
+            <Text style={styles.instructionText}>
+              Use the controls below to rotate, zoom, and explore the 3D model
+            </Text>
           </View>
         </View>
       </Modal>
@@ -215,7 +195,7 @@ export default function ModelDetailScreen() {
             style={styles.fullscreenCloseButton}
             onPress={() => setShowFullscreen(false)}
           >
-            <X size={28} color="#FFFFFF" />
+            <X size={24} color="#6B7280" />
           </TouchableOpacity>
 
           {selectedModel && (
@@ -233,18 +213,11 @@ export default function ModelDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#F8F9FA',
   },
   loadingContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  gradient: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
   },
   backButton: {
     position: 'absolute',
@@ -252,6 +225,13 @@ const styles = StyleSheet.create({
     left: 20,
     zIndex: 10,
     padding: 10,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   scrollView: {
     flex: 1,
@@ -259,48 +239,50 @@ const styles = StyleSheet.create({
   header: {
     paddingTop: 120,
     paddingHorizontal: 30,
-    marginBottom: 30,
+    marginBottom: 24,
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 8,
+    color: '#1F2937',
+    marginBottom: 6,
   },
   subtitle: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
-    lineHeight: 22,
+    fontSize: 15,
+    color: '#6B7280',
+    lineHeight: 20,
   },
   loadingText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    marginTop: 16,
+    color: '#6B7280',
+    fontSize: 15,
+    marginTop: 12,
   },
   modelsSection: {
     paddingHorizontal: 30,
-    paddingBottom: 50,
+    paddingBottom: 40,
   },
   modelCard: {
-    borderRadius: 20,
+    borderRadius: 16,
     overflow: 'hidden',
-    marginBottom: 25,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  cardBlur: {
-    padding: 20,
+    marginBottom: 20,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   cardContent: {
     flexDirection: 'column',
+    padding: 16,
   },
   modelPreviewContainer: {
     position: 'relative',
-    height: 200,
+    height: 180,
     borderRadius: 12,
     overflow: 'hidden',
-    marginBottom: 16,
-    backgroundColor: '#000',
+    marginBottom: 12,
+    backgroundColor: '#F3F4F6',
   },
   modelPreview: {
     flex: 1,
@@ -311,71 +293,72 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    backgroundColor: 'rgba(31, 41, 55, 0.3)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   viewButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(79, 172, 254, 0.9)',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    gap: 8,
+    backgroundColor: 'rgba(74, 144, 226, 0.9)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    gap: 6,
   },
   viewButtonText: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
   },
   modelInfo: {
     flex: 1,
   },
   modelTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 8,
+    color: '#1F2937',
+    marginBottom: 6,
   },
   modelDescription: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
-    lineHeight: 20,
-    marginBottom: 16,
+    fontSize: 13,
+    color: '#6B7280',
+    lineHeight: 18,
+    marginBottom: 12,
   },
   modelFeatures: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 6,
   },
   featureTag: {
-    backgroundColor: 'rgba(79, 172, 254, 0.2)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
+    backgroundColor: 'rgba(74, 144, 226, 0.1)',
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 8,
   },
   featureText: {
-    color: '#4FACFE',
-    fontSize: 12,
+    color: '#4A90E2',
+    fontSize: 11,
     fontWeight: '600',
   },
   emptyState: {
     alignItems: 'center',
-    padding: 40,
+    padding: 32,
   },
   emptyText: {
-    fontSize: 18,
-    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 16,
+    color: '#6B7280',
     textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   emptySubtext: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.6)',
+    fontSize: 13,
+    color: '#9CA3AF',
     textAlign: 'center',
   },
   modalContainer: {
     flex: 1,
+    backgroundColor: '#F8F9FA',
   },
   modalHeader: {
     flexDirection: 'row',
@@ -383,37 +366,47 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 60,
     paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingBottom: 16,
   },
   closeButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1F2937',
     textAlign: 'center',
     flex: 1,
-    marginHorizontal: 16,
+    marginHorizontal: 12,
   },
   fullscreenButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   modalViewer: {
     flex: 1,
     marginHorizontal: 20,
-    marginBottom: 20,
-    borderRadius: 16,
+    marginBottom: 16,
+    borderRadius: 12,
     overflow: 'hidden',
   },
   fullViewer: {
@@ -421,39 +414,47 @@ const styles = StyleSheet.create({
   },
   modalInfo: {
     marginHorizontal: 20,
-    marginBottom: 40,
-    borderRadius: 16,
-    overflow: 'hidden',
-  },
-  infoBlur: {
-    padding: 20,
+    marginBottom: 32,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   modalDescription: {
-    fontSize: 16,
-    color: '#FFFFFF',
-    lineHeight: 22,
-    marginBottom: 12,
+    fontSize: 15,
+    color: '#1F2937',
+    lineHeight: 20,
+    marginBottom: 10,
   },
   instructionText: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.7)',
-    lineHeight: 18,
+    fontSize: 13,
+    color: '#6B7280',
+    lineHeight: 16,
   },
   fullscreenContainer: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#F8F9FA',
   },
   fullscreenCloseButton: {
     position: 'absolute',
     top: 60,
     right: 20,
     zIndex: 10,
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
   },
   fullscreenViewer: {
     flex: 1,

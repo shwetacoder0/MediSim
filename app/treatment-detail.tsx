@@ -8,8 +8,6 @@ import {
   Dimensions,
   ActivityIndicator,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft, Play } from 'lucide-react-native';
 import { WebView } from 'react-native-webview';
@@ -44,11 +42,11 @@ export default function TreatmentDetailScreen() {
 
   const getCategoryColor = (index: number) => {
     const colors = [
-      '#4FACFE', // Blue
-      '#FF6B6B', // Red
-      '#4ECDC4', // Teal
-      '#FFB347', // Orange
-      '#A8E6CF', // Green
+      '#4A90E2', // Blue
+      '#6BCF7F', // Green
+      '#FF8A65', // Orange
+      '#FFB74D', // Amber
+      '#BA68C8', // Purple
     ];
     return colors[index % colors.length];
   };
@@ -67,11 +65,7 @@ export default function TreatmentDetailScreen() {
   if (loading) {
     return (
       <View style={[styles.container, styles.loadingContainer]}>
-        <LinearGradient
-          colors={['#0A0A0A', '#1A1A2E', '#16213E']}
-          style={styles.gradient}
-        />
-        <ActivityIndicator size="large" color="#4FACFE" />
+        <ActivityIndicator size="large" color="#4A90E2" />
         <Text style={styles.loadingText}>Loading treatment information...</Text>
       </View>
     );
@@ -79,13 +73,8 @@ export default function TreatmentDetailScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#0A0A0A', '#1A1A2E', '#16213E']}
-        style={styles.gradient}
-      />
-
       <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-        <ArrowLeft size={24} color="#FFFFFF" />
+        <ArrowLeft size={20} color="#6B7280" />
       </TouchableOpacity>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -101,50 +90,48 @@ export default function TreatmentDetailScreen() {
         <View style={styles.treatmentsSection}>
           {treatments.map((treatment, index) => (
             <View key={treatment.id} style={styles.treatmentCard}>
-              <BlurView intensity={15} tint="dark" style={styles.cardBlur}>
-                <View style={styles.cardContent}>
-                  {/* YouTube Video Embed */}
-                  <View style={styles.videoContainer}>
-                    <WebView
-                      source={{ uri: EducationService.getYouTubeEmbedUrl(treatment.content_url || '') }}
-                      style={styles.webView}
-                      allowsInlineMediaPlayback={true}
-                      mediaPlaybackRequiresUserAction={false}
-                      javaScriptEnabled={true}
-                      domStorageEnabled={true}
-                      startInLoadingState={true}
-                      renderLoading={() => (
-                        <View style={styles.videoPlaceholder}>
-                          <Play size={40} color="rgba(255, 255, 255, 0.8)" />
-                          <Text style={styles.loadingVideoText}>Loading video...</Text>
-                        </View>
-                      )}
-                    />
-                    <View style={styles.durationBadge}>
-                      <Text style={styles.durationText}>Educational</Text>
+              <View style={styles.cardContent}>
+                {/* YouTube Video Embed */}
+                <View style={styles.videoContainer}>
+                  <WebView
+                    source={{ uri: EducationService.getYouTubeEmbedUrl(treatment.content_url || '') }}
+                    style={styles.webView}
+                    allowsInlineMediaPlayback={true}
+                    mediaPlaybackRequiresUserAction={false}
+                    javaScriptEnabled={true}
+                    domStorageEnabled={true}
+                    startInLoadingState={true}
+                    renderLoading={() => (
+                      <View style={styles.videoPlaceholder}>
+                        <Play size={32} color="#6B7280" />
+                        <Text style={styles.loadingVideoText}>Loading video...</Text>
+                      </View>
+                    )}
+                  />
+                  <View style={styles.durationBadge}>
+                    <Text style={styles.durationText}>Educational</Text>
+                  </View>
+                </View>
+                
+                <View style={styles.treatmentInfo}>
+                  <View style={styles.treatmentHeader}>
+                    <Text style={styles.treatmentTitle}>{treatment.title}</Text>
+                    <View style={[
+                      styles.categoryBadge,
+                      { backgroundColor: getCategoryColor(index) + '15' }
+                    ]}>
+                      <Text style={[
+                        styles.categoryText,
+                        { color: getCategoryColor(index) }
+                      ]}>
+                        {getCategoryName(index)}
+                      </Text>
                     </View>
                   </View>
                   
-                  <View style={styles.treatmentInfo}>
-                    <View style={styles.treatmentHeader}>
-                      <Text style={styles.treatmentTitle}>{treatment.title}</Text>
-                      <View style={[
-                        styles.categoryBadge,
-                        { backgroundColor: getCategoryColor(index) + '20' }
-                      ]}>
-                        <Text style={[
-                          styles.categoryText,
-                          { color: getCategoryColor(index) }
-                        ]}>
-                          {getCategoryName(index)}
-                        </Text>
-                      </View>
-                    </View>
-                    
-                    <Text style={styles.treatmentDescription}>{treatment.description}</Text>
-                  </View>
+                  <Text style={styles.treatmentDescription}>{treatment.description}</Text>
                 </View>
-              </BlurView>
+              </View>
             </View>
           ))}
 
@@ -163,18 +150,11 @@ export default function TreatmentDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#F8F9FA',
   },
   loadingContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  gradient: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
   },
   backButton: {
     position: 'absolute',
@@ -182,6 +162,13 @@ const styles = StyleSheet.create({
     left: 20,
     zIndex: 10,
     padding: 10,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   scrollView: {
     flex: 1,
@@ -189,48 +176,50 @@ const styles = StyleSheet.create({
   header: {
     paddingTop: 120,
     paddingHorizontal: 30,
-    marginBottom: 30,
+    marginBottom: 24,
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 8,
+    color: '#1F2937',
+    marginBottom: 6,
   },
   subtitle: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
-    lineHeight: 22,
+    fontSize: 15,
+    color: '#6B7280',
+    lineHeight: 20,
   },
   loadingText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    marginTop: 16,
+    color: '#6B7280',
+    fontSize: 15,
+    marginTop: 12,
   },
   treatmentsSection: {
     paddingHorizontal: 30,
-    paddingBottom: 50,
+    paddingBottom: 40,
   },
   treatmentCard: {
-    borderRadius: 20,
+    borderRadius: 16,
     overflow: 'hidden',
-    marginBottom: 25,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  cardBlur: {
-    padding: 20,
+    marginBottom: 20,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   cardContent: {
     flexDirection: 'column',
+    padding: 16,
   },
   videoContainer: {
     position: 'relative',
-    height: 200,
+    height: 180,
     borderRadius: 12,
     overflow: 'hidden',
-    marginBottom: 16,
-    backgroundColor: '#000',
+    marginBottom: 12,
+    backgroundColor: '#F3F4F6',
   },
   webView: {
     flex: 1,
@@ -239,25 +228,25 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: '#F3F4F6',
   },
   loadingVideoText: {
-    color: 'rgba(255, 255, 255, 0.8)',
-    fontSize: 14,
-    marginTop: 8,
+    color: '#6B7280',
+    fontSize: 13,
+    marginTop: 6,
   },
   durationBadge: {
     position: 'absolute',
     bottom: 8,
     right: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    backgroundColor: 'rgba(31, 41, 55, 0.8)',
+    paddingHorizontal: 6,
+    paddingVertical: 3,
     borderRadius: 6,
   },
   durationText: {
     color: '#FFFFFF',
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
   },
   treatmentInfo: {
@@ -267,42 +256,42 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   treatmentTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1F2937',
     flex: 1,
-    marginRight: 12,
+    marginRight: 10,
   },
   categoryBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 8,
   },
   categoryText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
   },
   treatmentDescription: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
-    lineHeight: 20,
+    fontSize: 13,
+    color: '#6B7280',
+    lineHeight: 18,
   },
   emptyState: {
     alignItems: 'center',
-    padding: 40,
+    padding: 32,
   },
   emptyText: {
-    fontSize: 18,
-    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 16,
+    color: '#6B7280',
     textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   emptySubtext: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.6)',
+    fontSize: 13,
+    color: '#9CA3AF',
     textAlign: 'center',
   },
 });

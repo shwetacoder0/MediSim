@@ -8,8 +8,6 @@ import {
   ActivityIndicator,
   Platform,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
 import { Camera, Upload, FileText } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
@@ -216,11 +214,6 @@ export default function MediaPicker({ onFileSelected }: MediaPickerProps) {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#0A0A0A', '#1A1A2E', '#16213E']}
-        style={styles.gradient}
-      />
-
       <View style={styles.content}>
         <View style={styles.header}>
           <Text style={styles.title}>Upload Medical Report</Text>
@@ -235,13 +228,10 @@ export default function MediaPicker({ onFileSelected }: MediaPickerProps) {
             onPress={takePicture}
             disabled={uploading}
           >
-            <LinearGradient
-              colors={['#4FACFE', '#00F2FE']}
-              style={styles.buttonGradient}
-            >
-              <Camera size={24} color="#FFFFFF" />
+            <View style={styles.buttonGradient}>
+              <Camera size={20} color="#FFFFFF" />
               <Text style={styles.primaryButtonText}>Take a Photo</Text>
-            </LinearGradient>
+            </View>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -249,10 +239,8 @@ export default function MediaPicker({ onFileSelected }: MediaPickerProps) {
             onPress={pickDocument}
             disabled={uploading}
           >
-            <BlurView intensity={20} tint="dark" style={styles.secondaryBlur}>
-              <Upload size={24} color="rgba(255, 255, 255, 0.9)" />
-              <Text style={styles.secondaryButtonText}>Upload from Files</Text>
-            </BlurView>
+            <Upload size={20} color="#6B7280" />
+            <Text style={styles.secondaryButtonText}>Upload from Files</Text>
           </TouchableOpacity>
         </View>
 
@@ -270,8 +258,8 @@ export default function MediaPicker({ onFileSelected }: MediaPickerProps) {
                 disabled={uploading}
               >
                 <FileText
-                  size={16}
-                  color={reportType === type ? '#FFFFFF' : 'rgba(255, 255, 255, 0.6)'}
+                  size={14}
+                  color={reportType === type ? '#FFFFFF' : '#9CA3AF'}
                 />
                 <Text
                   style={[
@@ -288,10 +276,10 @@ export default function MediaPicker({ onFileSelected }: MediaPickerProps) {
 
         {uploading && (
           <View style={styles.uploadingContainer}>
-            <BlurView intensity={20} tint="dark" style={styles.uploadingBlur}>
-              <ActivityIndicator size="large" color="#4FACFE" />
+            <View style={styles.uploadingContent}>
+              <ActivityIndicator size="large" color="#4A90E2" />
               <Text style={styles.uploadingText}>{getProcessingMessage()}</Text>
-            </BlurView>
+            </View>
           </View>
         )}
       </View>
@@ -302,14 +290,7 @@ export default function MediaPicker({ onFileSelected }: MediaPickerProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
-  },
-  gradient: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
+    backgroundColor: '#F8F9FA',
   },
   content: {
     flex: 1,
@@ -319,96 +300,100 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: 50,
+    marginBottom: 40,
   },
   title: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 12,
+    color: '#1F2937',
+    marginBottom: 10,
     textAlign: 'center',
   },
   subtitle: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 15,
+    color: '#6B7280',
     textAlign: 'center',
-    lineHeight: 22,
+    lineHeight: 20,
   },
   uploadSection: {
-    marginBottom: 40,
-    gap: 16,
+    marginBottom: 32,
+    gap: 12,
   },
   primaryButton: {
-    borderRadius: 16,
+    borderRadius: 12,
     overflow: 'hidden',
-    elevation: 10,
-    shadowColor: '#4FACFE',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
+    shadowColor: '#4A90E2',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
   },
   buttonGradient: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 18,
-    gap: 12,
+    paddingVertical: 16,
+    gap: 10,
+    backgroundColor: '#4A90E2',
   },
   primaryButtonText: {
     color: '#FFFFFF',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
   },
   secondaryButton: {
-    borderRadius: 16,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  secondaryBlur: {
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 18,
-    gap: 12,
+    gap: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   secondaryButtonText: {
-    color: 'rgba(255, 255, 255, 0.9)',
-    fontSize: 18,
+    color: '#6B7280',
+    fontSize: 16,
     fontWeight: '500',
   },
   reportTypeSection: {
-    marginBottom: 40,
+    marginBottom: 32,
   },
   reportTypeLabel: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
-    color: '#FFFFFF',
-    marginBottom: 16,
+    color: '#1F2937',
+    marginBottom: 12,
   },
   reportTypeGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
+    gap: 8,
   },
   reportTypeButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
-    gap: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+    gap: 6,
   },
   reportTypeButtonActive: {
-    backgroundColor: 'rgba(79, 172, 254, 0.3)',
-    borderColor: '#4FACFE',
+    backgroundColor: '#4A90E2',
   },
   reportTypeText: {
-    color: 'rgba(255, 255, 255, 0.6)',
-    fontSize: 14,
+    color: '#9CA3AF',
+    fontSize: 13,
     fontWeight: '500',
   },
   reportTypeTextActive: {
@@ -422,17 +407,23 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: 'rgba(248, 249, 250, 0.9)',
   },
-  uploadingBlur: {
-    padding: 40,
-    borderRadius: 20,
+  uploadingContent: {
+    padding: 32,
+    borderRadius: 16,
     alignItems: 'center',
-    gap: 16,
+    gap: 12,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 8,
   },
   uploadingText: {
-    color: '#FFFFFF',
-    fontSize: 16,
+    color: '#1F2937',
+    fontSize: 15,
     fontWeight: '500',
   },
 });
