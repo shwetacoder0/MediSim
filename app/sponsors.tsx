@@ -9,7 +9,7 @@ import {
   Linking,
 } from 'react-native';
 import { router } from 'expo-router';
-import { ArrowRight, ExternalLink, Heart } from 'lucide-react-native';
+import { ArrowRight, ExternalLink, Heart, Zap, Database, Globe, Mic } from 'lucide-react-native';
 
 const sponsors = [
   {
@@ -20,15 +20,16 @@ const sponsors = [
     url: 'https://bolt.new',
     color: '#4A90E2',
     type: 'image',
+    icon: Zap,
   },
   {
     id: 'tavus',
     name: 'Tavus',
     description: 'AI video generation platform powering our AI doctor consultations',
-    image: require('../assets/images/tavus.svg'),
     url: 'https://tavus.io',
     color: '#6BCF7F',
-    type: 'svg',
+    type: 'icon',
+    icon: Mic,
   },
   {
     id: 'elevenlabs',
@@ -38,6 +39,7 @@ const sponsors = [
     url: 'https://elevenlabs.io',
     color: '#FF8A65',
     type: 'image',
+    icon: Mic,
   },
   {
     id: 'supabase',
@@ -47,15 +49,16 @@ const sponsors = [
     url: 'https://supabase.com',
     color: '#4CAF50',
     type: 'image',
+    icon: Database,
   },
   {
     id: 'netlify',
     name: 'Netlify',
     description: 'Web hosting and deployment platform for our landing page',
-    image: require('../assets/images/netlify.svg'),
     url: 'https://netlify.com',
     color: '#00C7B7',
-    type: 'svg',
+    type: 'icon',
+    icon: Globe,
   },
 ];
 
@@ -76,13 +79,21 @@ export default function SponsorsScreen() {
   };
 
   const renderSponsorImage = (sponsor: any) => {
-    return (
-      <Image
-        source={sponsor.image}
-        style={styles.sponsorImage}
-        resizeMode="contain"
-      />
-    );
+    if (sponsor.type === 'image' && sponsor.image) {
+      return (
+        <Image
+          source={sponsor.image}
+          style={styles.sponsorImage}
+          resizeMode="contain"
+        />
+      );
+    } else {
+      // Use icon for sponsors without images or SVG sponsors
+      const IconComponent = sponsor.icon;
+      return (
+        <IconComponent size={32} color={sponsor.color} />
+      );
+    }
   };
 
   return (

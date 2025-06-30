@@ -7,8 +7,6 @@ import {
   Image,
   Platform
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
 import { Brain, Zap, Image as ImageIcon, CircleCheck as CheckCircle } from 'lucide-react-native';
 import { supabase } from '../lib/supabase';
 import { TextExtractionService } from '../lib/textExtraction';
@@ -344,11 +342,6 @@ export default function ReportProcessor({
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#0A0A0A', '#1A1A2E', '#16213E']}
-        style={styles.gradient}
-      />
-
       <View style={styles.content}>
         <View style={styles.header}>
           <Text style={styles.title}>Processing Your Report</Text>
@@ -360,7 +353,7 @@ export default function ReportProcessor({
         <View style={styles.stepsContainer}>
           {steps.map((step, index) => (
             <View key={step.id} style={styles.stepContainer}>
-              <BlurView intensity={15} tint="dark" style={styles.stepBlur}>
+              <View style={styles.stepCard}>
                 <View style={styles.stepContent}>
                   <View style={styles.stepIcon}>
                     <View style={[
@@ -369,11 +362,11 @@ export default function ReportProcessor({
                       step.active && styles.iconActive
                     ]}>
                       {step.completed ? (
-                        <CheckCircle size={24} color="#4ECDC4" />
+                        <CheckCircle size={24} color="#4CAF50" />
                       ) : (
                         <step.icon
                           size={24}
-                          color={step.active ? "#4FACFE" : "rgba(255, 255, 255, 0.5)"}
+                          color={step.active ? "#4A90E2" : "#9CA3AF"}
                         />
                       )}
                     </View>
@@ -395,12 +388,12 @@ export default function ReportProcessor({
                   {step.active && processing && (
                     <ActivityIndicator
                       size="small"
-                      color="#4FACFE"
+                      color="#4A90E2"
                       style={styles.stepLoader}
                     />
                   )}
                 </View>
-              </BlurView>
+              </View>
 
               {index < steps.length - 1 && (
                 <View style={[
@@ -431,14 +424,7 @@ export default function ReportProcessor({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
-  },
-  gradient: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
+    backgroundColor: '#F8F9FA',
   },
   content: {
     flex: 1,
@@ -453,13 +439,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1F2937',
     marginBottom: 12,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: '#6B7280',
     textAlign: 'center',
     lineHeight: 22,
   },
@@ -469,11 +455,14 @@ const styles = StyleSheet.create({
   stepContainer: {
     marginBottom: 20,
   },
-  stepBlur: {
+  stepCard: {
     borderRadius: 16,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   stepContent: {
     flexDirection: 'row',
@@ -487,15 +476,15 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: '#F3F4F6',
     justifyContent: 'center',
     alignItems: 'center',
   },
   iconActive: {
-    backgroundColor: 'rgba(79, 172, 254, 0.2)',
+    backgroundColor: 'rgba(74, 144, 226, 0.1)',
   },
   iconCompleted: {
-    backgroundColor: 'rgba(78, 205, 196, 0.2)',
+    backgroundColor: 'rgba(76, 175, 80, 0.1)',
   },
   stepInfo: {
     flex: 1,
@@ -503,18 +492,18 @@ const styles = StyleSheet.create({
   stepTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'rgba(255, 255, 255, 0.6)',
+    color: '#9CA3AF',
     marginBottom: 4,
   },
   stepTitleActive: {
-    color: '#4FACFE',
+    color: '#4A90E2',
   },
   stepTitleCompleted: {
-    color: '#4ECDC4',
+    color: '#4CAF50',
   },
   stepDescription: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.7)',
+    color: '#6B7280',
     lineHeight: 18,
   },
   stepLoader: {
@@ -523,11 +512,11 @@ const styles = StyleSheet.create({
   stepConnector: {
     width: 2,
     height: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: '#E5E7EB',
     marginLeft: 54,
   },
   stepConnectorCompleted: {
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#4CAF50',
   },
   progressContainer: {
     alignItems: 'center',
@@ -535,18 +524,18 @@ const styles = StyleSheet.create({
   progressBar: {
     width: '100%',
     height: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: '#E5E7EB',
     borderRadius: 2,
     marginBottom: 12,
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#4FACFE',
+    backgroundColor: '#4A90E2',
     borderRadius: 2,
   },
   progressText: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: '#6B7280',
     fontWeight: '500',
   },
 });

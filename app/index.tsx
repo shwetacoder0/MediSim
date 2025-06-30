@@ -17,6 +17,7 @@ import Animated, {
   interpolate,
 } from 'react-native-reanimated';
 import { router } from 'expo-router';
+import { Heart } from 'lucide-react-native';
 import { useAuth, UserProfile } from '../lib/auth-context';
 
 const { width, height } = Dimensions.get('window');
@@ -107,7 +108,9 @@ export default function WelcomeScreen() {
           <View style={styles.glassOrb}>
             <View style={styles.blurOrb}>
               <View style={styles.innerOrb}>
-                <View style={styles.innerGradient} />
+                <View style={styles.innerGradient}>
+                  <Heart size={32} color="#FFFFFF" fill="#FFFFFF" />
+                </View>
               </View>
             </View>
           </View>
@@ -202,6 +205,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#4A90E2',
     opacity: 0.6,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   textContainer: {
     alignItems: 'center',

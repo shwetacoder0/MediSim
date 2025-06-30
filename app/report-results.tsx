@@ -16,8 +16,6 @@ import {
   TextInput
 } from 'react-native';
 import { LineChart, BarChart, PieChart, ProgressChart } from 'react-native-chart-kit';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft, Share2, Play, ChartBar as BarChart3, Eye, ChevronLeft, Download, Zap, MessageSquare, FileText, User, ChevronRight, Circle, X, Mic, Send, Pause } from 'lucide-react-native';
 import { ReportProcessingService } from '../lib/reportProcessing';
@@ -367,11 +365,7 @@ export default function ReportResultsScreen() {
   if (loading) {
     return (
       <View style={[styles.container, styles.loadingContainer]}>
-        <LinearGradient
-          colors={['#0A0A0A', '#1A1A2E', '#16213E']}
-          style={styles.gradient}
-        />
-        <ActivityIndicator size="large" color="#4FACFE" />
+        <ActivityIndicator size="large" color="#4A90E2" />
         <Text style={styles.loadingText}>Loading your results...</Text>
       </View>
     );
@@ -387,18 +381,13 @@ export default function ReportResultsScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#0A0A0A', '#1A1A2E', '#16213E']}
-        style={styles.gradient}
-      />
-
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.headerButton} onPress={handleBack}>
-          <ArrowLeft size={24} color="#FFFFFF" />
+          <ArrowLeft size={24} color="#1F2937" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.headerButton} onPress={handleShare}>
-          <Share2 size={24} color="#FFFFFF" />
+          <Share2 size={24} color="#1F2937" />
         </TouchableOpacity>
       </View>
 
@@ -422,14 +411,14 @@ export default function ReportResultsScreen() {
               style={[styles.imageNavButton, styles.imageNavButtonLeft]}
               onPress={handlePrevImage}
             >
-              <ChevronLeft size={24} color="#FFFFFF" />
+              <ChevronLeft size={24} color="#1F2937" />
             </TouchableOpacity>
 
             <TouchableOpacity
               style={[styles.imageNavButton, styles.imageNavButtonRight]}
               onPress={handleNextImage}
             >
-              <ChevronRight size={24} color="#FFFFFF" />
+              <ChevronRight size={24} color="#1F2937" />
             </TouchableOpacity>
           </View>
 
@@ -452,7 +441,7 @@ export default function ReportResultsScreen() {
 
                         {/* Image Description */}
         <View style={styles.imageDescriptionContainer}>
-          <BlurView intensity={15} tint="dark" style={styles.descriptionBlur}>
+          <View style={styles.descriptionCard}>
             <Text style={styles.imageTitle}>
               {activeImageIndex === 0 ? 'Kidney 3D Visualization' :
                activeImageIndex === 1 ? 'Urinary Tract Analysis' :
@@ -465,12 +454,12 @@ export default function ReportResultsScreen() {
                 'Comprehensive view of your urinary tract system with highlighted areas showing the flow and potential blockage points identified in your scan.' :
                 'Interactive model showing how your kidneys interact with surrounding organs, helping to understand the full context of your medical condition.'}
             </Text>
-          </BlurView>
+          </View>
         </View>
 
         {/* AI Doctor Card - Horizontal */}
         <View style={styles.aiDoctorCardContainer}>
-          <BlurView intensity={20} tint="dark" style={styles.aiDoctorCardBlur}>
+          <View style={styles.aiDoctorCard}>
             <TouchableOpacity
               style={styles.aiDoctorCardContent}
               onPress={handleWatchExplanation}
@@ -478,7 +467,7 @@ export default function ReportResultsScreen() {
             >
               <View style={styles.aiDoctorIconSection}>
                 <View style={styles.aiDoctorIconContainer}>
-                  <User size={24} color="#4FACFE" />
+                  <User size={24} color="#4A90E2" />
                 </View>
               </View>
               <View style={styles.aiDoctorTextSection}>
@@ -489,7 +478,7 @@ export default function ReportResultsScreen() {
               </View>
               <View style={styles.aiDoctorActionSection}>
                 {generatingVideo ? (
-                  <ActivityIndicator color="#4FACFE" size="small" />
+                  <ActivityIndicator color="#4A90E2" size="small" />
                 ) : (
                   <View style={styles.aiDoctorPlayButton}>
                     <Play size={16} color="#FFFFFF" />
@@ -497,7 +486,7 @@ export default function ReportResultsScreen() {
                 )}
               </View>
             </TouchableOpacity>
-          </BlurView>
+          </View>
         </View>
 
         {/* Data Visualization Section */}
@@ -512,7 +501,7 @@ export default function ReportResultsScreen() {
         <View style={styles.chartsContainer}>
           {/* Kidney Size Comparison Chart */}
           <View style={styles.chartCard}>
-            <BlurView intensity={15} tint="dark" style={styles.chartBlur}>
+            <View style={styles.chartCardContent}>
               <Text style={styles.chartTitle}>Kidney Size Comparison</Text>
               <View style={styles.chartContainer}>
                 <BarChart
@@ -521,17 +510,17 @@ export default function ReportResultsScreen() {
                     datasets: [
                       {
                         data: getChartData().kidney_sizes_cm.left_kidney,
-                        color: (opacity = 1) => `rgba(79, 172, 254, ${opacity})`,
+                        color: (opacity = 1) => `rgba(74, 144, 226, ${opacity})`,
                         strokeWidth: 2,
                       },
                       {
                         data: getChartData().kidney_sizes_cm.right_kidney,
-                        color: (opacity = 1) => `rgba(0, 242, 254, ${opacity})`,
+                        color: (opacity = 1) => `rgba(76, 175, 80, ${opacity})`,
                         strokeWidth: 2,
                       },
                       {
                         data: getChartData().kidney_sizes_cm.normal_range,
-                        color: (opacity = 1) => `rgba(255, 255, 255, ${opacity * 0.5})`,
+                        color: (opacity = 1) => `rgba(156, 163, 175, ${opacity})`,
                         strokeWidth: 2,
                       },
                     ]
@@ -542,15 +531,15 @@ export default function ReportResultsScreen() {
                   segments={5}
                   yAxisLabel=""
                   yAxisSuffix="cm"
-                  width={Dimensions.get('window').width - 60}
+                  width={Dimensions.get('window').width - 80}
                   height={220}
                   chartConfig={{
                     backgroundColor: 'transparent',
-                    backgroundGradientFrom: 'rgba(30, 58, 95, 0.4)',
-                    backgroundGradientTo: 'rgba(42, 74, 107, 0.4)',
+                    backgroundGradientFrom: '#FFFFFF',
+                    backgroundGradientTo: '#FFFFFF',
                     decimalPlaces: 1,
-                    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-                    labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                    color: (opacity = 1) => `rgba(31, 41, 55, ${opacity})`,
+                    labelColor: (opacity = 1) => `rgba(107, 114, 128, ${opacity})`,
                     style: {
                       borderRadius: 16,
                     },
@@ -567,27 +556,27 @@ export default function ReportResultsScreen() {
               </View>
                               <View style={styles.chartLegend}>
                   <View style={styles.legendItem}>
-                    <View style={[styles.legendColor, { backgroundColor: 'rgba(79, 172, 254, 1)' }]} />
+                    <View style={[styles.legendColor, { backgroundColor: '#4A90E2' }]} />
                     <Text style={styles.legendText}>Left Kidney</Text>
                   </View>
                   <View style={styles.legendItem}>
-                    <View style={[styles.legendColor, { backgroundColor: 'rgba(0, 242, 254, 1)' }]} />
+                    <View style={[styles.legendColor, { backgroundColor: '#4CAF50' }]} />
                     <Text style={styles.legendText}>Right Kidney</Text>
                   </View>
                   <View style={styles.legendItem}>
-                    <View style={[styles.legendColor, { backgroundColor: 'rgba(255, 255, 255, 0.5)' }]} />
+                    <View style={[styles.legendColor, { backgroundColor: '#9CA3AF' }]} />
                     <Text style={styles.legendText}>Normal Range</Text>
                   </View>
                 </View>
                 <Text style={styles.chartDescription}>
                   Comparison of your kidney dimensions (cm) against normal range
                 </Text>
-            </BlurView>
+            </View>
           </View>
 
           {/* Health Metrics Chart */}
           <View style={styles.chartCard}>
-            <BlurView intensity={15} tint="dark" style={styles.chartBlur}>
+            <View style={styles.chartCardContent}>
               <Text style={styles.chartTitle}>Key Health Metrics</Text>
               <View style={styles.metricsGrid}>
                 {Object.entries(getMetrics()).map(([key, value], index) => (
@@ -609,13 +598,13 @@ export default function ReportResultsScreen() {
                   </View>
                 ))}
               </View>
-            </BlurView>
+            </View>
           </View>
 
           {/* Stone Analysis Chart */}
           {getChartData().stone_presence.left_kidney && (
             <View style={styles.chartCard}>
-              <BlurView intensity={15} tint="dark" style={styles.chartBlur}>
+              <View style={styles.chartCardContent}>
                 <Text style={styles.chartTitle}>Stone Analysis</Text>
                 <View style={styles.stoneAnalysisContainer}>
                   <View style={styles.stoneVisual}>
@@ -648,7 +637,7 @@ export default function ReportResultsScreen() {
                     </View>
                   </View>
                 </View>
-              </BlurView>
+              </View>
             </View>
           )}
         </View>
@@ -668,31 +657,24 @@ export default function ReportResultsScreen() {
             style={styles.fullWidthCard}
             onPress={handleViewMetrics}
           >
-            <BlurView intensity={20} tint="dark" style={styles.cardBlur}>
-              <LinearGradient
-                colors={['rgba(30, 58, 95, 0.2)', 'rgba(42, 74, 107, 0.2)']}
-                style={styles.cardGradient}
-              >
-                <View style={styles.cardContent}>
-                  <View style={styles.cardIconContainer}>
-                    <BarChart3 size={28} color="#E0F2FE" />
-                  </View>
-                  <Text style={styles.cardTitle}>Advanced Metrics</Text>
-                  <Text style={styles.cardDescription}>
-                    Explore detailed analysis and comprehensive report metrics
-                  </Text>
-                  <View style={[styles.cardButton, styles.vizButton]}>
-                    <Eye size={16} color="#FFFFFF" />
-                  </View>
-                </View>
-              </LinearGradient>
-            </BlurView>
+            <View style={styles.cardContent}>
+              <View style={styles.cardIconContainer}>
+                <BarChart3 size={28} color="#4A90E2" />
+              </View>
+              <Text style={styles.cardTitle}>Advanced Metrics</Text>
+              <Text style={styles.cardDescription}>
+                Explore detailed analysis and comprehensive report metrics
+              </Text>
+              <View style={styles.cardButton}>
+                <Eye size={16} color="#FFFFFF" />
+              </View>
+            </View>
           </TouchableOpacity>
         </View>
 
         {/* Additional Info */}
         <View style={styles.additionalInfoContainer}>
-          <BlurView intensity={15} tint="dark" style={styles.additionalInfoBlur}>
+          <View style={styles.additionalInfoCard}>
             <Text style={styles.additionalInfoTitle}>About Your 3D Models</Text>
             <Text style={styles.additionalInfoText}>
               These 3D visualizations are generated using advanced AI algorithms that process your medical scan data.
@@ -705,7 +687,7 @@ export default function ReportResultsScreen() {
             >
               <Text style={styles.learnMoreText}>Learn More</Text>
             </TouchableOpacity>
-          </BlurView>
+          </View>
         </View>
       </ScrollView>
 
@@ -717,18 +699,13 @@ export default function ReportResultsScreen() {
         onRequestClose={() => setShowMetrics(false)}
       >
         <View style={styles.modalContainer}>
-          <LinearGradient
-            colors={['#0A0A0A', '#1A1A2E', '#16213E']}
-            style={styles.gradient}
-          />
-
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Report Analysis</Text>
             <TouchableOpacity
               style={styles.closeButton}
               onPress={() => setShowMetrics(false)}
             >
-              <Text style={styles.closeButtonText}>✕</Text>
+              <X size={20} color="#6B7280" />
             </TouchableOpacity>
           </View>
 
@@ -769,18 +746,13 @@ export default function ReportResultsScreen() {
         onRequestClose={handleCloseModal}
       >
         <View style={styles.doctorModalContainer}>
-          <LinearGradient
-            colors={['#0A0A0A', '#1A1A2E', '#16213E']}
-            style={styles.gradient}
-          />
-
           {/* Modal Header */}
           <View style={styles.doctorModalHeader}>
             <TouchableOpacity
               style={styles.closeButton}
               onPress={handleCloseModal}
             >
-              <X size={22} color="#FFFFFF" />
+              <X size={22} color="#6B7280" />
             </TouchableOpacity>
             <Text style={styles.doctorModalTitle}>AI Doctor Consultation</Text>
             <View style={styles.headerSpacer} />
@@ -821,7 +793,7 @@ export default function ReportResultsScreen() {
             <View style={styles.conversationStatus}>
               {isProcessing ? (
                 <View style={styles.processingContainer}>
-                  <ActivityIndicator size="large" color="#4FACFE" />
+                  <ActivityIndicator size="large" color="#4A90E2" />
                   <Text style={styles.processingText}>Connecting to AI Doctor...</Text>
                 </View>
               ) : isCallActive ? (
@@ -876,14 +848,7 @@ export default function ReportResultsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
-  },
-  gradient: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
+    backgroundColor: '#F8F9FA',
   },
   chartsContainer: {
     paddingHorizontal: 20,
@@ -892,18 +857,20 @@ const styles = StyleSheet.create({
   chartCard: {
     marginBottom: 20,
     borderRadius: 16,
-    overflow: 'hidden',
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
-  chartBlur: {
+  chartCardContent: {
     padding: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 16,
   },
   chartTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1F2937',
     marginBottom: 12,
   },
   chartContainer: {
@@ -912,7 +879,7 @@ const styles = StyleSheet.create({
   },
   chartDescription: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.7)',
+    color: '#6B7280',
     marginTop: 10,
     textAlign: 'center',
   },
@@ -937,18 +904,20 @@ const styles = StyleSheet.create({
   },
   legendText: {
     fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: '#6B7280',
   },
   aiDoctorCardContainer: {
     marginHorizontal: 20,
     marginBottom: 25,
-    borderRadius: 16,
-    overflow: 'hidden',
   },
-  aiDoctorCardBlur: {
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+  aiDoctorCard: {
     borderRadius: 16,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   aiDoctorCardContent: {
     flexDirection: 'row',
@@ -962,7 +931,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: 'rgba(79, 172, 254, 0.2)',
+    backgroundColor: 'rgba(74, 144, 226, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -973,12 +942,12 @@ const styles = StyleSheet.create({
   aiDoctorTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1F2937',
     marginBottom: 4,
   },
   aiDoctorDescription: {
     fontSize: 13,
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: '#6B7280',
     lineHeight: 18,
   },
   aiDoctorActionSection: {
@@ -989,7 +958,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#4FACFE',
+    backgroundColor: '#4A90E2',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -1010,25 +979,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: '#F3F4F6',
   },
   metricIconGood: {
-    backgroundColor: 'rgba(78, 205, 196, 0.2)',
+    backgroundColor: 'rgba(76, 175, 80, 0.1)',
   },
   metricIconWarning: {
-    backgroundColor: 'rgba(255, 107, 107, 0.2)',
+    backgroundColor: 'rgba(255, 152, 101, 0.1)',
   },
   metricIconInfo: {
-    backgroundColor: 'rgba(79, 172, 254, 0.2)',
+    backgroundColor: 'rgba(74, 144, 226, 0.1)',
   },
   metricIconText: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1F2937',
   },
   metricItemLabel: {
     fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: '#6B7280',
     textAlign: 'center',
   },
   stoneAnalysisContainer: {
@@ -1043,13 +1012,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   stoneCircle: {
-    backgroundColor: 'rgba(255, 107, 107, 0.6)',
+    backgroundColor: 'rgba(255, 152, 101, 0.6)',
     borderRadius: 100,
     marginBottom: 8,
   },
   stoneSize: {
     fontSize: 16,
-    color: '#FFFFFF',
+    color: '#1F2937',
     fontWeight: '600',
   },
   stoneDetails: {
@@ -1062,11 +1031,11 @@ const styles = StyleSheet.create({
   },
   stoneDetailLabel: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.7)',
+    color: '#6B7280',
   },
   stoneDetailValue: {
     fontSize: 14,
-    color: '#FFFFFF',
+    color: '#1F2937',
     fontWeight: '500',
   },
   loadingContainer: {
@@ -1075,7 +1044,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    color: '#FFFFFF',
+    color: '#6B7280',
     fontSize: 16,
     marginTop: 16,
   },
@@ -1085,7 +1054,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   errorText: {
-    color: '#FF6B6B',
+    color: '#FF8A65',
     fontSize: 16,
   },
   header: {
@@ -1099,9 +1068,14 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   scrollView: {
     flex: 1,
@@ -1128,10 +1102,15 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   imageNavButtonLeft: {
     left: 20,
@@ -1152,11 +1131,11 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    backgroundColor: '#E5E7EB',
     marginHorizontal: 4,
   },
   activeDot: {
-    backgroundColor: '#4FACFE',
+    backgroundColor: '#4A90E2',
     width: 10,
     height: 10,
     borderRadius: 5,
@@ -1164,24 +1143,26 @@ const styles = StyleSheet.create({
   imageDescriptionContainer: {
     marginHorizontal: 20,
     marginBottom: 25,
-    borderRadius: 16,
-    overflow: 'hidden',
   },
-  descriptionBlur: {
+  descriptionCard: {
     padding: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 16,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   imageTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1F2937',
     marginBottom: 8,
   },
   imageDescription: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: '#6B7280',
     lineHeight: 20,
   },
   sectionTitleContainer: {
@@ -1191,55 +1172,37 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1F2937',
     marginBottom: 8,
   },
   sectionSubtitle: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.7)',
+    color: '#6B7280',
     lineHeight: 20,
-  },
-  cardsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    marginBottom: 25,
   },
   singleCardContainer: {
     paddingHorizontal: 20,
     marginBottom: 25,
   },
-  card: {
-    width: '48%',
-    aspectRatio: 1,
-    borderRadius: 20,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-  },
   fullWidthCard: {
     width: '100%',
     borderRadius: 20,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  cardBlur: {
-    flex: 1,
-  },
-  cardGradient: {
-    flex: 1,
-    padding: 20,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   cardContent: {
-    flex: 1,
+    padding: 20,
     justifyContent: 'space-between',
   },
   cardIconContainer: {
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'rgba(74, 144, 226, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
@@ -1247,12 +1210,12 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1F2937',
     marginBottom: 8,
   },
   cardDescription: {
     fontSize: 13,
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: '#6B7280',
     lineHeight: 18,
     marginBottom: 12,
   },
@@ -1260,52 +1223,52 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#4FACFE',
+    backgroundColor: '#4A90E2',
     justifyContent: 'center',
     alignItems: 'center',
     alignSelf: 'flex-end',
   },
-  vizButton: {
-    backgroundColor: '#1E3A5F',
-  },
   additionalInfoContainer: {
     marginHorizontal: 20,
     marginBottom: 40,
-    borderRadius: 16,
-    overflow: 'hidden',
   },
-  additionalInfoBlur: {
+  additionalInfoCard: {
     padding: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 16,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   additionalInfoTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1F2937',
     marginBottom: 12,
   },
   additionalInfoText: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: '#6B7280',
     lineHeight: 20,
     marginBottom: 16,
   },
   learnMoreButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'rgba(74, 144, 226, 0.1)',
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 8,
     alignSelf: 'flex-start',
   },
   learnMoreText: {
-    color: '#4FACFE',
+    color: '#4A90E2',
     fontWeight: '600',
     fontSize: 14,
   },
   modalContainer: {
     flex: 1,
+    backgroundColor: '#F8F9FA',
   },
   modalHeader: {
     flexDirection: 'row',
@@ -1318,20 +1281,20 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1F2937',
   },
   closeButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  closeButtonText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '600',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   modalContent: {
     flex: 1,
@@ -1346,26 +1309,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+    borderBottomColor: '#E5E7EB',
   },
   metricLabel: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: '#6B7280',
   },
   metricValue: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: '#1F2937',
   },
   notesText: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: '#6B7280',
     lineHeight: 20,
   },
   // AI Doctor Modal styles
   doctorModalContainer: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#F8F9FA',
   },
   doctorModalHeader: {
     flexDirection: 'row',
@@ -1378,7 +1341,7 @@ const styles = StyleSheet.create({
   doctorModalTitle: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1F2937',
     textAlign: 'center',
   },
   headerSpacer: {
@@ -1392,6 +1355,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 20,
     position: 'relative',
+    backgroundColor: '#000',
+    borderRadius: 16,
+    marginHorizontal: 20,
+    overflow: 'hidden',
   },
   video: {
     width: '100%',
@@ -1422,7 +1389,7 @@ const styles = StyleSheet.create({
   },
   processingText: {
     fontSize: 16,
-    color: '#FFFFFF',
+    color: '#1F2937',
     marginTop: 20,
   },
   activeCallContainer: {
@@ -1439,7 +1406,7 @@ const styles = StyleSheet.create({
   waveBar: {
     width: 4,
     marginHorizontal: 3,
-    backgroundColor: '#4FACFE',
+    backgroundColor: '#4A90E2',
     borderRadius: 2,
   },
   waveBar1: {
@@ -1460,12 +1427,12 @@ const styles = StyleSheet.create({
   callActiveText: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1F2937',
     marginBottom: 10,
   },
   callInstructionText: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.7)',
+    color: '#6B7280',
     textAlign: 'center',
   },
   startCallContainer: {
@@ -1475,44 +1442,15 @@ const styles = StyleSheet.create({
   startCallText: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1F2937',
     marginBottom: 10,
     textAlign: 'center',
   },
   callDescriptionText: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.7)',
+    color: '#6B7280',
     textAlign: 'center',
     marginBottom: 20,
-  },
-  callControls: {
-    paddingVertical: 20,
-    alignItems: 'center',
-  },
-  startCallButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#4FACFE',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 30,
-  },
-  endCallButton: {
-    backgroundColor: '#FF6B6B',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 30,
-  },
-  callButtonIcon: {
-    marginRight: 8,
-  },
-  callButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  disabledButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
   },
   elevenlabsContainer: {
     alignItems: 'center',
