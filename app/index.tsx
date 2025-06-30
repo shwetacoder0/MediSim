@@ -64,6 +64,10 @@ export default function WelcomeScreen() {
     router.push('/features');
   };
 
+  const handleSponsors = () => {
+    router.push('/sponsors');
+  };
+
   // Show loading indicator while checking auth state
   if (isLoading) {
     return (
@@ -83,6 +87,15 @@ export default function WelcomeScreen() {
         colors={['#0A0A0A', '#1A1A2E', '#16213E']}
         style={styles.gradient}
       />
+
+      {/* Bolt Icon at the top */}
+      <View style={styles.boltIconContainer}>
+        <Image
+          source={require('../assets/images/white_circle_360x360.png')}
+          style={styles.boltIcon}
+          resizeMode="contain"
+        />
+      </View>
 
       {/* Animated Background Orbs */}
       <View style={styles.orbContainer}>
@@ -124,6 +137,11 @@ export default function WelcomeScreen() {
             </LinearGradient>
           </BlurView>
         </TouchableOpacity>
+
+        {/* Sponsors Link */}
+        <TouchableOpacity style={styles.sponsorsButton} onPress={handleSponsors}>
+          <Text style={styles.sponsorsText}>Thank Our Sponsors</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -144,6 +162,16 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
     bottom: 0,
+  },
+  boltIconContainer: {
+    position: 'absolute',
+    top: 60,
+    left: 30,
+    zIndex: 10,
+  },
+  boltIcon: {
+    width: 50,
+    height: 50,
   },
   orbContainer: {
     position: 'absolute',
@@ -198,7 +226,7 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     alignItems: 'center',
-    marginBottom: 120,
+    marginBottom: 80,
   },
   title: {
     fontSize: 48,
@@ -223,6 +251,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.3,
     shadowRadius: 20,
+    marginBottom: 30,
   },
   buttonBlur: {
     paddingHorizontal: 50,
@@ -238,5 +267,15 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     textAlign: 'center',
+  },
+  sponsorsButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+  },
+  sponsorsText: {
+    color: 'rgba(255, 255, 255, 0.7)',
+    fontSize: 16,
+    textAlign: 'center',
+    textDecorationLine: 'underline',
   },
 });

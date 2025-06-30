@@ -23,6 +23,7 @@ export default function RootLayout() {
         <Stack.Screen name="disease-detail" />
         <Stack.Screen name="treatment-detail" />
         <Stack.Screen name="model-detail" />
+        <Stack.Screen name="sponsors" />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="light" />
