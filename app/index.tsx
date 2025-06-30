@@ -9,9 +9,6 @@ import {
   ActivityIndicator,
   Linking,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
-import { router } from 'expo-router';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -19,6 +16,7 @@ import Animated, {
   withTiming,
   interpolate,
 } from 'react-native-reanimated';
+import { router } from 'expo-router';
 import { useAuth, UserProfile } from '../lib/auth-context';
 
 const { width, height } = Dimensions.get('window');
@@ -80,22 +78,13 @@ export default function WelcomeScreen() {
   if (isLoading) {
     return (
       <View style={[styles.container, styles.loadingContainer]}>
-        <LinearGradient
-          colors={['#0A0A0A', '#1A1A2E', '#16213E']}
-          style={styles.gradient}
-        />
-        <ActivityIndicator size="large" color="#4FACFE" />
+        <ActivityIndicator size="large" color="#4A90E2" />
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#0A0A0A', '#1A1A2E', '#16213E']}
-        style={styles.gradient}
-      />
-
       {/* Bolt Icon at the top - now clickable */}
       <TouchableOpacity style={styles.boltIconContainer} onPress={handleBoltClick}>
         <Image
@@ -108,10 +97,7 @@ export default function WelcomeScreen() {
       {/* Animated Background Orbs */}
       <View style={styles.orbContainer}>
         <Animated.View style={[styles.orb, animatedOrb]}>
-          <LinearGradient
-            colors={['#4FACFE', '#00F2FE', '#43E97B']}
-            style={styles.orbGradient}
-          />
+          <View style={styles.orbGradient} />
         </Animated.View>
       </View>
 
@@ -119,14 +105,11 @@ export default function WelcomeScreen() {
       <View style={styles.content}>
         <View style={styles.logoContainer}>
           <View style={styles.glassOrb}>
-            <BlurView intensity={20} tint="light" style={styles.blurOrb}>
+            <View style={styles.blurOrb}>
               <View style={styles.innerOrb}>
-                <LinearGradient
-                  colors={['#4FACFE', '#00F2FE']}
-                  style={styles.innerGradient}
-                />
+                <View style={styles.innerGradient} />
               </View>
-            </BlurView>
+            </View>
           </View>
         </View>
 
@@ -136,14 +119,9 @@ export default function WelcomeScreen() {
         </View>
 
         <TouchableOpacity style={styles.getStartedButton} onPress={handleGetStarted}>
-          <BlurView intensity={30} tint="light" style={styles.buttonBlur}>
-            <LinearGradient
-              colors={['#4FACFE', '#00F2FE']}
-              style={styles.buttonGradient}
-            >
-              <Text style={styles.buttonText}>Get Started</Text>
-            </LinearGradient>
-          </BlurView>
+          <View style={styles.buttonGradient}>
+            <Text style={styles.buttonText}>Get Started</Text>
+          </View>
         </TouchableOpacity>
       </View>
     </View>
@@ -153,29 +131,23 @@ export default function WelcomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#F8F9FA',
   },
   loadingContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  gradient: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
   },
   boltIconContainer: {
     position: 'absolute',
     top: 60,
     left: 30,
     zIndex: 10,
-    padding: 5, // Add padding for better touch target
+    padding: 5,
   },
   boltIcon: {
-    width: 50,
-    height: 50,
+    width: 40,
+    height: 40,
+    tintColor: '#6B7280',
   },
   orbContainer: {
     position: 'absolute',
@@ -190,11 +162,12 @@ const styles = StyleSheet.create({
     width: width * 1.5,
     height: width * 1.5,
     borderRadius: width * 0.75,
-    opacity: 0.1,
+    opacity: 0.03,
   },
   orbGradient: {
     flex: 1,
     borderRadius: width * 0.75,
+    backgroundColor: '#4A90E2',
   },
   content: {
     flex: 1,
@@ -203,15 +176,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
   },
   logoContainer: {
-    marginBottom: 80,
+    marginBottom: 60,
   },
   glassOrb: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
+    width: 140,
+    height: 140,
+    borderRadius: 70,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: 'rgba(74, 144, 226, 0.1)',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
   },
   blurOrb: {
     flex: 1,
@@ -219,56 +193,53 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   innerOrb: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     overflow: 'hidden',
   },
   innerGradient: {
     flex: 1,
-    opacity: 0.8,
+    backgroundColor: '#4A90E2',
+    opacity: 0.6,
   },
   textContainer: {
     alignItems: 'center',
-    marginBottom: 80,
+    marginBottom: 60,
   },
   title: {
-    fontSize: 48,
+    fontSize: 42,
     fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 16,
+    color: '#1F2937',
+    marginBottom: 12,
     textAlign: 'center',
-    letterSpacing: 1,
-  },
-  subtitle: {
-    fontSize: 18,
-    color: 'rgba(255, 255, 255, 0.8)',
-    textAlign: 'center',
-    fontWeight: '400',
     letterSpacing: 0.5,
   },
-  getStartedButton: {
-    borderRadius: 30,
-    overflow: 'hidden',
-    elevation: 10,
-    shadowColor: '#4FACFE',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    marginBottom: 30,
+  subtitle: {
+    fontSize: 16,
+    color: '#6B7280',
+    textAlign: 'center',
+    fontWeight: '400',
+    letterSpacing: 0.3,
   },
-  buttonBlur: {
-    paddingHorizontal: 50,
-    paddingVertical: 18,
+  getStartedButton: {
+    borderRadius: 25,
+    overflow: 'hidden',
+    shadowColor: '#4A90E2',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
   },
   buttonGradient: {
-    paddingHorizontal: 50,
-    paddingVertical: 18,
-    borderRadius: 30,
+    paddingHorizontal: 48,
+    paddingVertical: 16,
+    borderRadius: 25,
+    backgroundColor: '#4A90E2',
   },
   buttonText: {
     color: '#FFFFFF',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
     textAlign: 'center',
   },

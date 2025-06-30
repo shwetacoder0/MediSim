@@ -9,8 +9,6 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
 import { router } from 'expo-router';
 import { ArrowLeft, Mail, Lock, Eye, EyeOff } from 'lucide-react-native';
 import { signInUser, signUpUser } from '../lib/auth';
@@ -123,13 +121,8 @@ export default function AuthScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#0A0A0A', '#1A1A2E', '#16213E']}
-        style={styles.gradient}
-      />
-
       <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-        <ArrowLeft size={24} color="#FFFFFF" />
+        <ArrowLeft size={20} color="#6B7280" />
       </TouchableOpacity>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -148,85 +141,77 @@ export default function AuthScreen() {
 
           <View style={styles.form}>
             <View style={styles.inputContainer}>
-              <BlurView intensity={20} tint="dark" style={styles.inputBlur}>
-                <View style={styles.inputWrapper}>
-                  <Mail size={20} color="rgba(255, 255, 255, 0.6)" />
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Email address"
-                    placeholderTextColor="rgba(255, 255, 255, 0.6)"
-                    value={email}
-                    onChangeText={setEmail}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                  />
-                </View>
-              </BlurView>
+              <View style={styles.inputWrapper}>
+                <Mail size={18} color="#9CA3AF" />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Email address"
+                  placeholderTextColor="#9CA3AF"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+              </View>
             </View>
 
             {!isLogin && (
               <View style={styles.inputContainer}>
-                <BlurView intensity={20} tint="dark" style={styles.inputBlur}>
-                  <View style={styles.inputWrapper}>
-                    <Mail size={20} color="rgba(255, 255, 255, 0.6)" />
-                    <TextInput
-                      style={styles.input}
-                      placeholder="Full Name"
-                      placeholderTextColor="rgba(255, 255, 255, 0.6)"
-                      value={fullName}
-                      onChangeText={setFullName}
-                      autoCapitalize="words"
-                    />
-                  </View>
-                </BlurView>
+                <View style={styles.inputWrapper}>
+                  <Mail size={18} color="#9CA3AF" />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Full Name"
+                    placeholderTextColor="#9CA3AF"
+                    value={fullName}
+                    onChangeText={setFullName}
+                    autoCapitalize="words"
+                  />
+                </View>
               </View>
             )}
 
             <View style={styles.inputContainer}>
-              <BlurView intensity={20} tint="dark" style={styles.inputBlur}>
-                <View style={styles.inputWrapper}>
-                  <Lock size={20} color="rgba(255, 255, 255, 0.6)" />
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Password"
-                    placeholderTextColor="rgba(255, 255, 255, 0.6)"
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry={!showPassword}
-                  />
-                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                    {showPassword ? (
-                      <EyeOff size={20} color="rgba(255, 255, 255, 0.6)" />
-                    ) : (
-                      <Eye size={20} color="rgba(255, 255, 255, 0.6)" />
-                    )}
-                  </TouchableOpacity>
-                </View>
-              </BlurView>
+              <View style={styles.inputWrapper}>
+                <Lock size={18} color="#9CA3AF" />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Password"
+                  placeholderTextColor="#9CA3AF"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!showPassword}
+                />
+                <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                  {showPassword ? (
+                    <EyeOff size={18} color="#9CA3AF" />
+                  ) : (
+                    <Eye size={18} color="#9CA3AF" />
+                  )}
+                </TouchableOpacity>
+              </View>
             </View>
 
             {!isLogin && (
               <View style={styles.inputContainer}>
-                <BlurView intensity={20} tint="dark" style={styles.inputBlur}>
-                  <View style={styles.inputWrapper}>
-                    <Lock size={20} color="rgba(255, 255, 255, 0.6)" />
-                    <TextInput
-                      style={styles.input}
-                      placeholder="Confirm Password"
-                      placeholderTextColor="rgba(255, 255, 255, 0.6)"
-                      value={confirmPassword}
-                      onChangeText={setConfirmPassword}
-                      secureTextEntry={!showConfirmPassword}
-                    />
-                    <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
-                      {showConfirmPassword ? (
-                        <EyeOff size={20} color="rgba(255, 255, 255, 0.6)" />
-                      ) : (
-                        <Eye size={20} color="rgba(255, 255, 255, 0.6)" />
-                      )}
-                    </TouchableOpacity>
-                  </View>
-                </BlurView>
+                <View style={styles.inputWrapper}>
+                  <Lock size={18} color="#9CA3AF" />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Confirm Password"
+                    placeholderTextColor="#9CA3AF"
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    secureTextEntry={!showConfirmPassword}
+                  />
+                  <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+                    {showConfirmPassword ? (
+                      <EyeOff size={18} color="#9CA3AF" />
+                    ) : (
+                      <Eye size={18} color="#9CA3AF" />
+                    )}
+                  </TouchableOpacity>
+                </View>
               </View>
             )}
 
@@ -235,10 +220,7 @@ export default function AuthScreen() {
               onPress={handleAuth}
               disabled={loading}
             >
-              <LinearGradient
-                colors={['#4FACFE', '#00F2FE']}
-                style={styles.buttonGradient}
-              >
+              <View style={styles.buttonGradient}>
                 {loading ? (
                   <ActivityIndicator color="#FFFFFF" size="small" />
                 ) : (
@@ -246,7 +228,7 @@ export default function AuthScreen() {
                     {isLogin ? 'Sign In' : 'Create Account'}
                   </Text>
                 )}
-              </LinearGradient>
+              </View>
             </TouchableOpacity>
 
             <View style={styles.divider}>
@@ -260,13 +242,11 @@ export default function AuthScreen() {
               onPress={handleGoogleLogin}
               disabled={loading}
             >
-              <BlurView intensity={20} tint="dark" style={styles.googleBlur}>
-                {loading ? (
-                  <ActivityIndicator color="#FFFFFF" size="small" />
-                ) : (
-                  <Text style={styles.googleText}>Continue with Google</Text>
-                )}
-              </BlurView>
+              {loading ? (
+                <ActivityIndicator color="#6B7280" size="small" />
+              ) : (
+                <Text style={styles.googleText}>Continue with Google</Text>
+              )}
             </TouchableOpacity>
           </View>
 
@@ -293,14 +273,7 @@ export default function AuthScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
-  },
-  gradient: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
+    backgroundColor: '#F8F9FA',
   },
   backButton: {
     position: 'absolute',
@@ -308,6 +281,13 @@ const styles = StyleSheet.create({
     left: 20,
     zIndex: 10,
     padding: 10,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   scrollView: {
     flex: 1,
@@ -322,90 +302,93 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 12,
+    color: '#1F2937',
+    marginBottom: 8,
     textAlign: 'center',
   },
   subtitle: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 15,
+    color: '#6B7280',
     textAlign: 'center',
-    lineHeight: 22,
+    lineHeight: 20,
   },
   form: {
     marginBottom: 40,
   },
   inputContainer: {
-    marginBottom: 20,
-    borderRadius: 16,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  inputBlur: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    marginBottom: 16,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
   },
   input: {
     flex: 1,
-    color: '#FFFFFF',
-    fontSize: 16,
-    marginLeft: 12,
-    fontWeight: '500',
+    color: '#1F2937',
+    fontSize: 15,
+    marginLeft: 10,
+    fontWeight: '400',
   },
   authButton: {
-    borderRadius: 16,
+    borderRadius: 12,
     overflow: 'hidden',
-    marginTop: 20,
-    elevation: 10,
-    shadowColor: '#4FACFE',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
+    marginTop: 16,
+    shadowColor: '#4A90E2',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
   },
   buttonGradient: {
-    paddingVertical: 18,
+    paddingVertical: 16,
     alignItems: 'center',
+    backgroundColor: '#4A90E2',
   },
   buttonText: {
     color: '#FFFFFF',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
   },
   divider: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 30,
+    marginVertical: 24,
   },
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: '#E5E7EB',
   },
   dividerText: {
-    color: 'rgba(255, 255, 255, 0.6)',
-    marginHorizontal: 16,
-    fontSize: 14,
+    color: '#9CA3AF',
+    marginHorizontal: 12,
+    fontSize: 13,
   },
   googleButton: {
-    borderRadius: 16,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  googleBlur: {
-    paddingVertical: 18,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 16,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   googleText: {
-    color: '#FFFFFF',
-    fontSize: 16,
+    color: '#6B7280',
+    fontSize: 15,
     fontWeight: '500',
   },
   footer: {
@@ -413,20 +396,20 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   switchText: {
-    color: 'rgba(255, 255, 255, 0.8)',
-    fontSize: 16,
-    marginBottom: 20,
+    color: '#6B7280',
+    fontSize: 14,
+    marginBottom: 16,
   },
   switchLink: {
-    color: '#4FACFE',
+    color: '#4A90E2',
     fontWeight: '600',
   },
   skipButton: {
-    paddingVertical: 10,
+    paddingVertical: 8,
   },
   skipText: {
-    color: 'rgba(255, 255, 255, 0.6)',
-    fontSize: 14,
+    color: '#9CA3AF',
+    fontSize: 13,
     textDecorationLine: 'underline',
   },
 });

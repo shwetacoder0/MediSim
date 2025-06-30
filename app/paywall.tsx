@@ -6,8 +6,6 @@ import {
   StyleSheet,
   ScrollView,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
 import { router } from 'expo-router';
 import { ArrowLeft, Check } from 'lucide-react-native';
 
@@ -39,13 +37,8 @@ export default function PaywallScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#0A0A0A', '#1A1A2E', '#16213E']}
-        style={styles.gradient}
-      />
-
       <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-        <ArrowLeft size={24} color="#FFFFFF" />
+        <ArrowLeft size={20} color="#6B7280" />
       </TouchableOpacity>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -58,35 +51,30 @@ export default function PaywallScreen() {
           </View>
 
           <View style={styles.pricingCard}>
-            <BlurView intensity={20} tint="dark" style={styles.cardBlur}>
-              <View style={styles.cardContent}>
-                <View style={styles.pricingHeader}>
-                  <Text style={styles.planTitle}>Monthly</Text>
-                  <View style={styles.priceContainer}>
-                    <Text style={styles.price}>$15</Text>
-                    <Text style={styles.period}>/month</Text>
-                  </View>
-                </View>
-
-                <TouchableOpacity style={styles.subscribeButton} onPress={handleSubscribe}>
-                  <LinearGradient
-                    colors={['#4FACFE', '#00F2FE']}
-                    style={styles.subscribeGradient}
-                  >
-                    <Text style={styles.subscribeText}>Subscribe</Text>
-                  </LinearGradient>
-                </TouchableOpacity>
-
-                <View style={styles.featuresList}>
-                  {features.map((feature, index) => (
-                    <View key={index} style={styles.featureItem}>
-                      <Check size={20} color="#4FACFE" strokeWidth={2} />
-                      <Text style={styles.featureText}>{feature}</Text>
-                    </View>
-                  ))}
+            <View style={styles.cardContent}>
+              <View style={styles.pricingHeader}>
+                <Text style={styles.planTitle}>Monthly</Text>
+                <View style={styles.priceContainer}>
+                  <Text style={styles.price}>$15</Text>
+                  <Text style={styles.period}>/month</Text>
                 </View>
               </View>
-            </BlurView>
+
+              <TouchableOpacity style={styles.subscribeButton} onPress={handleSubscribe}>
+                <View style={styles.subscribeGradient}>
+                  <Text style={styles.subscribeText}>Subscribe</Text>
+                </View>
+              </TouchableOpacity>
+
+              <View style={styles.featuresList}>
+                {features.map((feature, index) => (
+                  <View key={index} style={styles.featureItem}>
+                    <Check size={16} color="#4A90E2" strokeWidth={2} />
+                    <Text style={styles.featureText}>{feature}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
           </View>
 
           <TouchableOpacity style={styles.restoreButton} onPress={handleRestore}>
@@ -105,14 +93,7 @@ export default function PaywallScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
-  },
-  gradient: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
+    backgroundColor: '#F8F9FA',
   },
   backButton: {
     position: 'absolute',
@@ -120,6 +101,13 @@ const styles = StyleSheet.create({
     left: 20,
     zIndex: 10,
     padding: 10,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   scrollView: {
     flex: 1,
@@ -134,46 +122,42 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 16,
+    color: '#1F2937',
+    marginBottom: 12,
     textAlign: 'center',
-    lineHeight: 38,
+    lineHeight: 34,
   },
   subtitle: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 15,
+    color: '#6B7280',
     textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: 22,
     paddingHorizontal: 10,
   },
   pricingCard: {
-    borderRadius: 24,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(79, 172, 254, 0.3)',
-    marginBottom: 40,
-    elevation: 20,
-    shadowColor: '#4FACFE',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 30,
-  },
-  cardBlur: {
-    padding: 30,
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
+    marginBottom: 32,
+    shadowColor: '#4A90E2',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.1,
+    shadowRadius: 24,
+    elevation: 12,
   },
   cardContent: {
     alignItems: 'center',
+    padding: 28,
   },
   pricingHeader: {
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 24,
   },
   planTitle: {
-    fontSize: 18,
-    color: 'rgba(255, 255, 255, 0.8)',
-    marginBottom: 8,
+    fontSize: 16,
+    color: '#6B7280',
+    marginBottom: 6,
     fontWeight: '500',
   },
   priceContainer: {
@@ -181,34 +165,35 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
   },
   price: {
-    fontSize: 48,
+    fontSize: 42,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1F2937',
   },
   period: {
-    fontSize: 18,
-    color: 'rgba(255, 255, 255, 0.8)',
-    marginLeft: 4,
+    fontSize: 16,
+    color: '#6B7280',
+    marginLeft: 3,
     fontWeight: '500',
   },
   subscribeButton: {
-    borderRadius: 16,
+    borderRadius: 12,
     overflow: 'hidden',
     width: '100%',
-    marginBottom: 30,
-    elevation: 10,
-    shadowColor: '#4FACFE',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
+    marginBottom: 24,
+    shadowColor: '#4A90E2',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
   },
   subscribeGradient: {
-    paddingVertical: 18,
+    paddingVertical: 16,
     alignItems: 'center',
+    backgroundColor: '#4A90E2',
   },
   subscribeText: {
     color: '#FFFFFF',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
   },
   featuresList: {
@@ -218,22 +203,22 @@ const styles = StyleSheet.create({
   featureItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   featureText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    marginLeft: 12,
+    color: '#1F2937',
+    fontSize: 15,
+    marginLeft: 10,
     fontWeight: '500',
   },
   restoreButton: {
     alignItems: 'center',
-    paddingVertical: 16,
-    marginBottom: 40,
+    paddingVertical: 12,
+    marginBottom: 32,
   },
   restoreText: {
-    color: '#4FACFE',
-    fontSize: 16,
+    color: '#4A90E2',
+    fontSize: 15,
     fontWeight: '500',
   },
   footer: {
@@ -241,8 +226,8 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   footerText: {
-    color: 'rgba(255, 255, 255, 0.6)',
-    fontSize: 14,
+    color: '#9CA3AF',
+    fontSize: 13,
     textAlign: 'center',
   },
 });

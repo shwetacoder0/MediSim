@@ -7,8 +7,6 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
 import { router } from 'expo-router';
 import { FileText, Bot, Microscope, ChartBar as BarChart3, Shield, ArrowRight } from 'lucide-react-native';
 
@@ -20,35 +18,35 @@ const features = [
     title: 'Visual Report Conversion',
     description: 'Transform complex medical reports into easy-to-understand visual summaries.',
     icon: FileText,
-    gradient: ['#FF6B6B', '#FFE66D'],
+    gradient: ['#4A90E2', '#5BA0F2'],
   },
   {
     id: 2,
     title: 'AI Doctor',
     description: 'Get instant AI-powered explanations of your medical reports.',
     icon: Bot,
-    gradient: ['#4ECDC4', '#44A08D'],
+    gradient: ['#6BCF7F', '#4CAF50'],
   },
   {
     id: 3,
     title: '3D Disease Models',
     description: 'Explore interactive 3D models of various health conditions.',
     icon: Microscope,
-    gradient: ['#A8E6CF', '#7FCDCD'],
+    gradient: ['#FF8A65', '#FF7043'],
   },
   {
     id: 4,
     title: 'Health Metric Visualization',
     description: 'Track and visualize your health metrics over time.',
     icon: BarChart3,
-    gradient: ['#FFB347', '#FFCC5C'],
+    gradient: ['#FFB74D', '#FFA726'],
   },
   {
     id: 5,
     title: 'App Privacy and AI Capabilities',
     description: 'Learn about our commitment to your privacy and the power of our AI.',
     icon: Shield,
-    gradient: ['#B19CD9', '#C299DC'],
+    gradient: ['#BA68C8', '#AB47BC'],
   },
 ];
 
@@ -63,17 +61,11 @@ export default function FeaturesScreen() {
   };
 
   const handleContinue = () => {
-    // Navigate to sponsors page instead of auth
     router.push('/sponsors');
   };
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#0A0A0A', '#1A1A2E', '#16213E']}
-        style={styles.gradient}
-      />
-
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Medisim</Text>
       </View>
@@ -91,14 +83,11 @@ export default function FeaturesScreen() {
           <View key={feature.id} style={styles.slide}>
             <View style={styles.slideContent}>
               <View style={styles.iconContainer}>
-                <BlurView intensity={20} tint="light" style={styles.iconBlur}>
-                  <LinearGradient
-                    colors={feature.gradient}
-                    style={styles.iconGradient}
-                  >
-                    <feature.icon size={60} color="#FFFFFF" strokeWidth={1.5} />
-                  </LinearGradient>
-                </BlurView>
+                <View style={styles.iconBlur}>
+                  <View style={[styles.iconGradient, { backgroundColor: feature.gradient[0] }]}>
+                    <feature.icon size={48} color="#FFFFFF" strokeWidth={1.5} />
+                  </View>
+                </View>
               </View>
 
               <Text style={styles.featureTitle}>{feature.title}</Text>
@@ -123,15 +112,10 @@ export default function FeaturesScreen() {
 
         {currentPage === features.length - 1 && (
           <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
-            <BlurView intensity={30} tint="light" style={styles.buttonBlur}>
-              <LinearGradient
-                colors={['#4FACFE', '#00F2FE']}
-                style={styles.buttonGradient}
-              >
-                <Text style={styles.buttonText}>Continue</Text>
-                <ArrowRight size={20} color="#FFFFFF" />
-              </LinearGradient>
-            </BlurView>
+            <View style={styles.buttonGradient}>
+              <Text style={styles.buttonText}>Continue</Text>
+              <ArrowRight size={18} color="#FFFFFF" />
+            </View>
           </TouchableOpacity>
         )}
       </View>
@@ -142,14 +126,7 @@ export default function FeaturesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
-  },
-  gradient: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
+    backgroundColor: '#F8F9FA',
   },
   header: {
     paddingTop: 60,
@@ -157,10 +134,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerTitle: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: '700',
-    color: '#FFFFFF',
-    letterSpacing: 1,
+    color: '#1F2937',
+    letterSpacing: 0.5,
   },
   scrollView: {
     flex: 1,
@@ -177,33 +154,33 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     marginBottom: 40,
-    borderRadius: 80,
+    borderRadius: 60,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: 'rgba(74, 144, 226, 0.1)',
   },
   iconBlur: {
-    padding: 40,
+    padding: 30,
   },
   iconGradient: {
-    padding: 40,
-    borderRadius: 80,
+    padding: 30,
+    borderRadius: 60,
     alignItems: 'center',
     justifyContent: 'center',
   },
   featureTitle: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1F2937',
     textAlign: 'center',
-    marginBottom: 20,
-    letterSpacing: 0.5,
+    marginBottom: 16,
+    letterSpacing: 0.3,
   },
   featureDescription: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 15,
+    color: '#6B7280',
     textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: 22,
     fontWeight: '400',
   },
   footer: {
@@ -216,39 +193,39 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: 'rgba(107, 114, 128, 0.3)',
+    marginHorizontal: 3,
+  },
+  activeDot: {
+    backgroundColor: '#4A90E2',
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    marginHorizontal: 4,
-  },
-  activeDot: {
-    backgroundColor: '#4FACFE',
   },
   continueButton: {
-    borderRadius: 30,
+    borderRadius: 25,
     overflow: 'hidden',
-    elevation: 10,
-    shadowColor: '#4FACFE',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-  },
-  buttonBlur: {
-    paddingHorizontal: 40,
-    paddingVertical: 16,
+    shadowColor: '#4A90E2',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
   },
   buttonGradient: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 40,
-    paddingVertical: 16,
-    borderRadius: 30,
+    paddingHorizontal: 32,
+    paddingVertical: 14,
+    borderRadius: 25,
+    backgroundColor: '#4A90E2',
   },
   buttonText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
-    marginRight: 8,
+    marginRight: 6,
   },
 });

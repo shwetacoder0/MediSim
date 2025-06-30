@@ -9,10 +9,8 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
 import { router } from 'expo-router';
-import { ArrowLeft, User, Mail, Calendar, Crown, CreditCard as Edit3, LogOut, Trash2, Check, X } from 'lucide-react-native';
+import { ArrowLeft, User, Mail, Calendar, Crown, Edit3, LogOut, Trash2, Check, X } from 'lucide-react-native';
 import { useAuth, UserProfile } from '../lib/auth-context';
 import { signOutUser, updateUserProfile } from '../lib/auth';
 import { supabase } from '../lib/supabase';
@@ -150,32 +148,21 @@ export default function ProfileScreen() {
   if (isLoading) {
     return (
       <View style={[styles.container, styles.loadingContainer]}>
-        <LinearGradient
-          colors={['#0A0A0A', '#1A1A2E', '#16213E']}
-          style={styles.gradient}
-        />
-        <ActivityIndicator size="large" color="#4FACFE" />
+        <ActivityIndicator size="large" color="#4A90E2" />
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#0A0A0A', '#1A1A2E', '#16213E']}
-        style={styles.gradient}
-      />
-
       <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-        <ArrowLeft size={24} color="#FFFFFF" />
+        <ArrowLeft size={20} color="#6B7280" />
       </TouchableOpacity>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <View style={styles.avatarContainer}>
-            <BlurView intensity={20} tint="dark" style={styles.avatarBlur}>
-              <User size={60} color="#4FACFE" />
-            </BlurView>
+            <User size={48} color="#4A90E2" />
           </View>
 
           <View style={styles.nameContainer}>
@@ -186,14 +173,14 @@ export default function ProfileScreen() {
                   value={tempName}
                   onChangeText={setTempName}
                   placeholder="Enter your name"
-                  placeholderTextColor="rgba(255, 255, 255, 0.5)"
+                  placeholderTextColor="#9CA3AF"
                 />
                 <View style={styles.editActions}>
                   <TouchableOpacity style={styles.editButton} onPress={handleSaveName}>
-                    <Check size={20} color="#4ECDC4" />
+                    <Check size={16} color="#4CAF50" />
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.editButton} onPress={handleCancelEdit}>
-                    <X size={20} color="#FF6B6B" />
+                    <X size={16} color="#FF6B6B" />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -201,7 +188,7 @@ export default function ProfileScreen() {
               <View style={styles.nameDisplay}>
                 <Text style={styles.name}>{fullName}</Text>
                 <TouchableOpacity style={styles.editNameButton} onPress={handleEditName}>
-                  <Edit3 size={20} color="rgba(255, 255, 255, 0.6)" />
+                  <Edit3 size={16} color="#9CA3AF" />
                 </TouchableOpacity>
               </View>
             )}
@@ -215,46 +202,44 @@ export default function ProfileScreen() {
             <Text style={styles.sectionTitle}>Account Information</Text>
 
             <View style={styles.infoCard}>
-              <BlurView intensity={15} tint="dark" style={styles.cardBlur}>
-                <View style={styles.infoItem}>
-                  <Mail size={20} color="rgba(255, 255, 255, 0.6)" />
-                  <View style={styles.infoText}>
-                    <Text style={styles.infoLabel}>Email</Text>
-                    <Text style={styles.infoValue}>{email}</Text>
-                    <Text style={styles.infoNote}>(Cannot be changed)</Text>
-                  </View>
+              <View style={styles.infoItem}>
+                <Mail size={18} color="#9CA3AF" />
+                <View style={styles.infoText}>
+                  <Text style={styles.infoLabel}>Email</Text>
+                  <Text style={styles.infoValue}>{email}</Text>
+                  <Text style={styles.infoNote}>(Cannot be changed)</Text>
                 </View>
+              </View>
 
-                <View style={styles.divider} />
+              <View style={styles.divider} />
 
-                <View style={styles.infoItem}>
-                  <Crown size={20} color={isProUser ? "#FFD700" : "rgba(255, 255, 255, 0.6)"} />
-                  <View style={styles.infoText}>
-                    <Text style={styles.infoLabel}>Subscription Status</Text>
-                    <Text style={[
-                      styles.infoValue,
-                      { color: isProUser ? '#4ECDC4' : '#FF9A9E' }
-                    ]}>
-                      {isProUser ? 'Active' : 'Inactive'}
-                    </Text>
-                    <Text style={styles.infoNote}>
-                      {isProUser
-                        ? 'Premium member'
-                        : 'Free account - Upgrade for more features'}
-                    </Text>
-                  </View>
+              <View style={styles.infoItem}>
+                <Crown size={18} color={isProUser ? "#FFD700" : "#9CA3AF"} />
+                <View style={styles.infoText}>
+                  <Text style={styles.infoLabel}>Subscription Status</Text>
+                  <Text style={[
+                    styles.infoValue,
+                    { color: isProUser ? '#4CAF50' : '#FF8A65' }
+                  ]}>
+                    {isProUser ? 'Active' : 'Inactive'}
+                  </Text>
+                  <Text style={styles.infoNote}>
+                    {isProUser
+                      ? 'Premium member'
+                      : 'Free account - Upgrade for more features'}
+                  </Text>
                 </View>
+              </View>
 
-                <View style={styles.divider} />
+              <View style={styles.divider} />
 
-                <View style={styles.infoItem}>
-                  <Calendar size={20} color="rgba(255, 255, 255, 0.6)" />
-                  <View style={styles.infoText}>
-                    <Text style={styles.infoLabel}>Join Date</Text>
-                    <Text style={styles.infoValue}>{joinDate || 'Unknown'}</Text>
-                  </View>
+              <View style={styles.infoItem}>
+                <Calendar size={18} color="#9CA3AF" />
+                <View style={styles.infoText}>
+                  <Text style={styles.infoLabel}>Join Date</Text>
+                  <Text style={styles.infoValue}>{joinDate || 'Unknown'}</Text>
                 </View>
-              </BlurView>
+              </View>
             </View>
           </View>
 
@@ -262,45 +247,39 @@ export default function ProfileScreen() {
             <Text style={styles.sectionTitle}>Account Actions</Text>
 
             <TouchableOpacity style={styles.actionCard} onPress={handleManageSubscription}>
-              <BlurView intensity={15} tint="dark" style={styles.cardBlur}>
-                <View style={styles.actionItem}>
-                  <Crown size={24} color={isProUser ? "#FFD700" : "rgba(255, 255, 255, 0.6)"} />
-                  <View style={styles.actionTextContainer}>
-                    <Text style={styles.actionText}>Manage Subscription</Text>
-                    <Text style={styles.actionDescription}>
-                      {isProUser ? 'Update billing, cancel, or change plan' : 'Upgrade to Premium'}
-                    </Text>
-                  </View>
+              <View style={styles.actionItem}>
+                <Crown size={20} color={isProUser ? "#FFD700" : "#9CA3AF"} />
+                <View style={styles.actionTextContainer}>
+                  <Text style={styles.actionText}>Manage Subscription</Text>
+                  <Text style={styles.actionDescription}>
+                    {isProUser ? 'Update billing, cancel, or change plan' : 'Upgrade to Premium'}
+                  </Text>
                 </View>
-              </BlurView>
+              </View>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.actionCard} onPress={handleLogout}>
-              <BlurView intensity={15} tint="dark" style={styles.cardBlur}>
-                <View style={styles.actionItem}>
-                  <LogOut size={24} color="#FF9A9E" />
-                  <View style={styles.actionTextContainer}>
-                    <Text style={[styles.actionText, { color: '#FF9A9E' }]}>Sign Out</Text>
-                    <Text style={styles.actionDescription}>
-                      Sign out of your account
-                    </Text>
-                  </View>
+              <View style={styles.actionItem}>
+                <LogOut size={20} color="#FF8A65" />
+                <View style={styles.actionTextContainer}>
+                  <Text style={[styles.actionText, { color: '#FF8A65' }]}>Sign Out</Text>
+                  <Text style={styles.actionDescription}>
+                    Sign out of your account
+                  </Text>
                 </View>
-              </BlurView>
+              </View>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.actionCard} onPress={handleDeleteAccount}>
-              <BlurView intensity={15} tint="dark" style={styles.cardBlur}>
-                <View style={styles.actionItem}>
-                  <Trash2 size={24} color="#FF6B6B" />
-                  <View style={styles.actionTextContainer}>
-                    <Text style={[styles.actionText, { color: '#FF6B6B' }]}>Delete Account</Text>
-                    <Text style={styles.actionDescription}>
-                      Permanently delete your account and data
-                    </Text>
-                  </View>
+              <View style={styles.actionItem}>
+                <Trash2 size={20} color="#FF6B6B" />
+                <View style={styles.actionTextContainer}>
+                  <Text style={[styles.actionText, { color: '#FF6B6B' }]}>Delete Account</Text>
+                  <Text style={styles.actionDescription}>
+                    Permanently delete your account and data
+                  </Text>
                 </View>
-              </BlurView>
+              </View>
             </TouchableOpacity>
           </View>
         </View>
@@ -312,14 +291,7 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
-  },
-  gradient: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
+    backgroundColor: '#F8F9FA',
   },
   backButton: {
     position: 'absolute',
@@ -327,6 +299,13 @@ const styles = StyleSheet.create({
     left: 20,
     zIndex: 10,
     padding: 10,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   scrollView: {
     flex: 1,
@@ -335,142 +314,145 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 120,
     paddingHorizontal: 30,
-    marginBottom: 40,
+    marginBottom: 32,
   },
   avatarContainer: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    overflow: 'hidden',
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  avatarBlur: {
-    flex: 1,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: 'rgba(74, 144, 226, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(74, 144, 226, 0.2)',
   },
   nameContainer: {
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   nameDisplay: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 10,
   },
   name: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1F2937',
   },
   editNameButton: {
-    padding: 8,
+    padding: 6,
   },
   editNameContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 10,
   },
   nameInput: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1F2937',
     borderBottomWidth: 2,
-    borderBottomColor: '#4FACFE',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    minWidth: 200,
+    borderBottomColor: '#4A90E2',
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    minWidth: 180,
     textAlign: 'center',
   },
   editActions: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 6,
   },
   editButton: {
-    padding: 8,
+    padding: 6,
   },
   email: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 14,
+    color: '#6B7280',
   },
   content: {
     paddingHorizontal: 30,
-    paddingBottom: 50,
+    paddingBottom: 40,
   },
   section: {
-    marginBottom: 30,
+    marginBottom: 24,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 16,
+    color: '#1F2937',
+    marginBottom: 12,
   },
   infoCard: {
-    borderRadius: 16,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  cardBlur: {
-    padding: 20,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   infoItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
   },
   infoText: {
-    marginLeft: 16,
+    marginLeft: 12,
     flex: 1,
   },
   infoLabel: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.6)',
-    marginBottom: 4,
-  },
-  infoValue: {
-    fontSize: 16,
-    color: '#FFFFFF',
-    fontWeight: '500',
+    fontSize: 12,
+    color: '#9CA3AF',
     marginBottom: 2,
   },
+  infoValue: {
+    fontSize: 14,
+    color: '#1F2937',
+    fontWeight: '500',
+    marginBottom: 1,
+  },
   infoNote: {
-    fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.5)',
+    fontSize: 11,
+    color: '#9CA3AF',
     fontStyle: 'italic',
   },
   divider: {
     height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    marginVertical: 16,
+    backgroundColor: 'rgba(107, 114, 128, 0.1)',
+    marginVertical: 12,
   },
   actionCard: {
-    borderRadius: 16,
+    borderRadius: 12,
     overflow: 'hidden',
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    marginBottom: 10,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   actionItem: {
     flexDirection: 'row',
     alignItems: 'center',
+    padding: 16,
   },
   actionTextContainer: {
-    marginLeft: 16,
+    marginLeft: 12,
     flex: 1,
   },
   actionText: {
-    fontSize: 18,
-    color: '#FFFFFF',
+    fontSize: 16,
+    color: '#1F2937',
     fontWeight: '500',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   actionDescription: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.6)',
-    lineHeight: 18,
+    fontSize: 12,
+    color: '#6B7280',
+    lineHeight: 16,
   },
   loadingContainer: {
     justifyContent: 'center',

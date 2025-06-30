@@ -8,8 +8,6 @@ import {
   Image,
   Linking,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
 import { router } from 'expo-router';
 import { ArrowRight, ExternalLink, Heart } from 'lucide-react-native';
 
@@ -20,7 +18,7 @@ const sponsors = [
     description: 'AI-powered development platform that made building MediSim possible',
     image: require('../assets/images/white_circle_360x360.png'),
     url: 'https://bolt.new',
-    color: '#4FACFE',
+    color: '#4A90E2',
     type: 'image',
   },
   {
@@ -29,7 +27,7 @@ const sponsors = [
     description: 'AI video generation platform powering our AI doctor consultations',
     image: require('../assets/images/tavus.svg'),
     url: 'https://tavus.io',
-    color: '#FF6B6B',
+    color: '#6BCF7F',
     type: 'svg',
   },
   {
@@ -38,7 +36,7 @@ const sponsors = [
     description: 'Advanced AI voice technology for natural doctor conversations',
     image: require('../assets/images/elevenlabs.png'),
     url: 'https://elevenlabs.io',
-    color: '#4ECDC4',
+    color: '#FF8A65',
     type: 'image',
   },
   {
@@ -47,7 +45,7 @@ const sponsors = [
     description: 'Backend-as-a-Service providing secure data storage and authentication',
     image: require('../assets/images/supa.png'),
     url: 'https://supabase.com',
-    color: '#3ECF8E',
+    color: '#4CAF50',
     type: 'image',
   },
   {
@@ -89,15 +87,10 @@ export default function SponsorsScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#0A0A0A', '#1A1A2E', '#16213E']}
-        style={styles.gradient}
-      />
-
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <View style={styles.heartContainer}>
-            <Heart size={40} color="#FF6B6B" fill="#FF6B6B" />
+            <Heart size={32} color="#FF8A65" fill="#FF8A65" />
           </View>
           <Text style={styles.title}>Thank You to Our Sponsors</Text>
           <Text style={styles.subtitle}>
@@ -113,67 +106,58 @@ export default function SponsorsScreen() {
               onPress={() => handleSponsorPress(sponsor.url)}
               activeOpacity={0.8}
             >
-              <BlurView intensity={15} tint="dark" style={styles.cardBlur}>
-                <View style={styles.cardContent}>
-                  <View style={styles.sponsorImageContainer}>
-                    <View style={[
-                      styles.imageWrapper,
-                      { backgroundColor: `${sponsor.color}20` }
-                    ]}>
-                      {renderSponsorImage(sponsor)}
-                    </View>
-                  </View>
-                  
-                  <View style={styles.sponsorInfo}>
-                    <View style={styles.sponsorHeader}>
-                      <Text style={styles.sponsorName}>{sponsor.name}</Text>
-                      <ExternalLink size={20} color="rgba(255, 255, 255, 0.6)" />
-                    </View>
-                    <Text style={styles.sponsorDescription}>
-                      {sponsor.description}
-                    </Text>
-                    
-                    <View style={styles.sponsorBadge}>
-                      <View style={[
-                        styles.badgeIndicator,
-                        { backgroundColor: sponsor.color }
-                      ]} />
-                      <Text style={styles.badgeText}>Technology Partner</Text>
-                    </View>
+              <View style={styles.cardContent}>
+                <View style={styles.sponsorImageContainer}>
+                  <View style={[
+                    styles.imageWrapper,
+                    { backgroundColor: `${sponsor.color}15` }
+                  ]}>
+                    {renderSponsorImage(sponsor)}
                   </View>
                 </View>
-              </BlurView>
+                
+                <View style={styles.sponsorInfo}>
+                  <View style={styles.sponsorHeader}>
+                    <Text style={styles.sponsorName}>{sponsor.name}</Text>
+                    <ExternalLink size={16} color="#9CA3AF" />
+                  </View>
+                  <Text style={styles.sponsorDescription}>
+                    {sponsor.description}
+                  </Text>
+                  
+                  <View style={styles.sponsorBadge}>
+                    <View style={[
+                      styles.badgeIndicator,
+                      { backgroundColor: sponsor.color }
+                    ]} />
+                    <Text style={styles.badgeText}>Technology Partner</Text>
+                  </View>
+                </View>
+              </View>
             </TouchableOpacity>
           ))}
         </View>
 
         <View style={styles.footerSection}>
-          <BlurView intensity={15} tint="dark" style={styles.footerBlur}>
-            <Text style={styles.footerTitle}>Built for the Future of Healthcare</Text>
-            <Text style={styles.footerText}>
-              MediSim represents the convergence of AI, healthcare, and accessibility. 
-              We're grateful to our technology partners who share our vision of making 
-              medical information more understandable and accessible to everyone.
-            </Text>
-            
-            <View style={styles.hackathonBadge}>
-              <Text style={styles.hackathonText}>🏆 Built for Bolt.new Hackathon 2025</Text>
-            </View>
-          </BlurView>
+          <Text style={styles.footerTitle}>Built for the Future of Healthcare</Text>
+          <Text style={styles.footerText}>
+            MediSim represents the convergence of AI, healthcare, and accessibility. 
+            We're grateful to our technology partners who share our vision of making 
+            medical information more understandable and accessible to everyone.
+          </Text>
+          
+          <View style={styles.hackathonBadge}>
+            <Text style={styles.hackathonText}>🏆 Built for Bolt.new Hackathon 2025</Text>
+          </View>
         </View>
 
         {/* Continue Button */}
         <View style={styles.continueSection}>
           <TouchableOpacity style={styles.continueButton} onPress={handleContinueToAuth}>
-            <BlurView intensity={30} tint="light" style={styles.continueButtonBlur}>
-              <LinearGradient
-                colors={['#4FACFE', '#00F2FE']}
-                style={styles.continueButtonGradient}
-              >
-                <Text style={styles.continueButtonText}>Continue to App</Text>
-                <ArrowRight size={20} color="#FFFFFF" />
-              </LinearGradient>
-            </BlurView>
+            <View style={styles.continueButtonGradient}>
+              <Text style={styles.continueButtonText}>Continue to App</Text>
+              <ArrowRight size={18} color="#FFFFFF" />
+            </View>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -184,14 +168,7 @@ export default function SponsorsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
-  },
-  gradient: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
+    backgroundColor: '#F8F9FA',
   },
   scrollView: {
     flex: 1,
@@ -203,19 +180,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   heartContainer: {
-    marginBottom: 20,
+    marginBottom: 16,
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 16,
+    color: '#1F2937',
+    marginBottom: 12,
     textAlign: 'center',
   },
   subtitle: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
-    lineHeight: 24,
+    fontSize: 15,
+    color: '#6B7280',
+    lineHeight: 22,
     textAlign: 'center',
     paddingHorizontal: 10,
   },
@@ -224,34 +201,36 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   sponsorCard: {
-    borderRadius: 20,
+    borderRadius: 16,
     overflow: 'hidden',
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  cardBlur: {
-    padding: 20,
+    marginBottom: 16,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   cardContent: {
     flexDirection: 'row',
     alignItems: 'center',
+    padding: 20,
   },
   sponsorImageContainer: {
-    marginRight: 20,
+    marginRight: 16,
   },
   imageWrapper: {
-    width: 80,
-    height: 80,
-    borderRadius: 16,
+    width: 60,
+    height: 60,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: 'rgba(107, 114, 128, 0.1)',
   },
   sponsorImage: {
-    width: 50,
-    height: 50,
+    width: 36,
+    height: 36,
   },
   sponsorInfo: {
     flex: 1,
@@ -260,72 +239,72 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   sponsorName: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1F2937',
   },
   sponsorDescription: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
-    lineHeight: 20,
-    marginBottom: 12,
+    fontSize: 13,
+    color: '#6B7280',
+    lineHeight: 18,
+    marginBottom: 10,
   },
   sponsorBadge: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   badgeIndicator: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginRight: 8,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginRight: 6,
   },
   badgeText: {
-    fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.7)',
+    fontSize: 11,
+    color: '#9CA3AF',
     fontWeight: '600',
   },
   footerSection: {
     marginHorizontal: 20,
     marginBottom: 30,
-    borderRadius: 20,
-    overflow: 'hidden',
-  },
-  footerBlur: {
-    padding: 30,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 20,
+    borderRadius: 16,
+    backgroundColor: '#FFFFFF',
+    padding: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   footerTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 16,
+    color: '#1F2937',
+    marginBottom: 12,
     textAlign: 'center',
   },
   footerText: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
-    lineHeight: 22,
+    fontSize: 13,
+    color: '#6B7280',
+    lineHeight: 20,
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 16,
   },
   hackathonBadge: {
-    backgroundColor: 'rgba(79, 172, 254, 0.2)',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 12,
+    backgroundColor: 'rgba(74, 144, 226, 0.1)',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 10,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(79, 172, 254, 0.3)',
+    borderColor: 'rgba(74, 144, 226, 0.2)',
   },
   hackathonText: {
-    fontSize: 16,
-    color: '#4FACFE',
+    fontSize: 14,
+    color: '#4A90E2',
     fontWeight: '600',
   },
   continueSection: {
@@ -334,29 +313,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   continueButton: {
-    borderRadius: 30,
+    borderRadius: 25,
     overflow: 'hidden',
-    elevation: 10,
-    shadowColor: '#4FACFE',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-  },
-  continueButtonBlur: {
-    paddingHorizontal: 40,
-    paddingVertical: 16,
+    shadowColor: '#4A90E2',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
   },
   continueButtonGradient: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 40,
-    paddingVertical: 16,
-    borderRadius: 30,
+    paddingHorizontal: 32,
+    paddingVertical: 14,
+    borderRadius: 25,
+    backgroundColor: '#4A90E2',
   },
   continueButtonText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
-    marginRight: 8,
+    marginRight: 6,
   },
 });

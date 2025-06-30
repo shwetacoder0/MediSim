@@ -8,8 +8,6 @@ import {
   Modal,
   ActivityIndicator,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
 import { router } from 'expo-router';
 import {
   Camera,
@@ -66,31 +64,22 @@ export default function HomeScreen() {
   if (isLoading) {
     return (
       <View style={[styles.container, styles.loadingContainer]}>
-        <LinearGradient
-          colors={['#0A0A0A', '#1A1A2E', '#16213E']}
-          style={styles.gradient}
-        />
-        <ActivityIndicator size="large" color="#4FACFE" />
+        <ActivityIndicator size="large" color="#4A90E2" />
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#0A0A0A', '#1A1A2E', '#16213E']}
-        style={styles.gradient}
-      />
-
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Text style={styles.appTitle}>Medisim</Text>
           <View style={styles.headerIcons}>
             <TouchableOpacity style={styles.iconButton} onPress={handleProfile}>
-              <User size={24} color="rgba(255, 255, 255, 0.8)" />
+              <User size={20} color="#6B7280" />
             </TouchableOpacity>
             <TouchableOpacity style={styles.iconButton} onPress={handleSettings}>
-              <Settings size={24} color="rgba(255, 255, 255, 0.8)" />
+              <Settings size={20} color="#6B7280" />
             </TouchableOpacity>
           </View>
         </View>
@@ -103,13 +92,10 @@ export default function HomeScreen() {
 
           <View style={styles.uploadButtons}>
             <TouchableOpacity style={styles.primaryButton} onPress={handleTakePhoto}>
-              <LinearGradient
-                colors={['#4FACFE', '#00F2FE']}
-                style={styles.primaryGradient}
-              >
-                <Camera size={24} color="#FFFFFF" />
+              <View style={styles.primaryGradient}>
+                <Camera size={20} color="#FFFFFF" />
                 <Text style={styles.primaryButtonText}>Upload Report</Text>
-              </LinearGradient>
+              </View>
             </TouchableOpacity>
           </View>
         </View>
@@ -122,19 +108,17 @@ export default function HomeScreen() {
           </Text>
 
           <TouchableOpacity style={styles.aiDoctorButton} onPress={handleAIDoctorChat}>
-            <BlurView intensity={20} tint="dark" style={styles.aiDoctorBlur}>
-              <View style={styles.aiDoctorContent}>
-                <View style={styles.aiDoctorIconContainer}>
-                  <MessageCircle size={24} color="#4FACFE" />
-                </View>
-                <View style={styles.aiDoctorTextContainer}>
-                  <Text style={styles.aiDoctorButtonTitle}>Start AI Consultation</Text>
-                  <Text style={styles.aiDoctorButtonSubtitle}>
-                    Chat with our AI doctor about your health
-                  </Text>
-                </View>
+            <View style={styles.aiDoctorContent}>
+              <View style={styles.aiDoctorIconContainer}>
+                <MessageCircle size={20} color="#4A90E2" />
               </View>
-            </BlurView>
+              <View style={styles.aiDoctorTextContainer}>
+                <Text style={styles.aiDoctorButtonTitle}>Start AI Consultation</Text>
+                <Text style={styles.aiDoctorButtonSubtitle}>
+                  Chat with our AI doctor about your health
+                </Text>
+              </View>
+            </View>
           </TouchableOpacity>
         </View>
 
@@ -145,60 +129,54 @@ export default function HomeScreen() {
             style={styles.exploreCard}
             onPress={() => handleExploreSection('treatments')}
           >
-            <BlurView intensity={15} tint="dark" style={styles.cardBlur}>
-              <View style={styles.cardContent}>
-                <View style={styles.cardLeft}>
-                  <Text style={styles.cardLabel}>Explore</Text>
-                  <Text style={styles.cardTitle}>Treatments</Text>
-                  <Text style={styles.cardDescription}>
-                    Watch animated videos showing how medical treatments work.
-                  </Text>
-                </View>
-                <View style={styles.cardIcon}>
-                  <Stethoscope size={40} color="#4FACFE" />
-                </View>
+            <View style={styles.cardContent}>
+              <View style={styles.cardLeft}>
+                <Text style={styles.cardLabel}>Explore</Text>
+                <Text style={styles.cardTitle}>Treatments</Text>
+                <Text style={styles.cardDescription}>
+                  Watch animated videos showing how medical treatments work.
+                </Text>
               </View>
-            </BlurView>
+              <View style={styles.cardIcon}>
+                <Stethoscope size={32} color="#4A90E2" />
+              </View>
+            </View>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.exploreCard}
             onPress={() => handleExploreSection('diseases')}
           >
-            <BlurView intensity={15} tint="dark" style={styles.cardBlur}>
-              <View style={styles.cardContent}>
-                <View style={styles.cardLeft}>
-                  <Text style={styles.cardLabel}>Learn</Text>
-                  <Text style={styles.cardTitle}>Diseases</Text>
-                  <Text style={styles.cardDescription}>
-                    Understand diseases with detailed explanations and visuals.
-                  </Text>
-                </View>
-                <View style={styles.cardIcon}>
-                  <Activity size={40} color="#FF6B6B" />
-                </View>
+            <View style={styles.cardContent}>
+              <View style={styles.cardLeft}>
+                <Text style={styles.cardLabel}>Learn</Text>
+                <Text style={styles.cardTitle}>Diseases</Text>
+                <Text style={styles.cardDescription}>
+                  Understand diseases with detailed explanations and visuals.
+                </Text>
               </View>
-            </BlurView>
+              <View style={styles.cardIcon}>
+                <Activity size={32} color="#6BCF7F" />
+              </View>
+            </View>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.exploreCard}
             onPress={() => handleExploreSection('3d-models')}
           >
-            <BlurView intensity={15} tint="dark" style={styles.cardBlur}>
-              <View style={styles.cardContent}>
-                <View style={styles.cardLeft}>
-                  <Text style={styles.cardLabel}>View</Text>
-                  <Text style={styles.cardTitle}>3D Body Models</Text>
-                  <Text style={styles.cardDescription}>
-                    Interact with detailed 3D models of the human body.
-                  </Text>
-                </View>
-                <View style={styles.cardIcon}>
-                  <Microscope size={40} color="#4ECDC4" />
-                </View>
+            <View style={styles.cardContent}>
+              <View style={styles.cardLeft}>
+                <Text style={styles.cardLabel}>View</Text>
+                <Text style={styles.cardTitle}>3D Body Models</Text>
+                <Text style={styles.cardDescription}>
+                  Interact with detailed 3D models of the human body.
+                </Text>
               </View>
-            </BlurView>
+              <View style={styles.cardIcon}>
+                <Microscope size={32} color="#FF8A65" />
+              </View>
+            </View>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -215,7 +193,7 @@ export default function HomeScreen() {
           style={styles.closeModalButton}
           onPress={() => setShowMediaPicker(false)}
         >
-          <X size={24} color="#FFFFFF" />
+          <X size={20} color="#6B7280" />
         </TouchableOpacity>
       </Modal>
 
@@ -227,18 +205,13 @@ export default function HomeScreen() {
         onRequestClose={handleCloseAIDoctor}
       >
         <View style={styles.aiDoctorModalContainer}>
-          <LinearGradient
-            colors={['#0A0A0A', '#1A1A2E', '#16213E']}
-            style={styles.gradient}
-          />
-          
           {/* Modal Header */}
           <View style={styles.aiDoctorModalHeader}>
             <TouchableOpacity
               style={styles.closeModalButton}
               onPress={handleCloseAIDoctor}
             >
-              <X size={24} color="#FFFFFF" />
+              <X size={20} color="#6B7280" />
             </TouchableOpacity>
             <Text style={styles.aiDoctorModalTitle}>AI Medical Assistant</Text>
             <View style={styles.headerSpacer} />
@@ -260,18 +233,11 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#F8F9FA',
   },
   loadingContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  gradient: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
   },
   scrollView: {
     flex: 1,
@@ -285,173 +251,190 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   appTitle: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: '700',
-    color: '#FFFFFF',
-    letterSpacing: 1,
+    color: '#1F2937',
+    letterSpacing: 0.5,
   },
   headerIcons: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 8,
   },
   iconButton: {
-    padding: 10,
+    padding: 8,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   mainSection: {
     paddingHorizontal: 30,
-    marginBottom: 40,
+    marginBottom: 32,
   },
   sectionTitle: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 12,
+    color: '#1F2937',
+    marginBottom: 8,
     textAlign: 'center',
   },
   sectionSubtitle: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 15,
+    color: '#6B7280',
     textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 40,
+    lineHeight: 22,
+    marginBottom: 32,
     paddingHorizontal: 10,
   },
   uploadButtons: {
-    gap: 16,
+    gap: 12,
   },
   primaryButton: {
-    borderRadius: 16,
+    borderRadius: 12,
     overflow: 'hidden',
-    elevation: 10,
-    shadowColor: '#4FACFE',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
+    shadowColor: '#4A90E2',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
   },
   primaryGradient: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 18,
-    gap: 12,
+    paddingVertical: 16,
+    gap: 10,
+    backgroundColor: '#4A90E2',
   },
   primaryButtonText: {
     color: '#FFFFFF',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
   },
   aiDoctorSection: {
     paddingHorizontal: 30,
-    marginBottom: 40,
+    marginBottom: 32,
   },
   aiDoctorTitle: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 8,
+    color: '#1F2937',
+    marginBottom: 6,
     textAlign: 'center',
   },
   aiDoctorSubtitle: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 13,
+    color: '#6B7280',
     textAlign: 'center',
-    lineHeight: 20,
-    marginBottom: 24,
+    lineHeight: 18,
+    marginBottom: 20,
   },
   aiDoctorButton: {
-    borderRadius: 16,
+    borderRadius: 12,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  aiDoctorBlur: {
-    padding: 20,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   aiDoctorContent: {
     flexDirection: 'row',
     alignItems: 'center',
+    padding: 16,
   },
   aiDoctorIconContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: 'rgba(79, 172, 254, 0.2)',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(74, 144, 226, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
+    marginRight: 12,
   },
   aiDoctorTextContainer: {
     flex: 1,
   },
   aiDoctorButtonTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 4,
+    color: '#1F2937',
+    marginBottom: 2,
   },
   aiDoctorButtonSubtitle: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
-    lineHeight: 18,
+    fontSize: 13,
+    color: '#6B7280',
+    lineHeight: 16,
   },
   exploreSection: {
     paddingHorizontal: 30,
-    paddingBottom: 50,
+    paddingBottom: 40,
   },
   exploreTitle: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 24,
+    color: '#1F2937',
+    marginBottom: 20,
   },
   exploreCard: {
-    borderRadius: 20,
+    borderRadius: 16,
     overflow: 'hidden',
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  cardBlur: {
-    padding: 24,
+    marginBottom: 16,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   cardContent: {
     flexDirection: 'row',
     alignItems: 'center',
+    padding: 20,
   },
   cardLeft: {
     flex: 1,
   },
   cardLabel: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.6)',
-    marginBottom: 4,
+    fontSize: 12,
+    color: '#9CA3AF',
+    marginBottom: 2,
     fontWeight: '500',
   },
   cardTitle: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 8,
+    color: '#1F2937',
+    marginBottom: 6,
   },
   cardDescription: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
-    lineHeight: 20,
+    fontSize: 13,
+    color: '#6B7280',
+    lineHeight: 18,
   },
   cardIcon: {
-    marginLeft: 20,
+    marginLeft: 16,
   },
   closeModalButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   aiDoctorModalContainer: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#F8F9FA',
   },
   aiDoctorModalHeader: {
     flexDirection: 'row',
@@ -459,19 +442,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 60,
     paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+    borderBottomColor: 'rgba(107, 114, 128, 0.1)',
   },
   aiDoctorModalTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1F2937',
     textAlign: 'center',
   },
   headerSpacer: {
-    width: 44,
-    height: 44,
+    width: 36,
+    height: 36,
   },
   aiDoctorChatContainer: {
     flex: 1,

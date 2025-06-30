@@ -8,14 +8,12 @@ import {
   Switch,
   Alert,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
 import { router } from 'expo-router';
-import { ArrowLeft, Bell, Shield, Globe, Moon, Volume2, FileText, Trash2, Brain, Mic, CircleHelp as HelpCircle, MessageCircle, ChevronRight } from 'lucide-react-native';
+import { ArrowLeft, Bell, Shield, Globe, Moon, Volume2, FileText, Trash2, Brain, Mic, HelpCircle, MessageCircle, ChevronRight } from 'lucide-react-native';
 
 export default function SettingsScreen() {
   const [notifications, setNotifications] = useState(true);
-  const [darkMode, setDarkMode] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [autoPlayTTS, setAutoPlayTTS] = useState(false);
 
@@ -64,13 +62,8 @@ export default function SettingsScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#0A0A0A', '#1A1A2E', '#16213E']}
-        style={styles.gradient}
-      />
-
       <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-        <ArrowLeft size={24} color="#FFFFFF" />
+        <ArrowLeft size={20} color="#6B7280" />
       </TouchableOpacity>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -87,78 +80,76 @@ export default function SettingsScreen() {
             <Text style={styles.sectionTitle}>General Settings</Text>
             
             <View style={styles.settingsCard}>
-              <BlurView intensity={15} tint="dark" style={styles.cardBlur}>
-                <TouchableOpacity style={styles.settingItem} onPress={handleLanguageSelection}>
-                  <View style={styles.settingLeft}>
-                    <Globe size={24} color="#4FACFE" />
-                    <View style={styles.settingText}>
-                      <Text style={styles.settingLabel}>Language</Text>
-                      <Text style={styles.settingDescription}>English (US)</Text>
-                    </View>
+              <TouchableOpacity style={styles.settingItem} onPress={handleLanguageSelection}>
+                <View style={styles.settingLeft}>
+                  <Globe size={20} color="#4A90E2" />
+                  <View style={styles.settingText}>
+                    <Text style={styles.settingLabel}>Language</Text>
+                    <Text style={styles.settingDescription}>English (US)</Text>
                   </View>
-                  <ChevronRight size={20} color="rgba(255, 255, 255, 0.6)" />
-                </TouchableOpacity>
-                
-                <View style={styles.divider} />
-                
-                <View style={styles.settingItem}>
-                  <View style={styles.settingLeft}>
-                    <Bell size={24} color="#4FACFE" />
-                    <View style={styles.settingText}>
-                      <Text style={styles.settingLabel}>Notifications</Text>
-                      <Text style={styles.settingDescription}>
-                        Receive updates about your health reports
-                      </Text>
-                    </View>
-                  </View>
-                  <Switch
-                    value={notifications}
-                    onValueChange={setNotifications}
-                    trackColor={{ false: '#767577', true: '#4FACFE' }}
-                    thumbColor={notifications ? '#FFFFFF' : '#f4f3f4'}
-                  />
                 </View>
-                
-                <View style={styles.divider} />
-                
-                <View style={styles.settingItem}>
-                  <View style={styles.settingLeft}>
-                    <Moon size={24} color="#4FACFE" />
-                    <View style={styles.settingText}>
-                      <Text style={styles.settingLabel}>Dark Mode</Text>
-                      <Text style={styles.settingDescription}>
-                        Use dark theme for better viewing
-                      </Text>
-                    </View>
+                <ChevronRight size={16} color="#9CA3AF" />
+              </TouchableOpacity>
+              
+              <View style={styles.divider} />
+              
+              <View style={styles.settingItem}>
+                <View style={styles.settingLeft}>
+                  <Bell size={20} color="#4A90E2" />
+                  <View style={styles.settingText}>
+                    <Text style={styles.settingLabel}>Notifications</Text>
+                    <Text style={styles.settingDescription}>
+                      Receive updates about your health reports
+                    </Text>
                   </View>
-                  <Switch
-                    value={darkMode}
-                    onValueChange={setDarkMode}
-                    trackColor={{ false: '#767577', true: '#4FACFE' }}
-                    thumbColor={darkMode ? '#FFFFFF' : '#f4f3f4'}
-                  />
                 </View>
-                
-                <View style={styles.divider} />
-                
-                <View style={styles.settingItem}>
-                  <View style={styles.settingLeft}>
-                    <Volume2 size={24} color="#4FACFE" />
-                    <View style={styles.settingText}>
-                      <Text style={styles.settingLabel}>Sound Effects</Text>
-                      <Text style={styles.settingDescription}>
-                        Enable audio feedback and sounds
-                      </Text>
-                    </View>
+                <Switch
+                  value={notifications}
+                  onValueChange={setNotifications}
+                  trackColor={{ false: '#E5E7EB', true: '#4A90E2' }}
+                  thumbColor={notifications ? '#FFFFFF' : '#F3F4F6'}
+                />
+              </View>
+              
+              <View style={styles.divider} />
+              
+              <View style={styles.settingItem}>
+                <View style={styles.settingLeft}>
+                  <Moon size={20} color="#4A90E2" />
+                  <View style={styles.settingText}>
+                    <Text style={styles.settingLabel}>Dark Mode</Text>
+                    <Text style={styles.settingDescription}>
+                      Use dark theme for better viewing
+                    </Text>
                   </View>
-                  <Switch
-                    value={soundEnabled}
-                    onValueChange={setSoundEnabled}
-                    trackColor={{ false: '#767577', true: '#4FACFE' }}
-                    thumbColor={soundEnabled ? '#FFFFFF' : '#f4f3f4'}
-                  />
                 </View>
-              </BlurView>
+                <Switch
+                  value={darkMode}
+                  onValueChange={setDarkMode}
+                  trackColor={{ false: '#E5E7EB', true: '#4A90E2' }}
+                  thumbColor={darkMode ? '#FFFFFF' : '#F3F4F6'}
+                />
+              </View>
+              
+              <View style={styles.divider} />
+              
+              <View style={styles.settingItem}>
+                <View style={styles.settingLeft}>
+                  <Volume2 size={20} color="#4A90E2" />
+                  <View style={styles.settingText}>
+                    <Text style={styles.settingLabel}>Sound Effects</Text>
+                    <Text style={styles.settingDescription}>
+                      Enable audio feedback and sounds
+                    </Text>
+                  </View>
+                </View>
+                <Switch
+                  value={soundEnabled}
+                  onValueChange={setSoundEnabled}
+                  trackColor={{ false: '#E5E7EB', true: '#4A90E2' }}
+                  thumbColor={soundEnabled ? '#FFFFFF' : '#F3F4F6'}
+                />
+              </View>
             </View>
           </View>
 
@@ -167,35 +158,31 @@ export default function SettingsScreen() {
             <Text style={styles.sectionTitle}>Data & AI Settings</Text>
             
             <TouchableOpacity style={styles.actionCard} onPress={handleViewReports}>
-              <BlurView intensity={15} tint="dark" style={styles.cardBlur}>
-                <View style={styles.actionItem}>
-                  <FileText size={24} color="#4FACFE" />
-                  <View style={styles.actionText}>
-                    <Text style={styles.actionLabel}>View Uploaded Reports</Text>
-                    <Text style={styles.actionDescription}>
-                      Manage your report history and delete files
-                    </Text>
-                  </View>
-                  <ChevronRight size={20} color="rgba(255, 255, 255, 0.6)" />
+              <View style={styles.actionItem}>
+                <FileText size={20} color="#4A90E2" />
+                <View style={styles.actionText}>
+                  <Text style={styles.actionLabel}>View Uploaded Reports</Text>
+                  <Text style={styles.actionDescription}>
+                    Manage your report history and delete files
+                  </Text>
                 </View>
-              </BlurView>
+                <ChevronRight size={16} color="#9CA3AF" />
+              </View>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.actionCard} onPress={handleClearAIData}>
-              <BlurView intensity={15} tint="dark" style={styles.cardBlur}>
-                <View style={styles.actionItem}>
-                  <Trash2 size={24} color="#FF9A9E" />
-                  <View style={styles.actionText}>
-                    <Text style={[styles.actionLabel, { color: '#FF9A9E' }]}>
-                      Clear AI Explanations & Images
-                    </Text>
-                    <Text style={styles.actionDescription}>
-                      Delete all AI-generated content per report
-                    </Text>
-                  </View>
-                  <ChevronRight size={20} color="rgba(255, 255, 255, 0.6)" />
+              <View style={styles.actionItem}>
+                <Trash2 size={20} color="#FF8A65" />
+                <View style={styles.actionText}>
+                  <Text style={[styles.actionLabel, { color: '#FF8A65' }]}>
+                    Clear AI Explanations & Images
+                  </Text>
+                  <Text style={styles.actionDescription}>
+                    Delete all AI-generated content per report
+                  </Text>
                 </View>
-              </BlurView>
+                <ChevronRight size={16} color="#9CA3AF" />
+              </View>
             </TouchableOpacity>
           </View>
 
@@ -204,38 +191,36 @@ export default function SettingsScreen() {
             <Text style={styles.sectionTitle}>AI Preferences</Text>
             
             <View style={styles.settingsCard}>
-              <BlurView intensity={15} tint="dark" style={styles.cardBlur}>
-                <TouchableOpacity style={styles.settingItem}>
-                  <View style={styles.settingLeft}>
-                    <Mic size={24} color="#4FACFE" />
-                    <View style={styles.settingText}>
-                      <Text style={styles.settingLabel}>AI Doctor Voice</Text>
-                      <Text style={styles.settingDescription}>Professional Male Voice</Text>
-                    </View>
+              <TouchableOpacity style={styles.settingItem}>
+                <View style={styles.settingLeft}>
+                  <Mic size={20} color="#4A90E2" />
+                  <View style={styles.settingText}>
+                    <Text style={styles.settingLabel}>AI Doctor Voice</Text>
+                    <Text style={styles.settingDescription}>Professional Male Voice</Text>
                   </View>
-                  <ChevronRight size={20} color="rgba(255, 255, 255, 0.6)" />
-                </TouchableOpacity>
-                
-                <View style={styles.divider} />
-                
-                <View style={styles.settingItem}>
-                  <View style={styles.settingLeft}>
-                    <Brain size={24} color="#4FACFE" />
-                    <View style={styles.settingText}>
-                      <Text style={styles.settingLabel}>Auto-play TTS</Text>
-                      <Text style={styles.settingDescription}>
-                        Automatically play voice explanations
-                      </Text>
-                    </View>
-                  </View>
-                  <Switch
-                    value={autoPlayTTS}
-                    onValueChange={setAutoPlayTTS}
-                    trackColor={{ false: '#767577', true: '#4FACFE' }}
-                    thumbColor={autoPlayTTS ? '#FFFFFF' : '#f4f3f4'}
-                  />
                 </View>
-              </BlurView>
+                <ChevronRight size={16} color="#9CA3AF" />
+              </TouchableOpacity>
+              
+              <View style={styles.divider} />
+              
+              <View style={styles.settingItem}>
+                <View style={styles.settingLeft}>
+                  <Brain size={20} color="#4A90E2" />
+                  <View style={styles.settingText}>
+                    <Text style={styles.settingLabel}>Auto-play TTS</Text>
+                    <Text style={styles.settingDescription}>
+                      Automatically play voice explanations
+                    </Text>
+                  </View>
+                </View>
+                <Switch
+                  value={autoPlayTTS}
+                  onValueChange={setAutoPlayTTS}
+                  trackColor={{ false: '#E5E7EB', true: '#4A90E2' }}
+                  thumbColor={autoPlayTTS ? '#FFFFFF' : '#F3F4F6'}
+                />
+              </View>
             </View>
           </View>
 
@@ -244,63 +229,55 @@ export default function SettingsScreen() {
             <Text style={styles.sectionTitle}>Support</Text>
             
             <TouchableOpacity style={styles.actionCard} onPress={handleFAQ}>
-              <BlurView intensity={15} tint="dark" style={styles.cardBlur}>
-                <View style={styles.actionItem}>
-                  <HelpCircle size={24} color="#4FACFE" />
-                  <View style={styles.actionText}>
-                    <Text style={styles.actionLabel}>FAQ / Help</Text>
-                    <Text style={styles.actionDescription}>
-                      Find answers to common questions
-                    </Text>
-                  </View>
-                  <ChevronRight size={20} color="rgba(255, 255, 255, 0.6)" />
+              <View style={styles.actionItem}>
+                <HelpCircle size={20} color="#4A90E2" />
+                <View style={styles.actionText}>
+                  <Text style={styles.actionLabel}>FAQ / Help</Text>
+                  <Text style={styles.actionDescription}>
+                    Find answers to common questions
+                  </Text>
                 </View>
-              </BlurView>
+                <ChevronRight size={16} color="#9CA3AF" />
+              </View>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.actionCard} onPress={handleContactSupport}>
-              <BlurView intensity={15} tint="dark" style={styles.cardBlur}>
-                <View style={styles.actionItem}>
-                  <MessageCircle size={24} color="#4FACFE" />
-                  <View style={styles.actionText}>
-                    <Text style={styles.actionLabel}>Contact / Feedback</Text>
-                    <Text style={styles.actionDescription}>
-                      Get help or share your feedback
-                    </Text>
-                  </View>
-                  <ChevronRight size={20} color="rgba(255, 255, 255, 0.6)" />
+              <View style={styles.actionItem}>
+                <MessageCircle size={20} color="#4A90E2" />
+                <View style={styles.actionText}>
+                  <Text style={styles.actionLabel}>Contact / Feedback</Text>
+                  <Text style={styles.actionDescription}>
+                    Get help or share your feedback
+                  </Text>
                 </View>
-              </BlurView>
+                <ChevronRight size={16} color="#9CA3AF" />
+              </View>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.actionCard} onPress={handlePrivacyPolicy}>
-              <BlurView intensity={15} tint="dark" style={styles.cardBlur}>
-                <View style={styles.actionItem}>
-                  <Shield size={24} color="#4FACFE" />
-                  <View style={styles.actionText}>
-                    <Text style={styles.actionLabel}>Privacy Policy</Text>
-                    <Text style={styles.actionDescription}>
-                      Learn how we protect your data
-                    </Text>
-                  </View>
-                  <ChevronRight size={20} color="rgba(255, 255, 255, 0.6)" />
+              <View style={styles.actionItem}>
+                <Shield size={20} color="#4A90E2" />
+                <View style={styles.actionText}>
+                  <Text style={styles.actionLabel}>Privacy Policy</Text>
+                  <Text style={styles.actionDescription}>
+                    Learn how we protect your data
+                  </Text>
                 </View>
-              </BlurView>
+                <ChevronRight size={16} color="#9CA3AF" />
+              </View>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.actionCard} onPress={handleTermsOfService}>
-              <BlurView intensity={15} tint="dark" style={styles.cardBlur}>
-                <View style={styles.actionItem}>
-                  <Globe size={24} color="#4FACFE" />
-                  <View style={styles.actionText}>
-                    <Text style={styles.actionLabel}>Terms of Service</Text>
-                    <Text style={styles.actionDescription}>
-                      Read our terms and conditions
-                    </Text>
-                  </View>
-                  <ChevronRight size={20} color="rgba(255, 255, 255, 0.6)" />
+              <View style={styles.actionItem}>
+                <Globe size={20} color="#4A90E2" />
+                <View style={styles.actionText}>
+                  <Text style={styles.actionLabel}>Terms of Service</Text>
+                  <Text style={styles.actionDescription}>
+                    Read our terms and conditions
+                  </Text>
                 </View>
-              </BlurView>
+                <ChevronRight size={16} color="#9CA3AF" />
+              </View>
             </TouchableOpacity>
           </View>
 
@@ -317,14 +294,7 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
-  },
-  gradient: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
+    backgroundColor: '#F8F9FA',
   },
   backButton: {
     position: 'absolute',
@@ -332,6 +302,13 @@ const styles = StyleSheet.create({
     left: 20,
     zIndex: 10,
     padding: 10,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   scrollView: {
     flex: 1,
@@ -339,45 +316,46 @@ const styles = StyleSheet.create({
   header: {
     paddingTop: 120,
     paddingHorizontal: 30,
-    marginBottom: 30,
+    marginBottom: 24,
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 8,
+    color: '#1F2937',
+    marginBottom: 6,
   },
   subtitle: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
-    lineHeight: 22,
+    fontSize: 15,
+    color: '#6B7280',
+    lineHeight: 20,
   },
   content: {
     paddingHorizontal: 30,
-    paddingBottom: 50,
+    paddingBottom: 40,
   },
   section: {
-    marginBottom: 30,
+    marginBottom: 24,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 16,
+    color: '#1F2937',
+    marginBottom: 12,
   },
   settingsCard: {
-    borderRadius: 16,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  cardBlur: {
-    padding: 20,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   settingItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    padding: 16,
   },
   settingLeft: {
     flexDirection: 'row',
@@ -385,66 +363,71 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   settingText: {
-    marginLeft: 16,
+    marginLeft: 12,
     flex: 1,
   },
   settingLabel: {
-    fontSize: 16,
-    color: '#FFFFFF',
+    fontSize: 15,
+    color: '#1F2937',
     fontWeight: '500',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   settingDescription: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.6)',
-    lineHeight: 18,
+    fontSize: 12,
+    color: '#6B7280',
+    lineHeight: 16,
   },
   divider: {
     height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    marginVertical: 20,
+    backgroundColor: 'rgba(107, 114, 128, 0.1)',
+    marginHorizontal: 16,
   },
   actionCard: {
-    borderRadius: 16,
+    borderRadius: 12,
     overflow: 'hidden',
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    marginBottom: 10,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   actionItem: {
     flexDirection: 'row',
     alignItems: 'center',
+    padding: 16,
   },
   actionText: {
-    marginLeft: 16,
+    marginLeft: 12,
     flex: 1,
   },
   actionLabel: {
-    fontSize: 16,
-    color: '#FFFFFF',
+    fontSize: 15,
+    color: '#1F2937',
     fontWeight: '500',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   actionDescription: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.6)',
-    lineHeight: 18,
+    fontSize: 12,
+    color: '#6B7280',
+    lineHeight: 16,
   },
   versionInfo: {
     alignItems: 'center',
-    marginTop: 20,
-    paddingTop: 20,
+    marginTop: 16,
+    paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.1)',
+    borderTopColor: 'rgba(107, 114, 128, 0.1)',
   },
   versionText: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 14,
+    color: '#6B7280',
     fontWeight: '500',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   versionSubtext: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.6)',
+    fontSize: 12,
+    color: '#9CA3AF',
   },
 });
