@@ -11,8 +11,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { router } from 'expo-router';
-import { ArrowLeft, ExternalLink, Heart } from 'lucide-react-native';
-import { SvgUri } from 'react-native-svg';
+import { ArrowRight, ExternalLink, Heart } from 'lucide-react-native';
 
 const sponsors = [
   {
@@ -63,8 +62,8 @@ const sponsors = [
 ];
 
 export default function SponsorsScreen() {
-  const handleBack = () => {
-    router.back();
+  const handleContinueToAuth = () => {
+    router.push('/auth');
   };
 
   const handleSponsorPress = async (url: string) => {
@@ -79,25 +78,13 @@ export default function SponsorsScreen() {
   };
 
   const renderSponsorImage = (sponsor: any) => {
-    if (sponsor.type === 'svg') {
-      // For SVG files, we'll use a fallback to Image component
-      // since react-native-svg might not be available
-      return (
-        <Image
-          source={sponsor.image}
-          style={styles.sponsorImage}
-          resizeMode="contain"
-        />
-      );
-    } else {
-      return (
-        <Image
-          source={sponsor.image}
-          style={styles.sponsorImage}
-          resizeMode="contain"
-        />
-      );
-    }
+    return (
+      <Image
+        source={sponsor.image}
+        style={styles.sponsorImage}
+        resizeMode="contain"
+      />
+    );
   };
 
   return (
@@ -106,10 +93,6 @@ export default function SponsorsScreen() {
         colors={['#0A0A0A', '#1A1A2E', '#16213E']}
         style={styles.gradient}
       />
-
-      <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-        <ArrowLeft size={24} color="#FFFFFF" />
-      </TouchableOpacity>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
@@ -178,6 +161,21 @@ export default function SponsorsScreen() {
             </View>
           </BlurView>
         </View>
+
+        {/* Continue Button */}
+        <View style={styles.continueSection}>
+          <TouchableOpacity style={styles.continueButton} onPress={handleContinueToAuth}>
+            <BlurView intensity={30} tint="light" style={styles.continueButtonBlur}>
+              <LinearGradient
+                colors={['#4FACFE', '#00F2FE']}
+                style={styles.continueButtonGradient}
+              >
+                <Text style={styles.continueButtonText}>Continue to App</Text>
+                <ArrowRight size={20} color="#FFFFFF" />
+              </LinearGradient>
+            </BlurView>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </View>
   );
@@ -195,18 +193,11 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
   },
-  backButton: {
-    position: 'absolute',
-    top: 60,
-    left: 20,
-    zIndex: 10,
-    padding: 10,
-  },
   scrollView: {
     flex: 1,
   },
   header: {
-    paddingTop: 120,
+    paddingTop: 80,
     paddingHorizontal: 30,
     marginBottom: 40,
     alignItems: 'center',
@@ -299,7 +290,7 @@ const styles = StyleSheet.create({
   },
   footerSection: {
     marginHorizontal: 20,
-    marginBottom: 50,
+    marginBottom: 30,
     borderRadius: 20,
     overflow: 'hidden',
   },
@@ -336,5 +327,36 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#4FACFE',
     fontWeight: '600',
+  },
+  continueSection: {
+    paddingHorizontal: 40,
+    paddingBottom: 50,
+    alignItems: 'center',
+  },
+  continueButton: {
+    borderRadius: 30,
+    overflow: 'hidden',
+    elevation: 10,
+    shadowColor: '#4FACFE',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+  },
+  continueButtonBlur: {
+    paddingHorizontal: 40,
+    paddingVertical: 16,
+  },
+  continueButtonGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 40,
+    paddingVertical: 16,
+    borderRadius: 30,
+  },
+  continueButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+    marginRight: 8,
   },
 });

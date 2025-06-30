@@ -63,10 +63,7 @@ export default function FeaturesScreen() {
   };
 
   const handleContinue = () => {
-    router.push('/auth');
-  };
-
-  const handleSponsors = () => {
+    // Navigate to sponsors page instead of auth
     router.push('/sponsors');
   };
 
@@ -125,23 +122,17 @@ export default function FeaturesScreen() {
         </View>
 
         {currentPage === features.length - 1 && (
-          <View style={styles.finalPageButtons}>
-            <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
-              <BlurView intensity={30} tint="light" style={styles.buttonBlur}>
-                <LinearGradient
-                  colors={['#4FACFE', '#00F2FE']}
-                  style={styles.buttonGradient}
-                >
-                  <Text style={styles.buttonText}>Continue</Text>
-                  <ArrowRight size={20} color="#FFFFFF" />
-                </LinearGradient>
-              </BlurView>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.sponsorsButton} onPress={handleSponsors}>
-              <Text style={styles.sponsorsText}>Thank Our Sponsors</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
+            <BlurView intensity={30} tint="light" style={styles.buttonBlur}>
+              <LinearGradient
+                colors={['#4FACFE', '#00F2FE']}
+                style={styles.buttonGradient}
+              >
+                <Text style={styles.buttonText}>Continue</Text>
+                <ArrowRight size={20} color="#FFFFFF" />
+              </LinearGradient>
+            </BlurView>
+          </TouchableOpacity>
         )}
       </View>
     </View>
@@ -234,10 +225,6 @@ const styles = StyleSheet.create({
   activeDot: {
     backgroundColor: '#4FACFE',
   },
-  finalPageButtons: {
-    alignItems: 'center',
-    width: '100%',
-  },
   continueButton: {
     borderRadius: 30,
     overflow: 'hidden',
@@ -246,7 +233,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.3,
     shadowRadius: 20,
-    marginBottom: 20,
   },
   buttonBlur: {
     paddingHorizontal: 40,
@@ -264,15 +250,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     marginRight: 8,
-  },
-  sponsorsButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-  },
-  sponsorsText: {
-    color: 'rgba(255, 255, 255, 0.7)',
-    fontSize: 16,
-    textAlign: 'center',
-    textDecorationLine: 'underline',
   },
 });
