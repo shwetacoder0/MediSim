@@ -12,7 +12,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { WebView } from 'react-native-webview';
 import { Phone, PhoneOff, User, Video, VideoOff, Mic, MicOff } from 'lucide-react-native';
-import { TavusService, ConversationSession } from '../lib/tavusService';
 import { TAVUS_CONFIG } from '../config/constants';
 
 interface AIDoctorChatProps {
@@ -20,68 +19,109 @@ interface AIDoctorChatProps {
   patientContext?: string;
 }
 
+interface TavusConversationResponse {
+  conversation_id: string;
+  conversation_name: string;
+  status: string;
+  conversation_url: string;
+  replica_id: string;
+  persona_id: string;
+  created_at: string;
+}
+
 export default function AIDoctorChat({ onClose, patientContext }: AIDoctorChatProps) {
-  const [session, setSession] = useState<ConversationSession | null>(null);
+  const [conversationData, setConversationData] = useState<TavusConversationResponse | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
   const [isCallActive, setIsCallActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isMuted, setIsMuted] = useState(false);
   const webViewRef = useRef<WebView>(null);
-  const tavusService = useRef(new TavusService(TAVUS_CONFIG));
 
   useEffect(() => {
     return () => {
       // Cleanup: end conversation when component unmounts
-      if (session?.conversationId && isCallActive) {
-        tavusService.current.endConversation(session.conversationId);
+      if (conversationData?.conversation_id && isCallActive) {
+        endConversationAPI(conversationData.conversation_id);
       }
     };
-  }, [session, isCallActive]);
+  }, [conversationData, isCallActive]);
 
   const startConversation = async () => {
     try {
       setIsConnecting(true);
       setError(null);
 
-      // For demo purposes, we'll simulate the Tavus connection
-      // In production, this would call the actual Tavus API
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      console.log('Starting Tavus conversation...');
+      console.log('API Key:', TAVUS_CONFIG.apiKey);
+      console.log('Replica ID:', TAVUS_CONFIG.replicaId);
+      console.log('Persona ID:', TAVUS_CONFIG.personaId);
 
-      const mockSession: ConversationSession = {
-        conversationId: 'demo-conversation-' + Date.now(),
-        conversationUrl: 'https://tavus.io/conversations/demo', // This would be the real Tavus URL
-        status: 'connected'
-      };
+      // Make the POST request to Tavus API
+      const response = await fetch('https://tavusapi.com/v2/conversations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': TAVUS_CONFIG.apiKey,
+        },
+        body: JSON.stringify({
+          replica_id: TAVUS_CONFIG.replicaId,
+          persona_id: TAVUS_CONFIG.personaId,
+        }),
+      });
 
-      setSession(mockSession);
+      console.log('Tavus API Response Status:', response.status);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Tavus API Error:', errorText);
+        throw new Error(`Tavus API error: ${response.status} - ${errorText}`);
+      }
+
+      const data: TavusConversationResponse = await response.json();
+      console.log('Tavus API Response:', data);
+
+      setConversationData(data);
       setIsCallActive(true);
       setIsConnecting(false);
 
-      // Show success message
-      Alert.alert(
-        'AI Doctor Connected',
-        'You are now connected to the AI Medical Assistant. You can start speaking about your health concerns.',
-        [{ text: 'OK' }]
-      );
+      console.log('Conversation URL:', data.conversation_url);
 
     } catch (error) {
-      console.error('Failed to start conversation:', error);
-      setError('Failed to connect to AI Doctor. Please try again.');
+      console.error('Failed to start Tavus conversation:', error);
+      setError(`Failed to connect to AI Doctor: ${error instanceof Error ? error.message : 'Unknown error'}`);
       setIsConnecting(false);
-      Alert.alert('Connection Error', 'Failed to connect to AI Doctor. Please try again.');
+      Alert.alert('Connection Error', 'Failed to connect to AI Doctor. Please check your internet connection and try again.');
+    }
+  };
+
+  const endConversationAPI = async (conversationId: string) => {
+    try {
+      console.log('Ending Tavus conversation:', conversationId);
+      
+      const response = await fetch(`https://tavusapi.com/v2/conversations/${conversationId}/end`, {
+        method: 'POST',
+        headers: {
+          'x-api-key': TAVUS_CONFIG.apiKey,
+        },
+      });
+
+      if (!response.ok) {
+        console.error('Failed to end conversation via API:', response.status);
+      } else {
+        console.log('Conversation ended successfully');
+      }
+    } catch (error) {
+      console.error('Error ending conversation:', error);
     }
   };
 
   const endConversation = async () => {
-    if (!session) return;
+    if (!conversationData) return;
 
     try {
-      // In production, this would call the Tavus API to end the conversation
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await endConversationAPI(conversationData.conversation_id);
       
-      setSession(null);
+      setConversationData(null);
       setIsCallActive(false);
       setIsMuted(false);
       
@@ -93,7 +133,7 @@ export default function AIDoctorChat({ onClose, patientContext }: AIDoctorChatPr
     } catch (error) {
       console.error('Failed to end conversation:', error);
       // Still close the session even if API call fails
-      setSession(null);
+      setConversationData(null);
       setIsCallActive(false);
       onClose?.();
     }
@@ -101,7 +141,7 @@ export default function AIDoctorChat({ onClose, patientContext }: AIDoctorChatPr
 
   const toggleMute = () => {
     setIsMuted(!isMuted);
-    // In production, this would control the microphone
+    // Note: Actual mute functionality would need to be implemented through the Tavus WebView
   };
 
   if (!isCallActive && !isConnecting) {
@@ -175,10 +215,10 @@ export default function AIDoctorChat({ onClose, patientContext }: AIDoctorChatPr
     <View style={styles.chatContainer}>
       {/* Video Container */}
       <View style={styles.videoContainer}>
-        {session?.conversationUrl ? (
+        {conversationData?.conversation_url ? (
           <WebView
             ref={webViewRef}
-            source={{ uri: session.conversationUrl }}
+            source={{ uri: conversationData.conversation_url }}
             style={styles.webView}
             mediaPlaybackRequiresUserAction={Platform.OS === 'ios' ? false : undefined}
             allowsInlineMediaPlayback={true}
@@ -199,23 +239,14 @@ export default function AIDoctorChat({ onClose, patientContext }: AIDoctorChatPr
             onLoadEnd={() => {
               console.log('WebView loaded successfully');
             }}
+            onLoadStart={() => {
+              console.log('WebView started loading:', conversationData.conversation_url);
+            }}
           />
         ) : (
-          <View style={styles.demoVideoContainer}>
-            <View style={styles.demoAvatar}>
-              <User size={80} color="#4FACFE" />
-            </View>
-            <Text style={styles.demoText}>AI Doctor</Text>
-            <Text style={styles.demoSubtext}>Connected and ready to help</Text>
-            
-            {/* Simulated speaking indicator */}
-            <View style={styles.speakingIndicator}>
-              <View style={[styles.waveBar, styles.waveBar1]} />
-              <View style={[styles.waveBar, styles.waveBar2]} />
-              <View style={[styles.waveBar, styles.waveBar3]} />
-              <View style={[styles.waveBar, styles.waveBar4]} />
-              <View style={[styles.waveBar, styles.waveBar5]} />
-            </View>
+          <View style={styles.loadingVideo}>
+            <ActivityIndicator size="large" color="#4FACFE" />
+            <Text style={styles.loadingText}>Preparing AI Doctor...</Text>
           </View>
         )}
       </View>
@@ -244,8 +275,8 @@ export default function AIDoctorChat({ onClose, patientContext }: AIDoctorChatPr
           </View>
 
           <Text style={styles.statusText}>
-            {session?.status === 'connecting' ? 'Connecting to AI Doctor...' :
-             session?.status === 'connected' ? 'AI Doctor is listening' :
+            {conversationData?.status === 'connecting' ? 'Connecting to AI Doctor...' :
+             conversationData?.status === 'active' ? 'AI Doctor is ready' :
              'Consultation active'}
           </Text>
           
@@ -325,6 +356,7 @@ const styles = StyleSheet.create({
     color: '#FF6B6B',
     textAlign: 'center',
     marginTop: 12,
+    paddingHorizontal: 10,
   },
   startButton: {
     borderRadius: 16,
@@ -371,61 +403,6 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     marginTop: 16,
-  },
-  demoVideoContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(10, 10, 10, 0.9)',
-  },
-  demoAvatar: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    backgroundColor: 'rgba(79, 172, 254, 0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-    borderWidth: 3,
-    borderColor: 'rgba(79, 172, 254, 0.4)',
-  },
-  demoText: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 8,
-  },
-  demoSubtext: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
-    marginBottom: 30,
-  },
-  speakingIndicator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 40,
-  },
-  waveBar: {
-    width: 4,
-    marginHorizontal: 2,
-    backgroundColor: '#4FACFE',
-    borderRadius: 2,
-  },
-  waveBar1: {
-    height: 15,
-  },
-  waveBar2: {
-    height: 25,
-  },
-  waveBar3: {
-    height: 35,
-  },
-  waveBar4: {
-    height: 25,
-  },
-  waveBar5: {
-    height: 15,
   },
   controlsContainer: {
     position: 'absolute',
