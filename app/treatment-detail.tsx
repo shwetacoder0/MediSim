@@ -5,48 +5,99 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  Image,
+  Dimensions,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { router, useLocalSearchParams } from 'expo-router';
-import { ArrowLeft, Clock, DollarSign, Activity } from 'lucide-react-native';
+import { ArrowLeft, Play } from 'lucide-react-native';
+import { WebView } from 'react-native-webview';
+
+const { width } = Dimensions.get('window');
 
 const treatmentData = {
   medications: [
     {
       id: 1,
-      title: 'ACE Inhibitors',
-      type: 'Cardiovascular',
-      duration: '6-12 months',
-      description: 'Medications that help relax blood vessels and reduce blood pressure.',
-      image: 'https://images.pexels.com/photos/3683074/pexels-photo-3683074.jpeg',
+      title: 'How Blood Pressure Medications Work',
+      description: 'Understanding ACE inhibitors and how they help reduce blood pressure by relaxing blood vessels.',
+      youtubeId: 'dQw4w9WgXcQ', // Replace with actual medical video IDs
+      duration: '4:32',
+      category: 'Cardiovascular',
     },
     {
       id: 2,
-      title: 'Statins',
-      type: 'Cholesterol',
-      duration: 'Long-term',
-      description: 'Drugs that lower cholesterol levels in the blood.',
-      image: 'https://images.pexels.com/photos/3683074/pexels-photo-3683074.jpeg',
+      title: 'Statin Therapy Animation',
+      description: 'See how statins work to lower cholesterol and prevent heart disease at the cellular level.',
+      youtubeId: 'dQw4w9WgXcQ',
+      duration: '3:45',
+      category: 'Cholesterol Management',
+    },
+    {
+      id: 3,
+      title: 'Insulin Mechanism of Action',
+      description: 'Animated explanation of how insulin regulates blood sugar levels in diabetes patients.',
+      youtubeId: 'dQw4w9WgXcQ',
+      duration: '5:12',
+      category: 'Diabetes',
+    },
+    {
+      id: 4,
+      title: 'Antibiotic Resistance Prevention',
+      description: 'Learn how antibiotics work and why proper usage is crucial to prevent resistance.',
+      youtubeId: 'dQw4w9WgXcQ',
+      duration: '6:20',
+      category: 'Infectious Disease',
+    },
+    {
+      id: 5,
+      title: 'Pain Relief Medications',
+      description: 'Understanding NSAIDs vs opioids and how different pain medications affect the body.',
+      youtubeId: 'dQw4w9WgXcQ',
+      duration: '4:55',
+      category: 'Pain Management',
     },
   ],
   surgery: [
     {
       id: 1,
-      title: 'Laparoscopic Surgery',
-      type: 'Minimally Invasive',
-      duration: '2-4 hours',
-      description: 'Surgical technique using small incisions and specialized instruments.',
-      image: 'https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg',
+      title: 'Laparoscopic Surgery Technique',
+      description: 'Step-by-step animation of minimally invasive laparoscopic procedures and their benefits.',
+      youtubeId: 'dQw4w9WgXcQ',
+      duration: '7:30',
+      category: 'Minimally Invasive',
     },
     {
       id: 2,
-      title: 'Cardiac Bypass',
-      type: 'Open Surgery',
-      duration: '4-6 hours',
-      description: 'Surgery to create new routes around blocked coronary arteries.',
-      image: 'https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg',
+      title: 'Heart Bypass Surgery Animation',
+      description: 'Detailed 3D animation showing how coronary artery bypass surgery restores blood flow.',
+      youtubeId: 'dQw4w9WgXcQ',
+      duration: '8:45',
+      category: 'Cardiac Surgery',
+    },
+    {
+      id: 3,
+      title: 'Knee Replacement Procedure',
+      description: 'Complete animation of total knee replacement surgery from incision to recovery.',
+      youtubeId: 'dQw4w9WgXcQ',
+      duration: '6:15',
+      category: 'Orthopedic',
+    },
+    {
+      id: 4,
+      title: 'Cataract Surgery Process',
+      description: 'See how modern cataract surgery removes clouded lenses and restores vision.',
+      youtubeId: 'dQw4w9WgXcQ',
+      duration: '4:20',
+      category: 'Ophthalmology',
+    },
+    {
+      id: 5,
+      title: 'Robotic Surgery Advantages',
+      description: 'Learn about robotic-assisted surgery and its precision benefits for complex procedures.',
+      youtubeId: 'dQw4w9WgXcQ',
+      duration: '5:40',
+      category: 'Advanced Technology',
     },
   ],
 };
@@ -59,14 +110,24 @@ export default function TreatmentDetailScreen() {
     router.back();
   };
 
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'Cardiovascular': return '#FF6B6B';
-      case 'Cholesterol': return '#FFB347';
-      case 'Minimally Invasive': return '#4ECDC4';
-      case 'Open Surgery': return '#B19CD9';
-      default: return '#4FACFE';
-    }
+  const getYouTubeEmbedUrl = (videoId: string) => {
+    return `https://www.youtube.com/embed/${videoId}?autoplay=0&controls=1&showinfo=0&rel=0`;
+  };
+
+  const getCategoryColor = (cat: string) => {
+    const colors = {
+      'Cardiovascular': '#FF6B6B',
+      'Cholesterol Management': '#FFB347',
+      'Diabetes': '#4ECDC4',
+      'Infectious Disease': '#B19CD9',
+      'Pain Management': '#FF9A9E',
+      'Minimally Invasive': '#4FACFE',
+      'Cardiac Surgery': '#FF6B6B',
+      'Orthopedic': '#FFB347',
+      'Ophthalmology': '#A8E6CF',
+      'Advanced Technology': '#4ECDC4',
+    };
+    return colors[cat as keyof typeof colors] || '#4FACFE';
   };
 
   return (
@@ -83,12 +144,10 @@ export default function TreatmentDetailScreen() {
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Text style={styles.title}>
-            {category === 'medications' ? 'Medications' : 
-             category === 'surgery' ? 'Surgical Procedures' : 
-             'Treatments'}
+            {category === 'medications' ? 'Medications' : 'Surgical Procedures'}
           </Text>
           <Text style={styles.subtitle}>
-            Comprehensive treatment options and procedures
+            Watch detailed animations showing how these treatments work
           </Text>
         </View>
 
@@ -97,35 +156,45 @@ export default function TreatmentDetailScreen() {
             <View key={treatment.id} style={styles.treatmentCard}>
               <BlurView intensity={15} tint="dark" style={styles.cardBlur}>
                 <View style={styles.cardContent}>
-                  <View style={styles.imageContainer}>
-                    <Image source={{ uri: treatment.image }} style={styles.treatmentImage} />
-                    <View style={styles.placeholderOverlay}>
-                      <Text style={styles.placeholderText}>Treatment Image</Text>
+                  {/* YouTube Video Embed */}
+                  <View style={styles.videoContainer}>
+                    <WebView
+                      source={{ uri: getYouTubeEmbedUrl(treatment.youtubeId) }}
+                      style={styles.webView}
+                      allowsInlineMediaPlayback={true}
+                      mediaPlaybackRequiresUserAction={false}
+                      javaScriptEnabled={true}
+                      domStorageEnabled={true}
+                      startInLoadingState={true}
+                      renderLoading={() => (
+                        <View style={styles.videoPlaceholder}>
+                          <Play size={40} color="rgba(255, 255, 255, 0.8)" />
+                          <Text style={styles.loadingText}>Loading video...</Text>
+                        </View>
+                      )}
+                    />
+                    <View style={styles.durationBadge}>
+                      <Text style={styles.durationText}>{treatment.duration}</Text>
                     </View>
                   </View>
                   
                   <View style={styles.treatmentInfo}>
                     <View style={styles.treatmentHeader}>
                       <Text style={styles.treatmentTitle}>{treatment.title}</Text>
-                      <View style={[styles.typeBadge, { backgroundColor: getTypeColor(treatment.type) + '20' }]}>
-                        <Text style={[styles.typeText, { color: getTypeColor(treatment.type) }]}>
-                          {treatment.type}
+                      <View style={[
+                        styles.categoryBadge,
+                        { backgroundColor: getCategoryColor(treatment.category) + '20' }
+                      ]}>
+                        <Text style={[
+                          styles.categoryText,
+                          { color: getCategoryColor(treatment.category) }
+                        ]}>
+                          {treatment.category}
                         </Text>
                       </View>
                     </View>
                     
                     <Text style={styles.treatmentDescription}>{treatment.description}</Text>
-                    
-                    <View style={styles.statsContainer}>
-                      <View style={styles.statItem}>
-                        <Clock size={16} color="rgba(255, 255, 255, 0.6)" />
-                        <Text style={styles.statText}>{treatment.duration}</Text>
-                      </View>
-                      <View style={styles.statItem}>
-                        <Activity size={16} color="rgba(255, 255, 255, 0.6)" />
-                        <Text style={styles.statText}>Learn More</Text>
-                      </View>
-                    </View>
                   </View>
                 </View>
               </BlurView>
@@ -169,7 +238,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#FFFFFF',
     marginBottom: 8,
-    textTransform: 'capitalize',
   },
   subtitle: {
     fontSize: 16,
@@ -183,7 +251,7 @@ const styles = StyleSheet.create({
   treatmentCard: {
     borderRadius: 20,
     overflow: 'hidden',
-    marginBottom: 20,
+    marginBottom: 25,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
   },
@@ -193,30 +261,40 @@ const styles = StyleSheet.create({
   cardContent: {
     flexDirection: 'column',
   },
-  imageContainer: {
+  videoContainer: {
     position: 'relative',
-    marginBottom: 16,
     height: 200,
     borderRadius: 12,
     overflow: 'hidden',
+    marginBottom: 16,
+    backgroundColor: '#000',
   },
-  treatmentImage: {
-    width: '100%',
-    height: '100%',
+  webView: {
+    flex: 1,
   },
-  placeholderOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+  videoPlaceholder: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
   },
-  placeholderText: {
+  loadingText: {
     color: 'rgba(255, 255, 255, 0.8)',
-    fontSize: 16,
+    fontSize: 14,
+    marginTop: 8,
+  },
+  durationBadge: {
+    position: 'absolute',
+    bottom: 8,
+    right: 8,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  durationText: {
+    color: '#FFFFFF',
+    fontSize: 12,
     fontWeight: '600',
   },
   treatmentInfo: {
@@ -224,7 +302,7 @@ const styles = StyleSheet.create({
   },
   treatmentHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
     marginBottom: 8,
   },
@@ -233,13 +311,14 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#FFFFFF',
     flex: 1,
+    marginRight: 12,
   },
-  typeBadge: {
+  categoryBadge: {
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
   },
-  typeText: {
+  categoryText: {
     fontSize: 12,
     fontWeight: '600',
   },
@@ -247,20 +326,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: 'rgba(255, 255, 255, 0.8)',
     lineHeight: 20,
-    marginBottom: 16,
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    gap: 20,
-  },
-  statItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  statText: {
-    fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.6)',
-    fontWeight: '500',
   },
 });

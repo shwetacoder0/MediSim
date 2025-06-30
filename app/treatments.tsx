@@ -10,7 +10,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { router } from 'expo-router';
-import { ArrowLeft, ChevronRight, Pill, Zap, Scissors, Activity, Shield, Stethoscope } from 'lucide-react-native';
+import { ArrowLeft, ChevronRight, Pill, Zap, Scissors, Activity, Shield, Stethoscope, Lock } from 'lucide-react-native';
 
 const treatmentCategories = [
   {
@@ -20,7 +20,8 @@ const treatmentCategories = [
     icon: Pill,
     color: '#4FACFE',
     image: 'https://images.pexels.com/photos/3683074/pexels-photo-3683074.jpeg',
-    count: 156,
+    count: 5,
+    isActive: true,
   },
   {
     id: 'surgery',
@@ -29,7 +30,8 @@ const treatmentCategories = [
     icon: Scissors,
     color: '#FF6B6B',
     image: 'https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg',
-    count: 89,
+    count: 5,
+    isActive: true,
   },
   {
     id: 'therapy',
@@ -38,7 +40,8 @@ const treatmentCategories = [
     icon: Activity,
     color: '#4ECDC4',
     image: 'https://images.pexels.com/photos/4506109/pexels-photo-4506109.jpeg',
-    count: 67,
+    count: 12,
+    isActive: false,
   },
   {
     id: 'radiation',
@@ -47,7 +50,8 @@ const treatmentCategories = [
     icon: Zap,
     color: '#FFB347',
     image: 'https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg',
-    count: 34,
+    count: 8,
+    isActive: false,
   },
   {
     id: 'immunotherapy',
@@ -56,7 +60,8 @@ const treatmentCategories = [
     icon: Shield,
     color: '#A8E6CF',
     image: 'https://images.pexels.com/photos/3825581/pexels-photo-3825581.jpeg',
-    count: 42,
+    count: 15,
+    isActive: false,
   },
   {
     id: 'diagnostics',
@@ -65,7 +70,8 @@ const treatmentCategories = [
     icon: Stethoscope,
     color: '#B19CD9',
     image: 'https://images.pexels.com/photos/40568/medical-appointment-doctor-healthcare-40568.jpeg',
-    count: 78,
+    count: 20,
+    isActive: false,
   },
 ];
 
@@ -74,7 +80,10 @@ export default function TreatmentsScreen() {
     router.back();
   };
 
-  const handleCategoryPress = (categoryId: string) => {
+  const handleCategoryPress = (categoryId: string, isActive: boolean) => {
+    if (!isActive) {
+      return; // Do nothing for locked categories
+    }
     router.push(`/treatment-detail?category=${categoryId}` as any);
   };
 
@@ -101,29 +110,65 @@ export default function TreatmentsScreen() {
           {treatmentCategories.map((category) => (
             <TouchableOpacity 
               key={category.id} 
-              style={styles.categoryCard}
-              onPress={() => handleCategoryPress(category.id)}
+              style={[
+                styles.categoryCard,
+                !category.isActive && styles.lockedCard
+              ]}
+              onPress={() => handleCategoryPress(category.id, category.isActive)}
+              disabled={!category.isActive}
             >
               <BlurView intensity={15} tint="dark" style={styles.cardBlur}>
                 <View style={styles.cardContent}>
                   <View style={styles.imageContainer}>
                     <Image source={{ uri: category.image }} style={styles.categoryImage} />
-                    <View style={styles.imageOverlay}>
-                      <category.icon size={32} color={category.color} />
+                    <View style={[
+                      styles.imageOverlay,
+                      !category.isActive && styles.lockedOverlay
+                    ]}>
+                      {category.isActive ? (
+                        <category.icon size={32} color={category.color} />
+                      ) : (
+                        <Lock size={32} color="rgba(255, 255, 255, 0.5)" />
+                      )}
                     </View>
                   </View>
                   
                   <View style={styles.cardInfo}>
                     <View style={styles.cardHeader}>
-                      <Text style={styles.categoryTitle}>{category.title}</Text>
-                      <View style={styles.countBadge}>
-                        <Text style={styles.countText}>{category.count}</Text>
+                      <Text style={[
+                        styles.categoryTitle,
+                        !category.isActive && styles.lockedText
+                      ]}>
+                        {category.title}
+                      </Text>
+                      <View style={[
+                        styles.countBadge,
+                        !category.isActive && styles.lockedBadge
+                      ]}>
+                        <Text style={[
+                          styles.countText,
+                          !category.isActive && styles.lockedCountText
+                        ]}>
+                          {category.count}
+                        </Text>
                       </View>
                     </View>
-                    <Text style={styles.categorySubtitle}>{category.subtitle}</Text>
+                    <Text style={[
+                      styles.categorySubtitle,
+                      !category.isActive && styles.lockedText
+                    ]}>
+                      {category.subtitle}
+                    </Text>
+                    {!category.isActive && (
+                      <Text style={styles.comingSoonText}>Coming Soon</Text>
+                    )}
                   </View>
                   
-                  <ChevronRight size={20} color="rgba(255, 255, 255, 0.6)" />
+                  {category.isActive ? (
+                    <ChevronRight size={20} color="rgba(255, 255, 255, 0.6)" />
+                  ) : (
+                    <Lock size={20} color="rgba(255, 255, 255, 0.3)" />
+                  )}
                 </View>
               </BlurView>
             </TouchableOpacity>
@@ -183,6 +228,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
   },
+  lockedCard: {
+    opacity: 0.6,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
+  },
   cardBlur: {
     padding: 20,
   },
@@ -210,6 +259,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  lockedOverlay: {
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  },
   cardInfo: {
     flex: 1,
   },
@@ -224,20 +276,35 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#FFFFFF',
   },
+  lockedText: {
+    color: 'rgba(255, 255, 255, 0.5)',
+  },
   countBadge: {
     backgroundColor: 'rgba(79, 172, 254, 0.2)',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
   },
+  lockedBadge: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  },
   countText: {
     color: '#4FACFE',
     fontSize: 12,
     fontWeight: '600',
   },
+  lockedCountText: {
+    color: 'rgba(255, 255, 255, 0.3)',
+  },
   categorySubtitle: {
     fontSize: 14,
     color: 'rgba(255, 255, 255, 0.7)',
     lineHeight: 18,
+  },
+  comingSoonText: {
+    fontSize: 12,
+    color: '#FFB347',
+    fontWeight: '600',
+    marginTop: 4,
   },
 });

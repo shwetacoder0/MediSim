@@ -116,21 +116,7 @@ export default function HomeScreen() {
             Get instant medical guidance and answers to your health questions
           </Text>
 
-          <TouchableOpacity style={styles.aiDoctorButton} onPress={handleAIDoctorChat}>
-            <BlurView intensity={20} tint="dark" style={styles.aiDoctorBlur}>
-              <View style={styles.aiDoctorContent}>
-                <View style={styles.aiDoctorIcon}>
-                  <MessageCircle size={32} color="#4FACFE" />
-                </View>
-                <View style={styles.aiDoctorText}>
-                  <Text style={styles.aiDoctorButtonTitle}>Talk to AI Doctor</Text>
-                  <Text style={styles.aiDoctorButtonDescription}>
-                    Start a video consultation now
-                  </Text>
-                </View>
-              </View>
-            </BlurView>
-          </TouchableOpacity>
+          <AIDoctorChat patientContext="General health consultation" />
         </View>
 
         <View style={styles.exploreSection}>
@@ -146,7 +132,7 @@ export default function HomeScreen() {
                   <Text style={styles.cardLabel}>Explore</Text>
                   <Text style={styles.cardTitle}>Treatments</Text>
                   <Text style={styles.cardDescription}>
-                    Discover the latest treatments for various conditions.
+                    Watch animated videos showing how medical treatments work.
                   </Text>
                 </View>
                 <View style={styles.cardIcon}>
@@ -221,7 +207,16 @@ export default function HomeScreen() {
         presentationStyle="fullScreen"
         onRequestClose={() => setShowAIDoctor(false)}
       >
-        <AIDoctorChat onClose={() => setShowAIDoctor(false)} />
+        <AIDoctorChat 
+          onClose={() => setShowAIDoctor(false)}
+          patientContext="Patient seeking general medical consultation and health guidance"
+        />
+        <TouchableOpacity
+          style={styles.closeModalButton}
+          onPress={() => setShowAIDoctor(false)}
+        >
+          <Text style={styles.closeModalText}>✕</Text>
+        </TouchableOpacity>
       </Modal>
     </View>
   );
@@ -327,42 +322,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 20,
     marginBottom: 24,
-  },
-  aiDoctorButton: {
-    borderRadius: 20,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  aiDoctorBlur: {
-    padding: 20,
-  },
-  aiDoctorContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  aiDoctorIcon: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: 'rgba(79, 172, 254, 0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
-  },
-  aiDoctorText: {
-    flex: 1,
-  },
-  aiDoctorButtonTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 4,
-  },
-  aiDoctorButtonDescription: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
-    lineHeight: 18,
   },
   exploreSection: {
     paddingHorizontal: 30,
