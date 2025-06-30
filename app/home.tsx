@@ -19,7 +19,8 @@ import {
   Stethoscope,
   Activity,
   Microscope,
-  MessageCircle
+  MessageCircle,
+  X
 } from 'lucide-react-native';
 import MediaPicker from '../components/MediaPicker';
 import AIDoctorChat from '../components/AIDoctorChat';
@@ -55,6 +56,10 @@ export default function HomeScreen() {
 
   const handleAIDoctorChat = () => {
     setShowAIDoctor(true);
+  };
+
+  const handleCloseAIDoctor = () => {
+    setShowAIDoctor(false);
   };
 
   // Show loading indicator while checking auth state
@@ -116,7 +121,21 @@ export default function HomeScreen() {
             Get instant medical guidance and answers to your health questions
           </Text>
 
-          <AIDoctorChat patientContext="General health consultation" />
+          <TouchableOpacity style={styles.aiDoctorButton} onPress={handleAIDoctorChat}>
+            <BlurView intensity={20} tint="dark" style={styles.aiDoctorBlur}>
+              <View style={styles.aiDoctorContent}>
+                <View style={styles.aiDoctorIconContainer}>
+                  <MessageCircle size={24} color="#4FACFE" />
+                </View>
+                <View style={styles.aiDoctorTextContainer}>
+                  <Text style={styles.aiDoctorButtonTitle}>Start AI Consultation</Text>
+                  <Text style={styles.aiDoctorButtonSubtitle}>
+                    Chat with our AI doctor about your health
+                  </Text>
+                </View>
+              </View>
+            </BlurView>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.exploreSection}>
@@ -196,7 +215,7 @@ export default function HomeScreen() {
           style={styles.closeModalButton}
           onPress={() => setShowMediaPicker(false)}
         >
-          <Text style={styles.closeModalText}>✕</Text>
+          <X size={24} color="#FFFFFF" />
         </TouchableOpacity>
       </Modal>
 
@@ -205,18 +224,34 @@ export default function HomeScreen() {
         visible={showAIDoctor}
         animationType="slide"
         presentationStyle="fullScreen"
-        onRequestClose={() => setShowAIDoctor(false)}
+        onRequestClose={handleCloseAIDoctor}
       >
-        <AIDoctorChat 
-          onClose={() => setShowAIDoctor(false)}
-          patientContext="Patient seeking general medical consultation and health guidance"
-        />
-        <TouchableOpacity
-          style={styles.closeModalButton}
-          onPress={() => setShowAIDoctor(false)}
-        >
-          <Text style={styles.closeModalText}>✕</Text>
-        </TouchableOpacity>
+        <View style={styles.aiDoctorModalContainer}>
+          <LinearGradient
+            colors={['#0A0A0A', '#1A1A2E', '#16213E']}
+            style={styles.gradient}
+          />
+          
+          {/* Modal Header */}
+          <View style={styles.aiDoctorModalHeader}>
+            <TouchableOpacity
+              style={styles.closeModalButton}
+              onPress={handleCloseAIDoctor}
+            >
+              <X size={24} color="#FFFFFF" />
+            </TouchableOpacity>
+            <Text style={styles.aiDoctorModalTitle}>AI Medical Assistant</Text>
+            <View style={styles.headerSpacer} />
+          </View>
+
+          {/* AI Doctor Chat Component */}
+          <View style={styles.aiDoctorChatContainer}>
+            <AIDoctorChat 
+              onClose={handleCloseAIDoctor}
+              patientContext="Patient seeking general medical consultation and health guidance"
+            />
+          </View>
+        </View>
       </Modal>
     </View>
   );
@@ -323,6 +358,42 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     marginBottom: 24,
   },
+  aiDoctorButton: {
+    borderRadius: 16,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  aiDoctorBlur: {
+    padding: 20,
+  },
+  aiDoctorContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  aiDoctorIconContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'rgba(79, 172, 254, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  aiDoctorTextContainer: {
+    flex: 1,
+  },
+  aiDoctorButtonTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 4,
+  },
+  aiDoctorButtonSubtitle: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.8)',
+    lineHeight: 18,
+  },
   exploreSection: {
     paddingHorizontal: 30,
     paddingBottom: 50,
@@ -371,19 +442,38 @@ const styles = StyleSheet.create({
     marginLeft: 20,
   },
   closeModalButton: {
-    position: 'absolute',
-    top: 60,
-    right: 20,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  closeModalText: {
+  aiDoctorModalContainer: {
+    flex: 1,
+    backgroundColor: '#000',
+  },
+  aiDoctorModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 60,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  aiDoctorModalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
     color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '600',
+    textAlign: 'center',
+  },
+  headerSpacer: {
+    width: 44,
+    height: 44,
+  },
+  aiDoctorChatContainer: {
+    flex: 1,
   },
 });
