@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,11 +6,13 @@ import {
   StyleSheet,
   ScrollView,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { router } from 'expo-router';
-import { ArrowLeft, ChevronRight, Heart, Brain, Bone, Eye, Settings as Lungs, Zap } from 'lucide-react-native';
+import { ArrowLeft, ChevronRight, Heart, Brain, User, Lock } from 'lucide-react-native';
+import { EducationService, EducationSection } from '../lib/educationService';
 
 const modelCategories = [
   {
@@ -20,7 +22,7 @@ const modelCategories = [
     icon: Heart,
     color: '#FF6B6B',
     image: 'https://images.pexels.com/photos/40568/medical-appointment-doctor-healthcare-40568.jpeg',
-    models: 8,
+    isActive: true,
   },
   {
     id: 'nervous',
@@ -29,54 +31,94 @@ const modelCategories = [
     icon: Brain,
     color: '#A8E6CF',
     image: 'https://images.pexels.com/photos/3825581/pexels-photo-3825581.jpeg',
-    models: 12,
+    isActive: true,
+  },
+  {
+    id: 'full-body',
+    title: 'Full Body Models',
+    subtitle: 'Complete anatomical systems',
+    icon: User,
+    color: '#4ECDC4',
+    image: 'https://images.pexels.com/photos/4506109/pexels-photo-4506109.jpeg',
+    isActive: true,
   },
   {
     id: 'respiratory',
     title: 'Respiratory System',
     subtitle: 'Lungs, airways, and breathing',
-    icon: Lungs,
+    icon: Heart, // Using Heart as placeholder
     color: '#4ECDC4',
     image: 'https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg',
-    models: 6,
+    isActive: false,
   },
   {
     id: 'skeletal',
     title: 'Skeletal System',
     subtitle: 'Bones, joints, and cartilage',
-    icon: Bone,
+    icon: Heart, // Using Heart as placeholder
     color: '#FFB347',
     image: 'https://images.pexels.com/photos/5473298/pexels-photo-5473298.jpeg',
-    models: 15,
-  },
-  {
-    id: 'sensory',
-    title: 'Sensory Organs',
-    subtitle: 'Eyes, ears, and sensory structures',
-    icon: Eye,
-    color: '#B19CD9',
-    image: 'https://images.pexels.com/photos/5752242/pexels-photo-5752242.jpeg',
-    models: 9,
-  },
-  {
-    id: 'muscular',
-    title: 'Muscular System',
-    subtitle: 'Muscles, tendons, and movement',
-    icon: Zap,
-    color: '#FF9A9E',
-    image: 'https://images.pexels.com/photos/4506109/pexels-photo-4506109.jpeg',
-    models: 11,
+    isActive: false,
   },
 ];
 
 export default function ModelsScreen() {
+  const [modelCounts, setModelCounts] = useState<Record<string, number>>({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadModelCounts();
+  }, []);
+
+  const loadModelCounts = async () => {
+    try {
+      setLoading(true);
+      const counts: Record<string, number> = {};
+
+      // Get counts for each active category
+      for (const category of modelCategories) {
+        if (category.isActive) {
+          const sections = await EducationService.getEducationSectionsByCategory(
+            '3d-models',
+            category.id
+          );
+          counts[category.id] = sections.length;
+        } else {
+          counts[category.id] = Math.floor(Math.random() * 10) + 5; // Random count for locked categories
+        }
+      }
+
+      setModelCounts(counts);
+    } catch (error) {
+      console.error('Error loading model counts:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleBack = () => {
     router.back();
   };
 
-  const handleCategoryPress = (categoryId: string) => {
+  const handleCategoryPress = (categoryId: string, isActive: boolean) => {
+    if (!isActive) {
+      return; // Do nothing for locked categories
+    }
     router.push(`/model-detail?category=${categoryId}` as any);
   };
+
+  if (loading) {
+    return (
+      <View style={[styles.container, styles.loadingContainer]}>
+        <LinearGradient
+          colors={['#0A0A0A', '#1A1A2E', '#16213E']}
+          style={styles.gradient}
+        />
+        <ActivityIndicator size="large" color="#4FACFE" />
+        <Text style={styles.loadingText}>Loading 3D models...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -101,29 +143,65 @@ export default function ModelsScreen() {
           {modelCategories.map((category) => (
             <TouchableOpacity 
               key={category.id} 
-              style={styles.categoryCard}
-              onPress={() => handleCategoryPress(category.id)}
+              style={[
+                styles.categoryCard,
+                !category.isActive && styles.lockedCard
+              ]}
+              onPress={() => handleCategoryPress(category.id, category.isActive)}
+              disabled={!category.isActive}
             >
               <BlurView intensity={15} tint="dark" style={styles.cardBlur}>
                 <View style={styles.cardContent}>
                   <View style={styles.imageContainer}>
                     <Image source={{ uri: category.image }} style={styles.categoryImage} />
-                    <View style={styles.imageOverlay}>
-                      <category.icon size={32} color={category.color} />
+                    <View style={[
+                      styles.imageOverlay,
+                      !category.isActive && styles.lockedOverlay
+                    ]}>
+                      {category.isActive ? (
+                        <category.icon size={32} color={category.color} />
+                      ) : (
+                        <Lock size={32} color="rgba(255, 255, 255, 0.5)" />
+                      )}
                     </View>
                   </View>
                   
                   <View style={styles.cardInfo}>
                     <View style={styles.cardHeader}>
-                      <Text style={styles.categoryTitle}>{category.title}</Text>
-                      <View style={styles.countBadge}>
-                        <Text style={styles.countText}>{category.models}</Text>
+                      <Text style={[
+                        styles.categoryTitle,
+                        !category.isActive && styles.lockedText
+                      ]}>
+                        {category.title}
+                      </Text>
+                      <View style={[
+                        styles.countBadge,
+                        !category.isActive && styles.lockedBadge
+                      ]}>
+                        <Text style={[
+                          styles.countText,
+                          !category.isActive && styles.lockedCountText
+                        ]}>
+                          {modelCounts[category.id] || 0}
+                        </Text>
                       </View>
                     </View>
-                    <Text style={styles.categorySubtitle}>{category.subtitle}</Text>
+                    <Text style={[
+                      styles.categorySubtitle,
+                      !category.isActive && styles.lockedText
+                    ]}>
+                      {category.subtitle}
+                    </Text>
+                    {!category.isActive && (
+                      <Text style={styles.comingSoonText}>Coming Soon</Text>
+                    )}
                   </View>
                   
-                  <ChevronRight size={20} color="rgba(255, 255, 255, 0.6)" />
+                  {category.isActive ? (
+                    <ChevronRight size={20} color="rgba(255, 255, 255, 0.6)" />
+                  ) : (
+                    <Lock size={20} color="rgba(255, 255, 255, 0.3)" />
+                  )}
                 </View>
               </BlurView>
             </TouchableOpacity>
@@ -138,6 +216,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#000',
+  },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   gradient: {
     position: 'absolute',
@@ -172,6 +254,11 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.8)',
     lineHeight: 22,
   },
+  loadingText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    marginTop: 16,
+  },
   categoriesSection: {
     paddingHorizontal: 30,
     paddingBottom: 50,
@@ -182,6 +269,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  lockedCard: {
+    opacity: 0.6,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
   },
   cardBlur: {
     padding: 20,
@@ -210,6 +301,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  lockedOverlay: {
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  },
   cardInfo: {
     flex: 1,
   },
@@ -224,20 +318,35 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#FFFFFF',
   },
+  lockedText: {
+    color: 'rgba(255, 255, 255, 0.5)',
+  },
   countBadge: {
     backgroundColor: 'rgba(79, 172, 254, 0.2)',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
   },
+  lockedBadge: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  },
   countText: {
     color: '#4FACFE',
     fontSize: 12,
     fontWeight: '600',
   },
+  lockedCountText: {
+    color: 'rgba(255, 255, 255, 0.3)',
+  },
   categorySubtitle: {
     fontSize: 14,
     color: 'rgba(255, 255, 255, 0.7)',
     lineHeight: 18,
+  },
+  comingSoonText: {
+    fontSize: 12,
+    color: '#FFB347',
+    fontWeight: '600',
+    marginTop: 4,
   },
 });
