@@ -20,7 +20,7 @@ const diseaseCategories = [
     icon: Heart,
     color: '#FF6B6B',
     image: 'https://images.pexels.com/photos/40568/medical-appointment-doctor-healthcare-40568.jpeg',
-    count: 4,
+    count: 1, // Updated count - only diabetes video
     isActive: true,
   },
   {
@@ -30,8 +30,8 @@ const diseaseCategories = [
     icon: Brain,
     color: '#A8E6CF',
     image: 'https://images.pexels.com/photos/3825581/pexels-photo-3825581.jpeg',
-    count: 4,
-    isActive: true,
+    count: 0, // No neurology videos yet
+    isActive: false,
   },
   {
     id: 'pulmonology',

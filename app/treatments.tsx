@@ -20,7 +20,7 @@ const treatmentCategories = [
     icon: Pill,
     color: '#4FACFE',
     image: 'https://images.pexels.com/photos/3683074/pexels-photo-3683074.jpeg',
-    count: 5,
+    count: 1, // Updated count - only angioplasty
     isActive: true,
   },
   {
@@ -30,7 +30,7 @@ const treatmentCategories = [
     icon: Scissors,
     color: '#FF6B6B',
     image: 'https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg',
-    count: 5,
+    count: 1, // Updated count - only pacemaker
     isActive: true,
   },
   {
