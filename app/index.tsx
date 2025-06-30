@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
   },
   boltIcon: {
     width: 40,
-    height: 40,
+    height: 40
   },
   orbContainer: {
     position: 'absolute',
