@@ -1,10 +1,9 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { View, StyleSheet, ActivityIndicator, Text, TouchableOpacity, Platform } from 'react-native';
-import { GLView } from 'expo-gl';
+import { GLView } from 'expo-gl-cpp';
 import { Renderer, Scene, PerspectiveCamera, AmbientLight, DirectionalLight } from 'expo-three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import * as THREE from 'three';
-import { RotateCcw, ZoomIn, ZoomOut, Rotate3d as RotateLeft, Rotate3d as RotateRight } from 'lucide-react-native';
+import { RotateCcw, ZoomIn, ZoomOut, RotateLeft, RotateRight } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
 
 interface GLBViewerProps {
@@ -71,13 +70,8 @@ export default function GLBViewer({ modelUrl, style }: GLBViewerProps) {
       directionalLight2.position.set(-1, -1, -1);
       scene.add(directionalLight2);
 
-      // Load GLB model
-      if (Platform.OS === 'web') {
-        // For web, we'll show a placeholder since GLTFLoader might not work properly
-        createPlaceholderModel(scene);
-      } else {
-        await loadGLBModel(scene, modelUrl);
-      }
+      // Create placeholder model based on URL
+      createPlaceholderModel(scene, modelUrl);
 
       setLoading(false);
 
@@ -110,55 +104,27 @@ export default function GLBViewer({ modelUrl, style }: GLBViewerProps) {
     }
   };
 
-  const loadGLBModel = async (scene: Scene, url: string) => {
-    try {
-      const loader = new GLTFLoader();
-      
-      // For demo purposes, create a placeholder model
-      // In production, you would load the actual GLB file
-      createPlaceholderModel(scene);
-      
-      // Uncomment this for actual GLB loading:
-      /*
-      loader.load(
-        url,
-        (gltf) => {
-          const model = gltf.scene;
-          
-          // Scale and position the model
-          const box = new THREE.Box3().setFromObject(model);
-          const center = box.getCenter(new THREE.Vector3());
-          const size = box.getSize(new THREE.Vector3());
-          
-          const maxDim = Math.max(size.x, size.y, size.z);
-          const scale = 2 / maxDim;
-          model.scale.setScalar(scale);
-          
-          model.position.sub(center.multiplyScalar(scale));
-          
-          scene.add(model);
-          modelRef.current = model;
-        },
-        (progress) => {
-          console.log('Loading progress:', progress);
-        },
-        (error) => {
-          console.error('Error loading GLB:', error);
-          createPlaceholderModel(scene);
-        }
-      );
-      */
-    } catch (error) {
-      console.error('Error in loadGLBModel:', error);
-      createPlaceholderModel(scene);
-    }
-  };
-
-  const createPlaceholderModel = (scene: Scene) => {
-    // Create a placeholder heart-like shape
+  const createPlaceholderModel = (scene: Scene, url: string) => {
     const group = new THREE.Group();
     
-    // Main body (sphere)
+    // Determine model type from URL
+    if (url.includes('heart')) {
+      createHeartModel(group);
+    } else if (url.includes('brain')) {
+      createBrainModel(group);
+    } else if (url.includes('full_body')) {
+      createFullBodyModel(group);
+    } else {
+      // Default heart model
+      createHeartModel(group);
+    }
+
+    scene.add(group);
+    modelRef.current = group;
+  };
+
+  const createHeartModel = (group: THREE.Group) => {
+    // Main heart body
     const bodyGeometry = new THREE.SphereGeometry(0.8, 32, 32);
     const bodyMaterial = new THREE.MeshPhongMaterial({ 
       color: 0xff6b6b,
@@ -169,21 +135,21 @@ export default function GLBViewer({ modelUrl, style }: GLBViewerProps) {
     group.add(body);
 
     // Left atrium
-    const leftAtriumGeometry = new THREE.SphereGeometry(0.4, 16, 16);
-    const leftAtriumMaterial = new THREE.MeshPhongMaterial({ 
+    const atriumGeometry = new THREE.SphereGeometry(0.4, 16, 16);
+    const atriumMaterial = new THREE.MeshPhongMaterial({ 
       color: 0xff8a8a,
       shininess: 30
     });
-    const leftAtrium = new THREE.Mesh(leftAtriumGeometry, leftAtriumMaterial);
+    const leftAtrium = new THREE.Mesh(atriumGeometry, atriumMaterial);
     leftAtrium.position.set(-0.6, 0.6, 0.2);
     group.add(leftAtrium);
 
     // Right atrium
-    const rightAtrium = new THREE.Mesh(leftAtriumGeometry, leftAtriumMaterial);
+    const rightAtrium = new THREE.Mesh(atriumGeometry, atriumMaterial);
     rightAtrium.position.set(0.6, 0.6, 0.2);
     group.add(rightAtrium);
 
-    // Aorta (cylinder)
+    // Aorta
     const aortaGeometry = new THREE.CylinderGeometry(0.15, 0.15, 1.5, 8);
     const aortaMaterial = new THREE.MeshPhongMaterial({ 
       color: 0xffaaaa,
@@ -193,9 +159,92 @@ export default function GLBViewer({ modelUrl, style }: GLBViewerProps) {
     aorta.position.set(0, 1.2, 0);
     aorta.rotation.z = Math.PI * 0.1;
     group.add(aorta);
+  };
 
-    scene.add(group);
-    modelRef.current = group;
+  const createBrainModel = (group: THREE.Group) => {
+    // Main brain hemisphere
+    const brainGeometry = new THREE.SphereGeometry(1, 32, 32);
+    const brainMaterial = new THREE.MeshPhongMaterial({ 
+      color: 0xffc0cb,
+      shininess: 20
+    });
+    const brain = new THREE.Mesh(brainGeometry, brainMaterial);
+    brain.scale.set(1.2, 1, 1);
+    group.add(brain);
+
+    // Brain stem
+    const stemGeometry = new THREE.CylinderGeometry(0.3, 0.4, 1, 8);
+    const stemMaterial = new THREE.MeshPhongMaterial({ 
+      color: 0xffb6c1,
+      shininess: 20
+    });
+    const stem = new THREE.Mesh(stemGeometry, stemMaterial);
+    stem.position.set(0, -1, 0);
+    group.add(stem);
+
+    // Cerebellum
+    const cerebellumGeometry = new THREE.SphereGeometry(0.4, 16, 16);
+    const cerebellumMaterial = new THREE.MeshPhongMaterial({ 
+      color: 0xff69b4,
+      shininess: 20
+    });
+    const cerebellum = new THREE.Mesh(cerebellumGeometry, cerebellumMaterial);
+    cerebellum.position.set(0, -0.3, -0.8);
+    group.add(cerebellum);
+  };
+
+  const createFullBodyModel = (group: THREE.Group) => {
+    // Torso
+    const torsoGeometry = new THREE.CylinderGeometry(0.8, 0.6, 2, 8);
+    const torsoMaterial = new THREE.MeshPhongMaterial({ 
+      color: 0xfdbcb4,
+      shininess: 10
+    });
+    const torso = new THREE.Mesh(torsoGeometry, torsoMaterial);
+    torso.position.set(0, 0, 0);
+    group.add(torso);
+
+    // Head
+    const headGeometry = new THREE.SphereGeometry(0.5, 16, 16);
+    const headMaterial = new THREE.MeshPhongMaterial({ 
+      color: 0xfdbcb4,
+      shininess: 10
+    });
+    const head = new THREE.Mesh(headGeometry, headMaterial);
+    head.position.set(0, 1.5, 0);
+    group.add(head);
+
+    // Arms
+    const armGeometry = new THREE.CylinderGeometry(0.15, 0.15, 1.5, 8);
+    const armMaterial = new THREE.MeshPhongMaterial({ 
+      color: 0xfdbcb4,
+      shininess: 10
+    });
+    
+    const leftArm = new THREE.Mesh(armGeometry, armMaterial);
+    leftArm.position.set(-1.2, 0.5, 0);
+    leftArm.rotation.z = Math.PI * 0.2;
+    group.add(leftArm);
+
+    const rightArm = new THREE.Mesh(armGeometry, armMaterial);
+    rightArm.position.set(1.2, 0.5, 0);
+    rightArm.rotation.z = -Math.PI * 0.2;
+    group.add(rightArm);
+
+    // Legs
+    const legGeometry = new THREE.CylinderGeometry(0.2, 0.2, 2, 8);
+    const legMaterial = new THREE.MeshPhongMaterial({ 
+      color: 0xfdbcb4,
+      shininess: 10
+    });
+    
+    const leftLeg = new THREE.Mesh(legGeometry, legMaterial);
+    leftLeg.position.set(-0.4, -2, 0);
+    group.add(leftLeg);
+
+    const rightLeg = new THREE.Mesh(legGeometry, legMaterial);
+    rightLeg.position.set(0.4, -2, 0);
+    group.add(rightLeg);
   };
 
   const resetView = () => {
