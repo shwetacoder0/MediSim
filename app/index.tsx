@@ -150,7 +150,6 @@ const styles = StyleSheet.create({
   boltIcon: {
     width: 40,
     height: 40,
-    tintColor: '#6B7280',
   },
   orbContainer: {
     position: 'absolute',
