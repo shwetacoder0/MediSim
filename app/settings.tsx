@@ -9,7 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { router } from 'expo-router';
-import { ArrowLeft, Bell, Shield, Globe, Moon, Volume2, FileText, Trash2, Brain, Mic, HelpCircle, MessageCircle, ChevronRight } from 'lucide-react-native';
+import { ArrowLeft, Bell, Shield, Globe, Moon, Volume2, FileText, Trash2, Brain, Mic, CircleHelp as HelpCircle, MessageCircle, ChevronRight } from 'lucide-react-native';
 
 export default function SettingsScreen() {
   const [notifications, setNotifications] = useState(true);
