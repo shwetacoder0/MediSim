@@ -8,8 +8,6 @@ import {
   Image,
   ActivityIndicator,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
 import { router } from 'expo-router';
 import { ArrowLeft, ChevronRight, Heart, Brain, User, Lock, Activity } from 'lucide-react-native';
 import { EducationService, EducationSection } from '../lib/educationService';
@@ -20,7 +18,7 @@ const modelCategories = [
     title: 'Brain Models',
     subtitle: 'Brain, spinal cord, and nervous system',
     icon: Brain,
-    color: '#A8E6CF',
+    color: '#BA68C8',
     image: 'https://images.pexels.com/photos/3825581/pexels-photo-3825581.jpeg',
     isActive: true,
   },
@@ -29,7 +27,7 @@ const modelCategories = [
     title: 'Intestine Models',
     subtitle: 'Digestive system and intestinal anatomy',
     icon: Activity,
-    color: '#FFB347',
+    color: '#FFB74D',
     image: 'https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg',
     isActive: true,
   },
@@ -38,7 +36,7 @@ const modelCategories = [
     title: 'Cardiovascular System',
     subtitle: 'Heart, blood vessels, and circulation',
     icon: Heart,
-    color: '#FF6B6B',
+    color: '#FF8A65',
     image: 'https://images.pexels.com/photos/40568/medical-appointment-doctor-healthcare-40568.jpeg',
     isActive: false,
   },
@@ -47,7 +45,7 @@ const modelCategories = [
     title: 'Full Body Models',
     subtitle: 'Complete anatomical systems',
     icon: User,
-    color: '#4ECDC4',
+    color: '#4DB6AC',
     image: 'https://images.pexels.com/photos/4506109/pexels-photo-4506109.jpeg',
     isActive: false,
   },
@@ -55,8 +53,8 @@ const modelCategories = [
     id: 'respiratory',
     title: 'Respiratory System',
     subtitle: 'Lungs, airways, and breathing',
-    icon: Heart, // Using Heart as placeholder
-    color: '#4ECDC4',
+    icon: Heart,
+    color: '#6BCF7F',
     image: 'https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg',
     isActive: false,
   },
@@ -106,11 +104,7 @@ export default function ModelsScreen() {
   if (loading) {
     return (
       <View style={[styles.container, styles.loadingContainer]}>
-        <LinearGradient
-          colors={['#0A0A0A', '#1A1A2E', '#16213E']}
-          style={styles.gradient}
-        />
-        <ActivityIndicator size="large" color="#4FACFE" />
+        <ActivityIndicator size="large" color="#4A90E2" />
         <Text style={styles.loadingText}>Loading 3D models...</Text>
       </View>
     );
@@ -118,13 +112,8 @@ export default function ModelsScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#0A0A0A', '#1A1A2E', '#16213E']}
-        style={styles.gradient}
-      />
-
       <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-        <ArrowLeft size={24} color="#FFFFFF" />
+        <ArrowLeft size={20} color="#6B7280" />
       </TouchableOpacity>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -146,60 +135,58 @@ export default function ModelsScreen() {
               onPress={() => handleCategoryPress(category.id, category.isActive)}
               disabled={!category.isActive}
             >
-              <BlurView intensity={15} tint="dark" style={styles.cardBlur}>
-                <View style={styles.cardContent}>
-                  <View style={styles.imageContainer}>
-                    <Image source={{ uri: category.image }} style={styles.categoryImage} />
-                    <View style={[
-                      styles.imageOverlay,
-                      !category.isActive && styles.lockedOverlay
-                    ]}>
-                      {category.isActive ? (
-                        <category.icon size={32} color={category.color} />
-                      ) : (
-                        <Lock size={32} color="rgba(255, 255, 255, 0.5)" />
-                      )}
-                    </View>
-                  </View>
-                  
-                  <View style={styles.cardInfo}>
-                    <View style={styles.cardHeader}>
-                      <Text style={[
-                        styles.categoryTitle,
-                        !category.isActive && styles.lockedText
-                      ]}>
-                        {category.title}
-                      </Text>
-                      <View style={[
-                        styles.countBadge,
-                        !category.isActive && styles.lockedBadge
-                      ]}>
-                        <Text style={[
-                          styles.countText,
-                          !category.isActive && styles.lockedCountText
-                        ]}>
-                          {modelCounts[category.id] || 0}
-                        </Text>
-                      </View>
-                    </View>
-                    <Text style={[
-                      styles.categorySubtitle,
-                      !category.isActive && styles.lockedText
-                    ]}>
-                      {category.subtitle}
-                    </Text>
-                    {!category.isActive && (
-                      <Text style={styles.comingSoonText}>Coming Soon</Text>
+              <View style={styles.cardContent}>
+                <View style={styles.imageContainer}>
+                  <Image source={{ uri: category.image }} style={styles.categoryImage} />
+                  <View style={[
+                    styles.imageOverlay,
+                    !category.isActive && styles.lockedOverlay
+                  ]}>
+                    {category.isActive ? (
+                      <category.icon size={24} color={category.color} />
+                    ) : (
+                      <Lock size={24} color="#9CA3AF" />
                     )}
                   </View>
-                  
-                  {category.isActive ? (
-                    <ChevronRight size={20} color="rgba(255, 255, 255, 0.6)" />
-                  ) : (
-                    <Lock size={20} color="rgba(255, 255, 255, 0.3)" />
+                </View>
+                
+                <View style={styles.cardInfo}>
+                  <View style={styles.cardHeader}>
+                    <Text style={[
+                      styles.categoryTitle,
+                      !category.isActive && styles.lockedText
+                    ]}>
+                      {category.title}
+                    </Text>
+                    <View style={[
+                      styles.countBadge,
+                      !category.isActive && styles.lockedBadge
+                    ]}>
+                      <Text style={[
+                        styles.countText,
+                        !category.isActive && styles.lockedCountText
+                      ]}>
+                        {modelCounts[category.id] || 0}
+                      </Text>
+                    </View>
+                  </View>
+                  <Text style={[
+                    styles.categorySubtitle,
+                    !category.isActive && styles.lockedText
+                  ]}>
+                    {category.subtitle}
+                  </Text>
+                  {!category.isActive && (
+                    <Text style={styles.comingSoonText}>Coming Soon</Text>
                   )}
                 </View>
-              </BlurView>
+                
+                {category.isActive ? (
+                  <ChevronRight size={16} color="#9CA3AF" />
+                ) : (
+                  <Lock size={16} color="#9CA3AF" />
+                )}
+              </View>
             </TouchableOpacity>
           ))}
         </View>
@@ -211,18 +198,11 @@ export default function ModelsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#F8F9FA',
   },
   loadingContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  gradient: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
   },
   backButton: {
     position: 'absolute',
@@ -230,6 +210,13 @@ const styles = StyleSheet.create({
     left: 20,
     zIndex: 10,
     padding: 10,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   scrollView: {
     flex: 1,
@@ -237,54 +224,55 @@ const styles = StyleSheet.create({
   header: {
     paddingTop: 120,
     paddingHorizontal: 30,
-    marginBottom: 30,
+    marginBottom: 24,
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 8,
+    color: '#1F2937',
+    marginBottom: 6,
   },
   subtitle: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
-    lineHeight: 22,
+    fontSize: 15,
+    color: '#6B7280',
+    lineHeight: 20,
   },
   loadingText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    marginTop: 16,
+    color: '#6B7280',
+    fontSize: 15,
+    marginTop: 12,
   },
   categoriesSection: {
     paddingHorizontal: 30,
-    paddingBottom: 50,
+    paddingBottom: 40,
   },
   categoryCard: {
-    borderRadius: 20,
+    borderRadius: 16,
     overflow: 'hidden',
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    marginBottom: 16,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   lockedCard: {
     opacity: 0.6,
-    borderColor: 'rgba(255, 255, 255, 0.05)',
-  },
-  cardBlur: {
-    padding: 20,
   },
   cardContent: {
     flexDirection: 'row',
     alignItems: 'center',
+    padding: 16,
   },
   imageContainer: {
     position: 'relative',
-    marginRight: 16,
+    marginRight: 12,
   },
   categoryImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 12,
+    width: 48,
+    height: 48,
+    borderRadius: 10,
   },
   imageOverlay: {
     position: 'absolute',
@@ -292,13 +280,13 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
   },
   lockedOverlay: {
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(156, 163, 175, 0.8)',
   },
   cardInfo: {
     flex: 1,
@@ -307,42 +295,42 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   categoryTitle: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1F2937',
   },
   lockedText: {
-    color: 'rgba(255, 255, 255, 0.5)',
+    color: '#9CA3AF',
   },
   countBadge: {
-    backgroundColor: 'rgba(79, 172, 254, 0.2)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
+    backgroundColor: 'rgba(74, 144, 226, 0.1)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
   },
   lockedBadge: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'rgba(156, 163, 175, 0.1)',
   },
   countText: {
-    color: '#4FACFE',
-    fontSize: 12,
+    color: '#4A90E2',
+    fontSize: 11,
     fontWeight: '600',
   },
   lockedCountText: {
-    color: 'rgba(255, 255, 255, 0.3)',
+    color: '#9CA3AF',
   },
   categorySubtitle: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.7)',
-    lineHeight: 18,
+    fontSize: 12,
+    color: '#6B7280',
+    lineHeight: 16,
   },
   comingSoonText: {
-    fontSize: 12,
-    color: '#FFB347',
+    fontSize: 10,
+    color: '#FFB74D',
     fontWeight: '600',
-    marginTop: 4,
+    marginTop: 2,
   },
 });
