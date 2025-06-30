@@ -108,57 +108,17 @@ export default function GLBViewer({ modelUrl, style }: GLBViewerProps) {
     const group = new THREE.Group();
     
     // Determine model type from URL
-    if (url.includes('heart')) {
-      createHeartModel(group);
-    } else if (url.includes('brain')) {
+    if (url.includes('brain')) {
       createBrainModel(group);
-    } else if (url.includes('full_body')) {
-      createFullBodyModel(group);
+    } else if (url.includes('intestine')) {
+      createIntestineModel(group);
     } else {
-      // Default heart model
-      createHeartModel(group);
+      // Default brain model
+      createBrainModel(group);
     }
 
     scene.add(group);
     modelRef.current = group;
-  };
-
-  const createHeartModel = (group: THREE.Group) => {
-    // Main heart body
-    const bodyGeometry = new THREE.SphereGeometry(0.8, 32, 32);
-    const bodyMaterial = new THREE.MeshPhongMaterial({ 
-      color: 0xff6b6b,
-      shininess: 30
-    });
-    const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-    body.scale.set(1, 1.2, 0.8);
-    group.add(body);
-
-    // Left atrium
-    const atriumGeometry = new THREE.SphereGeometry(0.4, 16, 16);
-    const atriumMaterial = new THREE.MeshPhongMaterial({ 
-      color: 0xff8a8a,
-      shininess: 30
-    });
-    const leftAtrium = new THREE.Mesh(atriumGeometry, atriumMaterial);
-    leftAtrium.position.set(-0.6, 0.6, 0.2);
-    group.add(leftAtrium);
-
-    // Right atrium
-    const rightAtrium = new THREE.Mesh(atriumGeometry, atriumMaterial);
-    rightAtrium.position.set(0.6, 0.6, 0.2);
-    group.add(rightAtrium);
-
-    // Aorta
-    const aortaGeometry = new THREE.CylinderGeometry(0.15, 0.15, 1.5, 8);
-    const aortaMaterial = new THREE.MeshPhongMaterial({ 
-      color: 0xffaaaa,
-      shininess: 30
-    });
-    const aorta = new THREE.Mesh(aortaGeometry, aortaMaterial);
-    aorta.position.set(0, 1.2, 0);
-    aorta.rotation.z = Math.PI * 0.1;
-    group.add(aorta);
   };
 
   const createBrainModel = (group: THREE.Group) => {
@@ -191,60 +151,82 @@ export default function GLBViewer({ modelUrl, style }: GLBViewerProps) {
     const cerebellum = new THREE.Mesh(cerebellumGeometry, cerebellumMaterial);
     cerebellum.position.set(0, -0.3, -0.8);
     group.add(cerebellum);
+
+    // Left hemisphere detail
+    const leftHemisphere = new THREE.SphereGeometry(0.5, 16, 16);
+    const leftMaterial = new THREE.MeshPhongMaterial({ 
+      color: 0xffa0b4,
+      shininess: 25
+    });
+    const leftBrain = new THREE.Mesh(leftHemisphere, leftMaterial);
+    leftBrain.position.set(-0.6, 0.2, 0);
+    group.add(leftBrain);
+
+    // Right hemisphere detail
+    const rightBrain = new THREE.Mesh(leftHemisphere, leftMaterial);
+    rightBrain.position.set(0.6, 0.2, 0);
+    group.add(rightBrain);
   };
 
-  const createFullBodyModel = (group: THREE.Group) => {
-    // Torso
-    const torsoGeometry = new THREE.CylinderGeometry(0.8, 0.6, 2, 8);
-    const torsoMaterial = new THREE.MeshPhongMaterial({ 
-      color: 0xfdbcb4,
+  const createIntestineModel = (group: THREE.Group) => {
+    // Small intestine - coiled structure
+    const curve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-2, 1, 0),
+      new THREE.Vector3(-1, 0.5, 1),
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(1, -0.5, -1),
+      new THREE.Vector3(2, -1, 0),
+      new THREE.Vector3(1, -1.5, 1),
+      new THREE.Vector3(-1, -2, 0),
+      new THREE.Vector3(-2, -2.5, -1),
+    ]);
+
+    const tubeGeometry = new THREE.TubeGeometry(curve, 64, 0.15, 8, false);
+    const intestineMaterial = new THREE.MeshPhongMaterial({ 
+      color: 0xffb6c1,
       shininess: 10
     });
-    const torso = new THREE.Mesh(torsoGeometry, torsoMaterial);
-    torso.position.set(0, 0, 0);
-    group.add(torso);
+    const smallIntestine = new THREE.Mesh(tubeGeometry, intestineMaterial);
+    group.add(smallIntestine);
 
-    // Head
-    const headGeometry = new THREE.SphereGeometry(0.5, 16, 16);
-    const headMaterial = new THREE.MeshPhongMaterial({ 
-      color: 0xfdbcb4,
+    // Large intestine - outer coil
+    const largeCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-2.5, 1.5, 0),
+      new THREE.Vector3(0, 1.5, 2),
+      new THREE.Vector3(2.5, 1.5, 0),
+      new THREE.Vector3(2.5, -1.5, -2),
+      new THREE.Vector3(-2.5, -1.5, 0),
+      new THREE.Vector3(-2.5, -3, 1),
+    ]);
+
+    const largeTubeGeometry = new THREE.TubeGeometry(largeCurve, 32, 0.25, 8, false);
+    const largeIntestineMaterial = new THREE.MeshPhongMaterial({ 
+      color: 0xff9999,
       shininess: 10
     });
-    const head = new THREE.Mesh(headGeometry, headMaterial);
-    head.position.set(0, 1.5, 0);
-    group.add(head);
+    const largeIntestine = new THREE.Mesh(largeTubeGeometry, largeIntestineMaterial);
+    group.add(largeIntestine);
 
-    // Arms
-    const armGeometry = new THREE.CylinderGeometry(0.15, 0.15, 1.5, 8);
-    const armMaterial = new THREE.MeshPhongMaterial({ 
-      color: 0xfdbcb4,
-      shininess: 10
+    // Stomach
+    const stomachGeometry = new THREE.SphereGeometry(0.6, 16, 16);
+    const stomachMaterial = new THREE.MeshPhongMaterial({ 
+      color: 0xffcccc,
+      shininess: 15
     });
-    
-    const leftArm = new THREE.Mesh(armGeometry, armMaterial);
-    leftArm.position.set(-1.2, 0.5, 0);
-    leftArm.rotation.z = Math.PI * 0.2;
-    group.add(leftArm);
+    const stomach = new THREE.Mesh(stomachGeometry, stomachMaterial);
+    stomach.position.set(-1.5, 2, 0);
+    stomach.scale.set(1, 1.3, 0.8);
+    group.add(stomach);
 
-    const rightArm = new THREE.Mesh(armGeometry, armMaterial);
-    rightArm.position.set(1.2, 0.5, 0);
-    rightArm.rotation.z = -Math.PI * 0.2;
-    group.add(rightArm);
-
-    // Legs
-    const legGeometry = new THREE.CylinderGeometry(0.2, 0.2, 2, 8);
-    const legMaterial = new THREE.MeshPhongMaterial({ 
-      color: 0xfdbcb4,
-      shininess: 10
+    // Liver (simplified)
+    const liverGeometry = new THREE.BoxGeometry(1.2, 0.8, 0.6);
+    const liverMaterial = new THREE.MeshPhongMaterial({ 
+      color: 0x8B4513,
+      shininess: 20
     });
-    
-    const leftLeg = new THREE.Mesh(legGeometry, legMaterial);
-    leftLeg.position.set(-0.4, -2, 0);
-    group.add(leftLeg);
-
-    const rightLeg = new THREE.Mesh(legGeometry, legMaterial);
-    rightLeg.position.set(0.4, -2, 0);
-    group.add(rightLeg);
+    const liver = new THREE.Mesh(liverGeometry, liverMaterial);
+    liver.position.set(1, 1.5, 0.5);
+    group.add(liver);
   };
 
   const resetView = () => {

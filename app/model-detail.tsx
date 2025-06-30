@@ -33,23 +33,9 @@ export default function ModelDetailScreen() {
     try {
       setLoading(true);
       
-      // For demo purposes, create sample models if none exist
-      const existingModels = await EducationService.getEducationSectionsByCategory(
-        '3d-models',
-        category as string
-      );
-
-      if (existingModels.length === 0) {
-        // Create sample data for the category
-        await createSampleModelsForCategory(category as string);
-        const newModels = await EducationService.getEducationSectionsByCategory(
-          '3d-models',
-          category as string
-        );
-        setModels(newModels);
-      } else {
-        setModels(existingModels);
-      }
+      // Get sample models for the category
+      const sampleModels = getSampleModelsForCategory(category as string);
+      setModels(sampleModels);
     } catch (error) {
       console.error('Error loading models:', error);
     } finally {
@@ -57,60 +43,40 @@ export default function ModelDetailScreen() {
     }
   };
 
-  const createSampleModelsForCategory = async (cat: string) => {
-    const sampleModels = getSampleModelsForCategory(cat);
-    
-    // In a real app, you would insert these into the database
-    // For demo purposes, we'll just use them directly
-    console.log('Sample models for category:', cat, sampleModels);
-  };
-
   const getSampleModelsForCategory = (cat: string): EducationSection[] => {
     const baseModels: Record<string, EducationSection[]> = {
-      cardiovascular: [
+      nervous: [
         {
           id: '1',
           section_type: '3d-models',
-          internal_section: 'cardiovascular',
-          title: 'Human Heart - Male',
-          description: 'Interactive 3D model of the male human heart showing chambers, valves, and major vessels. Explore the anatomy in detail.',
-          content_type: '3d',
-          glb_file_url: 'heart_male.glb',
-          image_url: 'https://images.pexels.com/photos/40568/medical-appointment-doctor-healthcare-40568.jpeg'
-        }
-      ],
-      nervous: [
-        {
-          id: '2',
-          section_type: '3d-models',
           internal_section: 'nervous',
           title: 'Human Brain - Male',
-          description: 'Detailed 3D brain model showing cerebral cortex, cerebellum, and brain stem. Perfect for studying neuroanatomy.',
+          description: 'Detailed 3D brain model showing cerebral cortex, cerebellum, and brain stem. Perfect for studying neuroanatomy and understanding brain structure.',
           content_type: '3d',
           glb_file_url: 'brain_male.glb',
           image_url: 'https://images.pexels.com/photos/3825581/pexels-photo-3825581.jpeg'
         },
         {
-          id: '3',
+          id: '2',
           section_type: '3d-models',
           internal_section: 'nervous',
           title: 'Human Brain - Female',
-          description: 'Detailed 3D brain model showing cerebral cortex, cerebellum, and brain stem with female anatomical variations.',
+          description: 'Detailed 3D brain model showing cerebral cortex, cerebellum, and brain stem with female anatomical variations for comprehensive study.',
           content_type: '3d',
           glb_file_url: 'brain_female.glb',
           image_url: 'https://images.pexels.com/photos/3825581/pexels-photo-3825581.jpeg'
         }
       ],
-      'full-body': [
+      digestive: [
         {
-          id: '4',
+          id: '3',
           section_type: '3d-models',
-          internal_section: 'full-body',
-          title: 'Full Human Body - Male',
-          description: 'Complete anatomical 3D model showing all major organ systems, skeletal structure, and muscular system.',
+          internal_section: 'digestive',
+          title: 'Human Intestine System',
+          description: 'Complete 3D model of the human digestive tract including small and large intestines, showing detailed internal structure and anatomy.',
           content_type: '3d',
-          glb_file_url: 'full_body_male.glb',
-          image_url: 'https://images.pexels.com/photos/4506109/pexels-photo-4506109.jpeg'
+          glb_file_url: 'intestine_system.glb',
+          image_url: 'https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg'
         }
       ]
     };
@@ -132,9 +98,8 @@ export default function ModelDetailScreen() {
 
   const getCategoryTitle = () => {
     switch (category) {
-      case 'cardiovascular': return 'Cardiovascular System';
-      case 'nervous': return 'Nervous System';
-      case 'full-body': return 'Full Body Models';
+      case 'nervous': return 'Brain Models';
+      case 'digestive': return 'Intestine Models';
       default: return '3D Models';
     }
   };
@@ -152,8 +117,7 @@ export default function ModelDetailScreen() {
     );
   }
 
-  // Use sample models if no models loaded from database
-  const displayModels = models.length > 0 ? models : getSampleModelsForCategory(category as string);
+  const displayModels = models;
 
   return (
     <View style={styles.container}>

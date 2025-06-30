@@ -11,10 +11,28 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { router } from 'expo-router';
-import { ArrowLeft, ChevronRight, Heart, Brain, User, Lock } from 'lucide-react-native';
+import { ArrowLeft, ChevronRight, Heart, Brain, User, Lock, Activity } from 'lucide-react-native';
 import { EducationService, EducationSection } from '../lib/educationService';
 
 const modelCategories = [
+  {
+    id: 'nervous',
+    title: 'Brain Models',
+    subtitle: 'Brain, spinal cord, and nervous system',
+    icon: Brain,
+    color: '#A8E6CF',
+    image: 'https://images.pexels.com/photos/3825581/pexels-photo-3825581.jpeg',
+    isActive: true,
+  },
+  {
+    id: 'digestive',
+    title: 'Intestine Models',
+    subtitle: 'Digestive system and intestinal anatomy',
+    icon: Activity,
+    color: '#FFB347',
+    image: 'https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg',
+    isActive: true,
+  },
   {
     id: 'cardiovascular',
     title: 'Cardiovascular System',
@@ -22,16 +40,7 @@ const modelCategories = [
     icon: Heart,
     color: '#FF6B6B',
     image: 'https://images.pexels.com/photos/40568/medical-appointment-doctor-healthcare-40568.jpeg',
-    isActive: true,
-  },
-  {
-    id: 'nervous',
-    title: 'Nervous System',
-    subtitle: 'Brain, spinal cord, and nerves',
-    icon: Brain,
-    color: '#A8E6CF',
-    image: 'https://images.pexels.com/photos/3825581/pexels-photo-3825581.jpeg',
-    isActive: true,
+    isActive: false,
   },
   {
     id: 'full-body',
@@ -40,7 +49,7 @@ const modelCategories = [
     icon: User,
     color: '#4ECDC4',
     image: 'https://images.pexels.com/photos/4506109/pexels-photo-4506109.jpeg',
-    isActive: true,
+    isActive: false,
   },
   {
     id: 'respiratory',
@@ -49,15 +58,6 @@ const modelCategories = [
     icon: Heart, // Using Heart as placeholder
     color: '#4ECDC4',
     image: 'https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg',
-    isActive: false,
-  },
-  {
-    id: 'skeletal',
-    title: 'Skeletal System',
-    subtitle: 'Bones, joints, and cartilage',
-    icon: Heart, // Using Heart as placeholder
-    color: '#FFB347',
-    image: 'https://images.pexels.com/photos/5473298/pexels-photo-5473298.jpeg',
     isActive: false,
   },
 ];
@@ -75,18 +75,14 @@ export default function ModelsScreen() {
       setLoading(true);
       const counts: Record<string, number> = {};
 
-      // Get counts for each active category
-      for (const category of modelCategories) {
-        if (category.isActive) {
-          const sections = await EducationService.getEducationSectionsByCategory(
-            '3d-models',
-            category.id
-          );
-          counts[category.id] = sections.length;
-        } else {
-          counts[category.id] = Math.floor(Math.random() * 10) + 5; // Random count for locked categories
-        }
-      }
+      // Set specific counts for active categories
+      counts['nervous'] = 2; // Brain male and female
+      counts['digestive'] = 1; // Intestine model
+
+      // Random counts for locked categories
+      counts['cardiovascular'] = 3;
+      counts['full-body'] = 2;
+      counts['respiratory'] = 4;
 
       setModelCounts(counts);
     } catch (error) {
