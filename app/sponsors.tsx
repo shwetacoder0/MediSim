@@ -12,6 +12,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { router } from 'expo-router';
 import { ArrowLeft, ExternalLink, Heart } from 'lucide-react-native';
+import { SvgUri } from 'react-native-svg';
 
 const sponsors = [
   {
@@ -21,6 +22,7 @@ const sponsors = [
     image: require('../assets/images/white_circle_360x360.png'),
     url: 'https://bolt.new',
     color: '#4FACFE',
+    type: 'image',
   },
   {
     id: 'tavus',
@@ -29,6 +31,7 @@ const sponsors = [
     image: require('../assets/images/tavus.svg'),
     url: 'https://tavus.io',
     color: '#FF6B6B',
+    type: 'svg',
   },
   {
     id: 'elevenlabs',
@@ -37,6 +40,7 @@ const sponsors = [
     image: require('../assets/images/elevenlabs.png'),
     url: 'https://elevenlabs.io',
     color: '#4ECDC4',
+    type: 'image',
   },
   {
     id: 'supabase',
@@ -45,6 +49,7 @@ const sponsors = [
     image: require('../assets/images/supa.png'),
     url: 'https://supabase.com',
     color: '#3ECF8E',
+    type: 'image',
   },
   {
     id: 'netlify',
@@ -53,6 +58,7 @@ const sponsors = [
     image: require('../assets/images/netlify.svg'),
     url: 'https://netlify.com',
     color: '#00C7B7',
+    type: 'svg',
   },
 ];
 
@@ -69,6 +75,28 @@ export default function SponsorsScreen() {
       }
     } catch (error) {
       console.error('Error opening URL:', error);
+    }
+  };
+
+  const renderSponsorImage = (sponsor: any) => {
+    if (sponsor.type === 'svg') {
+      // For SVG files, we'll use a fallback to Image component
+      // since react-native-svg might not be available
+      return (
+        <Image
+          source={sponsor.image}
+          style={styles.sponsorImage}
+          resizeMode="contain"
+        />
+      );
+    } else {
+      return (
+        <Image
+          source={sponsor.image}
+          style={styles.sponsorImage}
+          resizeMode="contain"
+        />
+      );
     }
   };
 
@@ -109,11 +137,7 @@ export default function SponsorsScreen() {
                       styles.imageWrapper,
                       { backgroundColor: `${sponsor.color}20` }
                     ]}>
-                      <Image
-                        source={sponsor.image}
-                        style={styles.sponsorImage}
-                        resizeMode="contain"
-                      />
+                      {renderSponsorImage(sponsor)}
                     </View>
                   </View>
                   

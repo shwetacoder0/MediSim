@@ -7,6 +7,7 @@ import {
   Dimensions,
   Image,
   ActivityIndicator,
+  Linking,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
@@ -64,8 +65,15 @@ export default function WelcomeScreen() {
     router.push('/features');
   };
 
-  const handleSponsors = () => {
-    router.push('/sponsors');
+  const handleBoltClick = async () => {
+    try {
+      const supported = await Linking.canOpenURL('https://bolt.new');
+      if (supported) {
+        await Linking.openURL('https://bolt.new');
+      }
+    } catch (error) {
+      console.error('Error opening Bolt.new:', error);
+    }
   };
 
   // Show loading indicator while checking auth state
@@ -88,14 +96,14 @@ export default function WelcomeScreen() {
         style={styles.gradient}
       />
 
-      {/* Bolt Icon at the top */}
-      <View style={styles.boltIconContainer}>
+      {/* Bolt Icon at the top - now clickable */}
+      <TouchableOpacity style={styles.boltIconContainer} onPress={handleBoltClick}>
         <Image
           source={require('../assets/images/white_circle_360x360.png')}
           style={styles.boltIcon}
           resizeMode="contain"
         />
-      </View>
+      </TouchableOpacity>
 
       {/* Animated Background Orbs */}
       <View style={styles.orbContainer}>
@@ -137,11 +145,6 @@ export default function WelcomeScreen() {
             </LinearGradient>
           </BlurView>
         </TouchableOpacity>
-
-        {/* Sponsors Link */}
-        <TouchableOpacity style={styles.sponsorsButton} onPress={handleSponsors}>
-          <Text style={styles.sponsorsText}>Thank Our Sponsors</Text>
-        </TouchableOpacity>
       </View>
     </View>
   );
@@ -168,6 +171,7 @@ const styles = StyleSheet.create({
     top: 60,
     left: 30,
     zIndex: 10,
+    padding: 5, // Add padding for better touch target
   },
   boltIcon: {
     width: 50,
@@ -267,15 +271,5 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     textAlign: 'center',
-  },
-  sponsorsButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-  },
-  sponsorsText: {
-    color: 'rgba(255, 255, 255, 0.7)',
-    fontSize: 16,
-    textAlign: 'center',
-    textDecorationLine: 'underline',
   },
 });
