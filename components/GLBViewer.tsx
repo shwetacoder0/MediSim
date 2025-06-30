@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { View, StyleSheet, ActivityIndicator, Text, TouchableOpacity, Platform } from 'react-native';
-import { GLView } from 'expo-gl-cpp';
+import { GLView } from 'expo-gl';
 import { Renderer, Scene, PerspectiveCamera, AmbientLight, DirectionalLight } from 'expo-three';
 import * as THREE from 'three';
 import { RotateCcw, ZoomIn, ZoomOut, Rotate3d as RotateLeft, Rotate3d as RotateRight } from 'lucide-react-native';
