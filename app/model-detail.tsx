@@ -32,56 +32,13 @@ export default function ModelDetailScreen() {
   const loadModels = async () => {
     try {
       setLoading(true);
-      
-      // Get sample models for the category
-      const sampleModels = getSampleModelsForCategory(category as string);
-      setModels(sampleModels);
+      const data = await EducationService.getEducationSectionsByCategory('3d-models', category as string);
+      setModels(data);
     } catch (error) {
       console.error('Error loading models:', error);
     } finally {
       setLoading(false);
     }
-  };
-
-  const getSampleModelsForCategory = (cat: string): EducationSection[] => {
-    const baseModels: Record<string, EducationSection[]> = {
-      nervous: [
-        {
-          id: '1',
-          section_type: '3d-models',
-          internal_section: 'nervous',
-          title: 'Human Brain - Male',
-          description: 'Detailed 3D brain model showing cerebral cortex, cerebellum, and brain stem. Perfect for studying neuroanatomy and understanding brain structure.',
-          content_type: '3d',
-          glb_file_url: 'brain_male.glb',
-          image_url: 'https://images.pexels.com/photos/3825581/pexels-photo-3825581.jpeg'
-        },
-        {
-          id: '2',
-          section_type: '3d-models',
-          internal_section: 'nervous',
-          title: 'Human Brain - Female',
-          description: 'Detailed 3D brain model showing cerebral cortex, cerebellum, and brain stem with female anatomical variations for comprehensive study.',
-          content_type: '3d',
-          glb_file_url: 'brain_female.glb',
-          image_url: 'https://images.pexels.com/photos/3825581/pexels-photo-3825581.jpeg'
-        }
-      ],
-      digestive: [
-        {
-          id: '3',
-          section_type: '3d-models',
-          internal_section: 'digestive',
-          title: 'Human Intestine System',
-          description: 'Complete 3D model of the human digestive tract including small and large intestines, showing detailed internal structure and anatomy.',
-          content_type: '3d',
-          glb_file_url: 'intestine_system.glb',
-          image_url: 'https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg'
-        }
-      ]
-    };
-
-    return baseModels[cat] || [];
   };
 
   const handleBack = () => {
@@ -117,8 +74,6 @@ export default function ModelDetailScreen() {
     );
   }
 
-  const displayModels = models;
-
   return (
     <View style={styles.container}>
       <LinearGradient
@@ -139,7 +94,7 @@ export default function ModelDetailScreen() {
         </View>
 
         <View style={styles.modelsSection}>
-          {displayModels.map((model) => (
+          {models.map((model) => (
             <TouchableOpacity
               key={model.id}
               style={styles.modelCard}
@@ -184,6 +139,13 @@ export default function ModelDetailScreen() {
               </BlurView>
             </TouchableOpacity>
           ))}
+
+          {models.length === 0 && (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyText}>No 3D models available for this category yet.</Text>
+              <Text style={styles.emptySubtext}>More models coming soon!</Text>
+            </View>
+          )}
         </View>
       </ScrollView>
 
@@ -396,6 +358,21 @@ const styles = StyleSheet.create({
     color: '#4FACFE',
     fontSize: 12,
     fontWeight: '600',
+  },
+  emptyState: {
+    alignItems: 'center',
+    padding: 40,
+  },
+  emptyText: {
+    fontSize: 18,
+    color: 'rgba(255, 255, 255, 0.8)',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.6)',
+    textAlign: 'center',
   },
   modalContainer: {
     flex: 1,

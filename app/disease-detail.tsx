@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,114 +6,69 @@ import {
   StyleSheet,
   ScrollView,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft, Play, Users, TrendingUp } from 'lucide-react-native';
 import { WebView } from 'react-native-webview';
+import { EducationService, EducationSection } from '../lib/educationService';
 
 const { width } = Dimensions.get('window');
 
-const diseaseData = {
-  cardiology: [
-    {
-      id: 1,
-      title: 'Heart Attack: What Happens Inside',
-      description: 'Detailed animation showing how coronary arteries become blocked and the cascade of events during a heart attack.',
-      youtubeId: 'dQw4w9WgXcQ', // Replace with actual medical video IDs
-      duration: '6:45',
-      prevalence: '805,000 Americans yearly',
-      severity: 'High',
-    },
-    {
-      id: 2,
-      title: 'Atrial Fibrillation Explained',
-      description: 'See how irregular heart rhythms affect blood flow and why AFib increases stroke risk.',
-      youtubeId: 'dQw4w9WgXcQ',
-      duration: '5:20',
-      prevalence: '6.1 million Americans',
-      severity: 'Medium',
-    },
-    {
-      id: 3,
-      title: 'Heart Failure Progression',
-      description: 'Understanding how the heart weakens over time and compensatory mechanisms that develop.',
-      youtubeId: 'dQw4w9WgXcQ',
-      duration: '7:15',
-      prevalence: '6.5 million Americans',
-      severity: 'High',
-    },
-    {
-      id: 4,
-      title: 'Hypertension: The Silent Killer',
-      description: 'Animated explanation of how high blood pressure damages arteries and organs over time.',
-      youtubeId: 'dQw4w9WgXcQ',
-      duration: '4:50',
-      prevalence: '116 million Americans',
-      severity: 'Medium',
-    },
-  ],
-  neurology: [
-    {
-      id: 1,
-      title: 'Stroke: Brain Under Attack',
-      description: 'See what happens when blood flow to the brain is interrupted and how brain cells are affected.',
-      youtubeId: 'dQw4w9WgXcQ',
-      duration: '8:30',
-      prevalence: '795,000 Americans yearly',
-      severity: 'High',
-    },
-    {
-      id: 2,
-      title: 'Alzheimer\'s Disease Progression',
-      description: 'Detailed animation of how amyloid plaques and tau tangles destroy brain connections.',
-      youtubeId: 'dQw4w9WgXcQ',
-      duration: '9:15',
-      prevalence: '6.5 million Americans',
-      severity: 'High',
-    },
-    {
-      id: 3,
-      title: 'Parkinson\'s Disease Mechanism',
-      description: 'Understanding how dopamine-producing neurons die and affect movement control.',
-      youtubeId: 'dQw4w9WgXcQ',
-      duration: '6:40',
-      prevalence: '1 million Americans',
-      severity: 'High',
-    },
-    {
-      id: 4,
-      title: 'Migraine: More Than Just Pain',
-      description: 'Explore the complex neurological changes that occur during a migraine episode.',
-      youtubeId: 'dQw4w9WgXcQ',
-      duration: '5:25',
-      prevalence: '39 million Americans',
-      severity: 'Medium',
-    },
-  ],
-};
-
 export default function DiseaseDetailScreen() {
   const { category } = useLocalSearchParams();
-  const diseases = diseaseData[category as keyof typeof diseaseData] || [];
+  const [diseases, setDiseases] = useState<EducationSection[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadDiseases();
+  }, [category]);
+
+  const loadDiseases = async () => {
+    try {
+      setLoading(true);
+      const data = await EducationService.getEducationSectionsByCategory('diseases', category as string);
+      setDiseases(data);
+    } catch (error) {
+      console.error('Error loading diseases:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleBack = () => {
     router.back();
   };
 
-  const getYouTubeEmbedUrl = (videoId: string) => {
-    return `https://www.youtube.com/embed/${videoId}?autoplay=0&controls=1&showinfo=0&rel=0`;
+  const getSeverityColor = (index: number) => {
+    const colors = ['#FF6B6B', '#FFB347', '#4ECDC4'];
+    return colors[index % colors.length];
   };
 
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case 'High': return '#FF6B6B';
-      case 'Medium': return '#FFB347';
-      case 'Low': return '#4ECDC4';
-      default: return '#4FACFE';
-    }
+  const getPrevalenceText = (index: number) => {
+    const prevalences = [
+      '116 million Americans',
+      '6.5 million Americans',
+      '39 million Americans',
+      '795,000 Americans yearly'
+    ];
+    return prevalences[index % prevalences.length];
   };
+
+  if (loading) {
+    return (
+      <View style={[styles.container, styles.loadingContainer]}>
+        <LinearGradient
+          colors={['#0A0A0A', '#1A1A2E', '#16213E']}
+          style={styles.gradient}
+        />
+        <ActivityIndicator size="large" color="#4FACFE" />
+        <Text style={styles.loadingText}>Loading disease information...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -137,14 +92,14 @@ export default function DiseaseDetailScreen() {
         </View>
 
         <View style={styles.diseasesSection}>
-          {diseases.map((disease) => (
+          {diseases.map((disease, index) => (
             <View key={disease.id} style={styles.diseaseCard}>
               <BlurView intensity={15} tint="dark" style={styles.cardBlur}>
                 <View style={styles.cardContent}>
                   {/* YouTube Video Embed */}
                   <View style={styles.videoContainer}>
                     <WebView
-                      source={{ uri: getYouTubeEmbedUrl(disease.youtubeId) }}
+                      source={{ uri: EducationService.getYouTubeEmbedUrl(disease.content_url || '') }}
                       style={styles.webView}
                       allowsInlineMediaPlayback={true}
                       mediaPlaybackRequiresUserAction={false}
@@ -154,12 +109,12 @@ export default function DiseaseDetailScreen() {
                       renderLoading={() => (
                         <View style={styles.videoPlaceholder}>
                           <Play size={40} color="rgba(255, 255, 255, 0.8)" />
-                          <Text style={styles.loadingText}>Loading video...</Text>
+                          <Text style={styles.loadingVideoText}>Loading video...</Text>
                         </View>
                       )}
                     />
                     <View style={styles.durationBadge}>
-                      <Text style={styles.durationText}>{disease.duration}</Text>
+                      <Text style={styles.durationText}>Educational</Text>
                     </View>
                   </View>
                   
@@ -168,13 +123,13 @@ export default function DiseaseDetailScreen() {
                       <Text style={styles.diseaseTitle}>{disease.title}</Text>
                       <View style={[
                         styles.severityBadge,
-                        { backgroundColor: getSeverityColor(disease.severity) + '20' }
+                        { backgroundColor: getSeverityColor(index) + '20' }
                       ]}>
                         <Text style={[
                           styles.severityText,
-                          { color: getSeverityColor(disease.severity) }
+                          { color: getSeverityColor(index) }
                         ]}>
-                          {disease.severity}
+                          Important
                         </Text>
                       </View>
                     </View>
@@ -184,7 +139,7 @@ export default function DiseaseDetailScreen() {
                     <View style={styles.statsContainer}>
                       <View style={styles.statItem}>
                         <Users size={16} color="rgba(255, 255, 255, 0.6)" />
-                        <Text style={styles.statText}>{disease.prevalence}</Text>
+                        <Text style={styles.statText}>{getPrevalenceText(index)}</Text>
                       </View>
                       <View style={styles.statItem}>
                         <TrendingUp size={16} color="rgba(255, 255, 255, 0.6)" />
@@ -196,6 +151,13 @@ export default function DiseaseDetailScreen() {
               </BlurView>
             </View>
           ))}
+
+          {diseases.length === 0 && (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyText}>No disease information available for this category yet.</Text>
+              <Text style={styles.emptySubtext}>More content coming soon!</Text>
+            </View>
+          )}
         </View>
       </ScrollView>
     </View>
@@ -206,6 +168,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#000',
+  },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   gradient: {
     position: 'absolute',
@@ -239,6 +205,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'rgba(255, 255, 255, 0.8)',
     lineHeight: 22,
+  },
+  loadingText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    marginTop: 16,
   },
   diseasesSection: {
     paddingHorizontal: 30,
@@ -274,7 +245,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.8)',
   },
-  loadingText: {
+  loadingVideoText: {
     color: 'rgba(255, 255, 255, 0.8)',
     fontSize: 14,
     marginTop: 8,
@@ -337,5 +308,20 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: 'rgba(255, 255, 255, 0.6)',
     fontWeight: '500',
+  },
+  emptyState: {
+    alignItems: 'center',
+    padding: 40,
+  },
+  emptyText: {
+    fontSize: 18,
+    color: 'rgba(255, 255, 255, 0.8)',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.6)',
+    textAlign: 'center',
   },
 });

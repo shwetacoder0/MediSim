@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,129 +6,76 @@ import {
   StyleSheet,
   ScrollView,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft, Play } from 'lucide-react-native';
 import { WebView } from 'react-native-webview';
+import { EducationService, EducationSection } from '../lib/educationService';
 
 const { width } = Dimensions.get('window');
 
-const treatmentData = {
-  medications: [
-    {
-      id: 1,
-      title: 'How Blood Pressure Medications Work',
-      description: 'Understanding ACE inhibitors and how they help reduce blood pressure by relaxing blood vessels.',
-      youtubeId: 'dQw4w9WgXcQ', // Replace with actual medical video IDs
-      duration: '4:32',
-      category: 'Cardiovascular',
-    },
-    {
-      id: 2,
-      title: 'Statin Therapy Animation',
-      description: 'See how statins work to lower cholesterol and prevent heart disease at the cellular level.',
-      youtubeId: 'dQw4w9WgXcQ',
-      duration: '3:45',
-      category: 'Cholesterol Management',
-    },
-    {
-      id: 3,
-      title: 'Insulin Mechanism of Action',
-      description: 'Animated explanation of how insulin regulates blood sugar levels in diabetes patients.',
-      youtubeId: 'dQw4w9WgXcQ',
-      duration: '5:12',
-      category: 'Diabetes',
-    },
-    {
-      id: 4,
-      title: 'Antibiotic Resistance Prevention',
-      description: 'Learn how antibiotics work and why proper usage is crucial to prevent resistance.',
-      youtubeId: 'dQw4w9WgXcQ',
-      duration: '6:20',
-      category: 'Infectious Disease',
-    },
-    {
-      id: 5,
-      title: 'Pain Relief Medications',
-      description: 'Understanding NSAIDs vs opioids and how different pain medications affect the body.',
-      youtubeId: 'dQw4w9WgXcQ',
-      duration: '4:55',
-      category: 'Pain Management',
-    },
-  ],
-  surgery: [
-    {
-      id: 1,
-      title: 'Laparoscopic Surgery Technique',
-      description: 'Step-by-step animation of minimally invasive laparoscopic procedures and their benefits.',
-      youtubeId: 'dQw4w9WgXcQ',
-      duration: '7:30',
-      category: 'Minimally Invasive',
-    },
-    {
-      id: 2,
-      title: 'Heart Bypass Surgery Animation',
-      description: 'Detailed 3D animation showing how coronary artery bypass surgery restores blood flow.',
-      youtubeId: 'dQw4w9WgXcQ',
-      duration: '8:45',
-      category: 'Cardiac Surgery',
-    },
-    {
-      id: 3,
-      title: 'Knee Replacement Procedure',
-      description: 'Complete animation of total knee replacement surgery from incision to recovery.',
-      youtubeId: 'dQw4w9WgXcQ',
-      duration: '6:15',
-      category: 'Orthopedic',
-    },
-    {
-      id: 4,
-      title: 'Cataract Surgery Process',
-      description: 'See how modern cataract surgery removes clouded lenses and restores vision.',
-      youtubeId: 'dQw4w9WgXcQ',
-      duration: '4:20',
-      category: 'Ophthalmology',
-    },
-    {
-      id: 5,
-      title: 'Robotic Surgery Advantages',
-      description: 'Learn about robotic-assisted surgery and its precision benefits for complex procedures.',
-      youtubeId: 'dQw4w9WgXcQ',
-      duration: '5:40',
-      category: 'Advanced Technology',
-    },
-  ],
-};
-
 export default function TreatmentDetailScreen() {
   const { category } = useLocalSearchParams();
-  const treatments = treatmentData[category as keyof typeof treatmentData] || [];
+  const [treatments, setTreatments] = useState<EducationSection[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadTreatments();
+  }, [category]);
+
+  const loadTreatments = async () => {
+    try {
+      setLoading(true);
+      const data = await EducationService.getEducationSectionsByCategory('treatments', category as string);
+      setTreatments(data);
+    } catch (error) {
+      console.error('Error loading treatments:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleBack = () => {
     router.back();
   };
 
-  const getYouTubeEmbedUrl = (videoId: string) => {
-    return `https://www.youtube.com/embed/${videoId}?autoplay=0&controls=1&showinfo=0&rel=0`;
+  const getCategoryColor = (index: number) => {
+    const colors = [
+      '#4FACFE', // Blue
+      '#FF6B6B', // Red
+      '#4ECDC4', // Teal
+      '#FFB347', // Orange
+      '#A8E6CF', // Green
+    ];
+    return colors[index % colors.length];
   };
 
-  const getCategoryColor = (cat: string) => {
-    const colors = {
-      'Cardiovascular': '#FF6B6B',
-      'Cholesterol Management': '#FFB347',
-      'Diabetes': '#4ECDC4',
-      'Infectious Disease': '#B19CD9',
-      'Pain Management': '#FF9A9E',
-      'Minimally Invasive': '#4FACFE',
-      'Cardiac Surgery': '#FF6B6B',
-      'Orthopedic': '#FFB347',
-      'Ophthalmology': '#A8E6CF',
-      'Advanced Technology': '#4ECDC4',
-    };
-    return colors[cat as keyof typeof colors] || '#4FACFE';
+  const getCategoryName = (index: number) => {
+    const categories = [
+      'Cardiovascular',
+      'Surgical',
+      'Interventional',
+      'Therapeutic',
+      'Advanced'
+    ];
+    return categories[index % categories.length];
   };
+
+  if (loading) {
+    return (
+      <View style={[styles.container, styles.loadingContainer]}>
+        <LinearGradient
+          colors={['#0A0A0A', '#1A1A2E', '#16213E']}
+          style={styles.gradient}
+        />
+        <ActivityIndicator size="large" color="#4FACFE" />
+        <Text style={styles.loadingText}>Loading treatment information...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -152,14 +99,14 @@ export default function TreatmentDetailScreen() {
         </View>
 
         <View style={styles.treatmentsSection}>
-          {treatments.map((treatment) => (
+          {treatments.map((treatment, index) => (
             <View key={treatment.id} style={styles.treatmentCard}>
               <BlurView intensity={15} tint="dark" style={styles.cardBlur}>
                 <View style={styles.cardContent}>
                   {/* YouTube Video Embed */}
                   <View style={styles.videoContainer}>
                     <WebView
-                      source={{ uri: getYouTubeEmbedUrl(treatment.youtubeId) }}
+                      source={{ uri: EducationService.getYouTubeEmbedUrl(treatment.content_url || '') }}
                       style={styles.webView}
                       allowsInlineMediaPlayback={true}
                       mediaPlaybackRequiresUserAction={false}
@@ -169,12 +116,12 @@ export default function TreatmentDetailScreen() {
                       renderLoading={() => (
                         <View style={styles.videoPlaceholder}>
                           <Play size={40} color="rgba(255, 255, 255, 0.8)" />
-                          <Text style={styles.loadingText}>Loading video...</Text>
+                          <Text style={styles.loadingVideoText}>Loading video...</Text>
                         </View>
                       )}
                     />
                     <View style={styles.durationBadge}>
-                      <Text style={styles.durationText}>{treatment.duration}</Text>
+                      <Text style={styles.durationText}>Educational</Text>
                     </View>
                   </View>
                   
@@ -183,13 +130,13 @@ export default function TreatmentDetailScreen() {
                       <Text style={styles.treatmentTitle}>{treatment.title}</Text>
                       <View style={[
                         styles.categoryBadge,
-                        { backgroundColor: getCategoryColor(treatment.category) + '20' }
+                        { backgroundColor: getCategoryColor(index) + '20' }
                       ]}>
                         <Text style={[
                           styles.categoryText,
-                          { color: getCategoryColor(treatment.category) }
+                          { color: getCategoryColor(index) }
                         ]}>
-                          {treatment.category}
+                          {getCategoryName(index)}
                         </Text>
                       </View>
                     </View>
@@ -200,6 +147,13 @@ export default function TreatmentDetailScreen() {
               </BlurView>
             </View>
           ))}
+
+          {treatments.length === 0 && (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyText}>No treatment information available for this category yet.</Text>
+              <Text style={styles.emptySubtext}>More content coming soon!</Text>
+            </View>
+          )}
         </View>
       </ScrollView>
     </View>
@@ -210,6 +164,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#000',
+  },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   gradient: {
     position: 'absolute',
@@ -243,6 +201,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'rgba(255, 255, 255, 0.8)',
     lineHeight: 22,
+  },
+  loadingText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    marginTop: 16,
   },
   treatmentsSection: {
     paddingHorizontal: 30,
@@ -278,7 +241,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.8)',
   },
-  loadingText: {
+  loadingVideoText: {
     color: 'rgba(255, 255, 255, 0.8)',
     fontSize: 14,
     marginTop: 8,
@@ -326,5 +289,20 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: 'rgba(255, 255, 255, 0.8)',
     lineHeight: 20,
+  },
+  emptyState: {
+    alignItems: 'center',
+    padding: 40,
+  },
+  emptyText: {
+    fontSize: 18,
+    color: 'rgba(255, 255, 255, 0.8)',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.6)',
+    textAlign: 'center',
   },
 });

@@ -83,104 +83,82 @@ export class EducationService {
    * Get 3D model URL from storage
    */
   static get3DModelUrl(fileName: string): string {
-    const { data } = supabase.storage
-      .from(STORAGE_BUCKETS.MODELS_3D)
-      .getPublicUrl(fileName);
-
-    return data.publicUrl;
+    if (!fileName) return '';
+    
+    // Use the direct Supabase storage URL you provided
+    const baseUrl = 'https://lietwvmpknkteaptxvqm.supabase.co/storage/v1/object/public/3d-stuff/';
+    return `${baseUrl}${fileName}`;
   }
 
   /**
-   * Create sample education data (for development)
+   * Get YouTube video ID from URL
    */
-  static async createSampleData(): Promise<void> {
-    try {
-      const sampleData: Omit<EducationSection, 'id'>[] = [
-        // 3D Models
-        {
-          section_type: '3d-models',
-          internal_section: 'cardiovascular',
-          title: 'Human Heart - Male',
-          description: 'Interactive 3D model of the male human heart showing chambers, valves, and major vessels',
-          content_type: '3d',
-          glb_file_url: 'heart_male.glb',
-          image_url: 'https://images.pexels.com/photos/40568/medical-appointment-doctor-healthcare-40568.jpeg'
-        },
-        {
-          section_type: '3d-models',
-          internal_section: 'nervous',
-          title: 'Human Brain - Male',
-          description: 'Detailed 3D brain model showing cerebral cortex, cerebellum, and brain stem',
-          content_type: '3d',
-          glb_file_url: 'brain_male.glb',
-          image_url: 'https://images.pexels.com/photos/3825581/pexels-photo-3825581.jpeg'
-        },
-        {
-          section_type: '3d-models',
-          internal_section: 'nervous',
-          title: 'Human Brain - Female',
-          description: 'Detailed 3D brain model showing cerebral cortex, cerebellum, and brain stem',
-          content_type: '3d',
-          glb_file_url: 'brain_female.glb',
-          image_url: 'https://images.pexels.com/photos/3825581/pexels-photo-3825581.jpeg'
-        },
-        {
-          section_type: '3d-models',
-          internal_section: 'full-body',
-          title: 'Full Human Body - Male',
-          description: 'Complete anatomical 3D model showing all major organ systems',
-          content_type: '3d',
-          glb_file_url: 'full_body_male.glb',
-          image_url: 'https://images.pexels.com/photos/4506109/pexels-photo-4506109.jpeg'
-        },
-        // Diseases (YouTube videos)
-        {
-          section_type: 'diseases',
-          internal_section: 'cardiology',
-          title: 'Heart Attack: What Happens Inside',
-          description: 'Detailed animation showing how coronary arteries become blocked',
-          content_type: 'video',
-          content_url: 'dQw4w9WgXcQ',
-          image_url: 'https://images.pexels.com/photos/40568/medical-appointment-doctor-healthcare-40568.jpeg'
-        },
-        {
-          section_type: 'diseases',
-          internal_section: 'neurology',
-          title: 'Stroke: Brain Under Attack',
-          description: 'See what happens when blood flow to the brain is interrupted',
-          content_type: 'video',
-          content_url: 'dQw4w9WgXcQ',
-          image_url: 'https://images.pexels.com/photos/3825581/pexels-photo-3825581.jpeg'
-        },
-        // Treatments (YouTube videos)
-        {
-          section_type: 'treatments',
-          internal_section: 'medications',
-          title: 'How Blood Pressure Medications Work',
-          description: 'Understanding ACE inhibitors and how they help reduce blood pressure',
-          content_type: 'video',
-          content_url: 'dQw4w9WgXcQ',
-          image_url: 'https://images.pexels.com/photos/3683074/pexels-photo-3683074.jpeg'
-        },
-        {
-          section_type: 'treatments',
-          internal_section: 'surgery',
-          title: 'Laparoscopic Surgery Technique',
-          description: 'Step-by-step animation of minimally invasive laparoscopic procedures',
-          content_type: 'video',
-          content_url: 'dQw4w9WgXcQ',
-          image_url: 'https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg'
-        }
-      ];
+  static getYouTubeVideoId(url: string): string {
+    if (!url) return '';
+    
+    // Extract video ID from various YouTube URL formats
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    
+    return (match && match[2].length === 11) ? match[2] : '';
+  }
 
-      const { error } = await supabase
+  /**
+   * Get YouTube embed URL
+   */
+  static getYouTubeEmbedUrl(url: string): string {
+    const videoId = this.getYouTubeVideoId(url);
+    if (!videoId) return '';
+    
+    return `https://www.youtube.com/embed/${videoId}?autoplay=0&controls=1&showinfo=0&rel=0`;
+  }
+
+  /**
+   * Count items by section type and internal section
+   */
+  static async getItemCounts(): Promise<Record<string, number>> {
+    try {
+      const { data, error } = await supabase
         .from('education_sections')
-        .insert(sampleData);
+        .select('section_type, internal_section');
 
       if (error) throw error;
-      console.log('Sample education data created successfully');
+
+      const counts: Record<string, number> = {};
+      
+      data?.forEach(item => {
+        const key = item.internal_section || item.section_type;
+        counts[key] = (counts[key] || 0) + 1;
+      });
+
+      return counts;
     } catch (error) {
-      console.error('Error creating sample data:', error);
+      console.error('Error getting item counts:', error);
+      return {};
+    }
+  }
+
+  /**
+   * Check if a category has content
+   */
+  static async hasContent(sectionType: string, internalSection?: string): Promise<boolean> {
+    try {
+      let query = supabase
+        .from('education_sections')
+        .select('id', { count: 'exact' })
+        .eq('section_type', sectionType);
+
+      if (internalSection) {
+        query = query.eq('internal_section', internalSection);
+      }
+
+      const { count, error } = await query;
+
+      if (error) throw error;
+      return (count || 0) > 0;
+    } catch (error) {
+      console.error('Error checking content:', error);
+      return false;
     }
   }
 }
