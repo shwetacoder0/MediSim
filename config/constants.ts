@@ -4,7 +4,7 @@ export const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 
 // Gemini API Configuration
 export const GEMINI_CONFIG = {
-  API_KEY: 'AIzaSyDSVlzZiZuTTH250Dp36K72DejUnJsHNS8', // Replace with your actual Gemini API key
+  API_KEY: '', // Replace with your actual Gemini API key
   BASE_URL: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent'
 };
 
